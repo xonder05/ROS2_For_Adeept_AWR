@@ -1,0 +1,5 @@
+int32 target_position
+---
+int32 end_position
+---
+int32 curr_position
