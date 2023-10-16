@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Linux Command Execution</title>
+    <style>
+        /* Add CSS for the scrollable output container */
+        #output-container {
+            max-height: 400px; /* Set a fixed height */
+            overflow-y: scroll; /* Enable vertical scrolling */
+        }
+
+        li {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Linux Command Execution</h1>
+    <textarea id="command" rows="5" cols="40" placeholder="Enter Linux command"></textarea><br>
+    <button id="execute">Execute</button>
+    <br>
+    <label for="output">Output:</label>
+    <div id="output-container">
+        <div id="output"></div> <!-- Output is wrapped in a container -->
+    </div>
+
+    <ul id="itemList">
+        <!-- List items will be added here dynamically -->
+    </ul>
+
+    <button id="w" onmousedown="buttonEvent('w', 'press')" onmouseup="buttonEvent('w', 'release')">w</button>
+    <button id="s" onmousedown="buttonEvent('s', 'press')" onmouseup="buttonEvent('s', 'release')">s</button>
+    <button id="a" onmousedown="buttonEvent('a', 'press')" onmouseup="buttonEvent('a', 'release')">a</button>
+    <button id="d" onmousedown="buttonEvent('d', 'press')" onmouseup="buttonEvent('d', 'release')">d</button>
+    
+    <script>
+        document.getElementById("execute").addEventListener("click", function() {
+            var command = document.getElementById("command").value;
+            var outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = "Executing command...";
+            
+            // Modify the fetch request to execute the long-running command and handle the response as text
+            fetch('/execute', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `command=${encodeURIComponent(command)}`,
+            })
+            .then(response => {
+                const reader = response.body.getReader();
+                const textDecoder = new TextDecoder('utf-8'); // Define the character encoding
+
+                return new ReadableStream({
+                    async start(controller) {
+                        while (true) {
+                            const { done, value } = await reader.read();
+                            if (done) {
+                                break;
+                            }
+                            const line = textDecoder.decode(value);
+                            const lineDiv = document.createElement('div'); // Create a new <div> for each line
+                            lineDiv.textContent = line;
+                            outputDiv.appendChild(lineDiv); // Append the line to the output in real-time
+                        }
+                        controller.close();
+                    }
+                });
+            });
+        });
+
+
+        const data = [
+            { text: "Item 1", buttonText: "Button 1" },
+            { text: "Item 2", buttonText: "Button 2" },
+            { text: "Item 3", buttonText: "Button 3" },
+        ];
+
+        // Function to create and populate list items
+        function createListItem(item) {
+            const li = document.createElement("li");
+            li.innerHTML = `
+                <span>${item.text}</span>
+                <button>${item.buttonText}</button>
+            `;
+            return li;
+        }
+
+        // Function to populate the list
+        function populateList(data) {
+            const itemList = document.getElementById("itemList");
+            data.forEach(item => {
+                const li = createListItem(item);
+                itemList.appendChild(li);
+            });
+        }
+
+        fetch('/get_data')
+            .then(response => response.json())
+            .then(data => {
+                populateList(data);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+
+
+        function buttonEvent(buttonId, action) {
+            fetch('/direction-press', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ buttonId, action })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log(`Button ${buttonId} ${action} event sent to the backend.`);
+                } else {
+                    console.error('Failed to send event to the backend.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+    </script>
+</body>
+</html>

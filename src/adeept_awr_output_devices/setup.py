@@ -22,7 +22,8 @@ setup(
         'console_scripts': [
             "dc_motor_node = adeept_awr_output_devices.dc_motor_node:main",
             "rgb_led_node = adeept_awr_output_devices.rgb_led_node:main",
-            "servo_node = adeept_awr_output_devices.servo_node:main"
+            "servo_node = adeept_awr_output_devices.servo_node:main",
+            "emptynode = adeept_awr_output_devices.emptynode:main"
         ],
     },
 )

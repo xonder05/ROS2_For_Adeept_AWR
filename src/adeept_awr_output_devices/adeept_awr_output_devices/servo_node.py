@@ -27,16 +27,16 @@ class ServoNode(Node):
         diff = self.curr_servo_pos - goal_handle.request.target_position
 
         if diff < 0:
-            for i in range(0,diff):
+            for i in range(0,abs(diff)):
                 self.curr_servo_pos += 1
-                self.pwm.set_pwm(3, 0, (self.curr_servo_pos))
+                self.pwm.set_pwm(0, 0, (self.curr_servo_pos))
                 feedback_msg.curr_position = self.curr_servo_pos
                 goal_handle.publish_feedback(feedback_msg)
                 time.sleep(0.05)
         else:
             for i in range(0,diff):
                 self.curr_servo_pos -= 1
-                self.pwm.set_pwm(3, 0, (self.curr_servo_pos))
+                self.pwm.set_pwm(0, 0, (self.curr_servo_pos))
                 feedback_msg.curr_position = self.curr_servo_pos
                 goal_handle.publish_feedback(feedback_msg)
                 time.sleep(0.1)

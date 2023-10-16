@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'adeept_awr_input_sensors'
+package_name = 'adeept_awr_web_controller'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "ultrasonic_node = adeept_awr_input_sensors.ultrasonic_node:main"
+            "web_controller_node = adeept_awr_web_controller.web_controller_node:main"
         ],
     },
 )

@@ -18,6 +18,7 @@ class Publisher(Node):
         msg = Num()
         msg.num = self.number
         self.cmd_vel_pub_.publish(msg)
+        self.get_logger().info(str(self.number))
         self.number += 1
 
 

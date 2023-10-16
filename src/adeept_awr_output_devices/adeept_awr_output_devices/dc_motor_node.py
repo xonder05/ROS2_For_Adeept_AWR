@@ -40,7 +40,7 @@ class DCMotor():
         GPIO.setup(Motor_B_Pin1, GPIO.OUT)
         GPIO.setup(Motor_B_Pin2, GPIO.OUT)
         
-        self.motorStop(self) # Avoid motor starting to rotate automatically after initialization
+        self.motorStop() # Avoid motor starting to rotate automatically after initialization
         
         try: # Try is used here to avoid errors due to repeated PWM settings
             pwm_A = GPIO.PWM(Motor_A_EN, 1000)
@@ -91,13 +91,13 @@ class DCMotorNode(Node):
         if (direction == "w"):
             self.motor.motor_A(1, 100)
             self.motor.motor_B(1, 100)
-            self.motor.motorStop()
             time.sleep(1)
+            self.motor.motorStop()
         elif (direction == "s"):
             self.motor.motor_A(-1, 100)
             self.motor.motor_B(-1, 100)
-            self.motor.motorStop()
             time.sleep(1)
+            self.motor.motorStop()
         elif (direction == "a"):
             pass
         elif (direction == "d"):
