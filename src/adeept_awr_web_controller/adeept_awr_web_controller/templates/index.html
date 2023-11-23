@@ -1,115 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Linux Command Execution</title>
+    <title>Adeept AWR Web Controller</title>
     <style>
-        /* Add CSS for the scrollable output container */
-        #output-container {
-            max-height: 400px; /* Set a fixed height */
-            overflow-y: scroll; /* Enable vertical scrolling */
+        .main-container {
+            display: grid;
+            grid-template-rows: 0.5fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
+            grid-template-areas: 
+                'header header'
+                'camera servo-controls'
+                "empty drive-controls";
+            grid-gap: 10px;
         }
 
-        li {
-            padding: 10px;
-            border: 1px solid #ccc;
-            margin: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .main-header {
+            grid-area: header;
         }
+
+        .camera-container {
+            grid-area: camera;
+
+            display: grid;
+            grid-template-rows: 1fr 4fr;
+            grid-template-columns: 1fr;
+            grid-template-areas: 
+                "button"
+                "image";
+        }
+        .camera-button {
+            grid-area: button;
+        }
+        .camera-image {
+            grid-area: image;
+        }
+
+        .drive-container {
+            grid-area: drive-controls;
+            
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-areas: 
+                "top-left forward top-right"
+                "left back right";
+        }
+        .drive-forward {
+            grid-area: forward;
+        }
+        .drive-back {
+            grid-area: back;
+        }
+        .drive-left {
+            grid-area: left;
+        }
+        .drive-right {
+            grid-area: right;
+        }
+
+        .servo-container {
+            grid-area: servo-controls;
+
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            grid-template-columns: 1fr;
+            grid-template-areas: 
+                "look-up"
+                "look-down";
+        }
+        .look-up {
+            grid-area: look-up;
+        }
+        .look-down {
+            grid-area: look-down;
+        }  
+
     </style>
 </head>
-<body>
-    <h1>Linux Command Execution</h1>
-    <textarea id="command" rows="5" cols="40" placeholder="Enter Linux command"></textarea><br>
-    <button id="execute">Execute</button>
-    <br>
-    <label for="output">Output:</label>
-    <div id="output-container">
-        <div id="output"></div> <!-- Output is wrapped in a container -->
+<body class="main-container">
+
+    <h1 class="main-header">Adeept AWR Controller</h1>
+
+    <div class="camera-container">
+        <button class="camera-button" onclick="toggleVideoFeed()">Toggle Video Feed</button>
+        <img id="camera" class="camera-image" style="height: 270px; width: 480px;">
     </div>
 
-    <ul id="itemList">
-        <!-- List items will be added here dynamically -->
-    </ul>
+    <div class="servo-container">
+        <button class="look-up">Up</button>
+        <button class="look-down">Down</button>
+    </div>
 
-    <button id="w" onmousedown="buttonEvent('w', 'press')" onmouseup="buttonEvent('w', 'release')">w</button>
-    <button id="s" onmousedown="buttonEvent('s', 'press')" onmouseup="buttonEvent('s', 'release')">s</button>
-    <button id="a" onmousedown="buttonEvent('a', 'press')" onmouseup="buttonEvent('a', 'release')">a</button>
-    <button id="d" onmousedown="buttonEvent('d', 'press')" onmouseup="buttonEvent('d', 'release')">d</button>
+    <div class="drive-container">
+        <button class="drive-forward" id="w" onmousedown="buttonEvent('w', 'press')" onmouseup="buttonEvent('w', 'release')">w</button>
+        <button class="drive-back" id="s" onmousedown="buttonEvent('s', 'press')" onmouseup="buttonEvent('s', 'release')">s</button>
+        <button class="drive-left" id="a" onmousedown="buttonEvent('a', 'press')" onmouseup="buttonEvent('a', 'release')">a</button>
+        <button class="drive-right" id="d" onmousedown="buttonEvent('d', 'press')" onmouseup="buttonEvent('d', 'release')">d</button>    
+    </div>
     
     <script>
-        document.getElementById("execute").addEventListener("click", function() {
-            var command = document.getElementById("command").value;
-            var outputDiv = document.getElementById("output");
-            outputDiv.innerHTML = "Executing command...";
-            
-            // Modify the fetch request to execute the long-running command and handle the response as text
-            fetch('/execute', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `command=${encodeURIComponent(command)}`,
-            })
-            .then(response => {
-                const reader = response.body.getReader();
-                const textDecoder = new TextDecoder('utf-8'); // Define the character encoding
-
-                return new ReadableStream({
-                    async start(controller) {
-                        while (true) {
-                            const { done, value } = await reader.read();
-                            if (done) {
-                                break;
-                            }
-                            const line = textDecoder.decode(value);
-                            const lineDiv = document.createElement('div'); // Create a new <div> for each line
-                            lineDiv.textContent = line;
-                            outputDiv.appendChild(lineDiv); // Append the line to the output in real-time
-                        }
-                        controller.close();
-                    }
-                });
-            });
-        });
-
-
-        const data = [
-            { text: "Item 1", buttonText: "Button 1" },
-            { text: "Item 2", buttonText: "Button 2" },
-            { text: "Item 3", buttonText: "Button 3" },
-        ];
-
-        // Function to create and populate list items
-        function createListItem(item) {
-            const li = document.createElement("li");
-            li.innerHTML = `
-                <span>${item.text}</span>
-                <button>${item.buttonText}</button>
-            `;
-            return li;
-        }
-
-        // Function to populate the list
-        function populateList(data) {
-            const itemList = document.getElementById("itemList");
-            data.forEach(item => {
-                const li = createListItem(item);
-                itemList.appendChild(li);
-            });
-        }
-
-        fetch('/get_data')
-            .then(response => response.json())
-            .then(data => {
-                populateList(data);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-
-
         function buttonEvent(buttonId, action) {
             fetch('/direction-press', {
                 method: 'POST',
@@ -130,6 +119,18 @@
             });
         }
 
+        function toggleVideoFeed()
+        {
+            var camera = document.getElementById("camera");
+            if (camera.src === "")
+            {
+                camera.src = "/video_feed";
+            }
+            else
+            {
+                camera.src = "";
+            }
+        }
     </script>
 </body>
 </html>
