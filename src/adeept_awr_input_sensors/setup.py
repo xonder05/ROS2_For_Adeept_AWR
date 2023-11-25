@@ -21,7 +21,8 @@ setup(
     entry_points={
         'console_scripts': [
             "ultrasonic_node = adeept_awr_input_sensors.ultrasonic_node:main",
-            "pi_camera_node = adeept_awr_input_sensors.pi_camera_node:main"
+            "pi_camera_node = adeept_awr_input_sensors.pi_camera_node:main",
+            "line_tracking_node = adeept_awr_input_sensors.line_tracking_node:main"
         ],
     },
 )
