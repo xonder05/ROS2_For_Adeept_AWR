@@ -10,11 +10,11 @@ class PiCameraNode(Node):
     def __init__(self):
         super().__init__("pi_camera_node")
         self.publisher = self.create_publisher(CameraFrame, "camera_stream", 10)
-        self.timer = self.create_timer(0.0333, self.get_frame)
+        self.timer = self.create_timer(0.05, self.get_frame)
         
         self.cap = cv2.VideoCapture('/dev/video0', cv2.CAP_V4L)
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 960)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 540)
 
 
     def get_frame(self):

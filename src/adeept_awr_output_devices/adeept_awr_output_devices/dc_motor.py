@@ -55,13 +55,13 @@ class DCMotor():
 
 
     def right_side_motor(self, direction, speed):
-        if direction == 1:
+        if direction == -1:
             GPIO.output(right_side_motor_Pin1, GPIO.HIGH)
             GPIO.output(right_side_motor_Pin2, GPIO.LOW)
             pwm_B.start(100)
             pwm_B.ChangeDutyCycle(speed)
         
-        elif direction == -1:
+        elif direction == 1:
             GPIO.output(right_side_motor_Pin1, GPIO.LOW)
             GPIO.output(right_side_motor_Pin2, GPIO.HIGH)
             pwm_B.start(100)
