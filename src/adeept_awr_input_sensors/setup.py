@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "ultrasonic_node = adeept_awr_input_sensors.ultrasonic_node:main"
+            "ultrasonic_node = adeept_awr_input_sensors.ultrasonic_node:main",
+            "pi_camera_node = adeept_awr_input_sensors.pi_camera_node:main"
         ],
     },
 )

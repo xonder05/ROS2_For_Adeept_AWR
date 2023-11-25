@@ -83,7 +83,7 @@
     <h1 class="main-header">Adeept AWR Controller</h1>
 
     <div class="camera-container">
-        <button class="camera-button" onclick="toggleVideoFeed()">Toggle Video Feed</button>
+        <button class="camera-button" onclick="subsribe()">Toggle Video Feed</button>
         <img id="camera" class="camera-image" style="height: 270px; width: 480px;">
     </div>
 
@@ -114,6 +114,7 @@
         </p>
       </div>
     
+
     <script>
         var ros = new ROSLIB.Ros();
 
@@ -144,8 +145,6 @@
 
         // Create a connection to the rosbridge WebSocket server.
         ros.connect('ws://192.168.2.1:9090');
-
-
 
         function driveCommand(buttonId, action) {
             var webController = new ROSLIB.Service({
@@ -195,6 +194,25 @@
                 console.log("servo result");
             });
         }
+
+        function subsribe()
+        {
+            console.log("subscribed");
+            var listener = new ROSLIB.Topic({
+                ros : ros,
+                name : '/camera_stream',
+                messageType : 'adeept_awr_interfaces/msg/CameraFrame'
+            });
+
+            // Then we add a callback to be called every time a message is published on this topic.
+            listener.subscribe(function(message) {
+                var camera = document.getElementById('camera');
+                camera.src = message.base64_data;
+
+                //listener.unsubscribe();
+            });
+        }
+
     </script>
 </body>
 </html>

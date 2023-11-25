@@ -28,6 +28,7 @@ find_package(rosidl_default_generators REQUIRED)
 set(msg_files
   "msg/DriveDirections.msg"
   "msg/UltrasonicDistance.msg"
+  "msg/CameraFrame.msg"
   )
 
 set(srv_files
