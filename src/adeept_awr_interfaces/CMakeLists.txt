@@ -32,6 +32,7 @@ set(msg_files
 
 set(srv_files
   "srv/RGB.srv"
+  "srv/WebCommand.srv"
   )
 
 set(action_files

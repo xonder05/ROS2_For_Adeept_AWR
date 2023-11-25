@@ -1,136 +1,185 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Adeept AWR Web Controller</title>
-    <style>
-        .main-container {
-            display: grid;
-            grid-template-rows: 0.5fr 1fr 1fr;
-            grid-template-columns: 1fr 1fr;
-            grid-template-areas: 
-                'header header'
-                'camera servo-controls'
-                "empty drive-controls";
-            grid-gap: 10px;
-        }
+<meta charset="utf-8" />
+<script src="roslib.js"></script>
 
-        .main-header {
-            grid-area: header;
-        }
+<script>
+  // Connecting to ROS
+  // -----------------
+  var ros = new ROSLIB.Ros();
 
-        .camera-container {
-            grid-area: camera;
+  // If there is an error on the backend, an 'error' emit will be emitted.
+  ros.on('error', function(error) {
+    document.getElementById('connecting').style.display = 'none';
+    document.getElementById('connected').style.display = 'none';
+    document.getElementById('closed').style.display = 'none';
+    document.getElementById('error').style.display = 'inline';
+    console.log(error);
+  });
 
-            display: grid;
-            grid-template-rows: 1fr 4fr;
-            grid-template-columns: 1fr;
-            grid-template-areas: 
-                "button"
-                "image";
-        }
-        .camera-button {
-            grid-area: button;
-        }
-        .camera-image {
-            grid-area: image;
-        }
+  // Find out exactly when we made a connection.
+  ros.on('connection', function() {
+    console.log('Connection made!');
+    document.getElementById('connecting').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+    document.getElementById('closed').style.display = 'none';
+    document.getElementById('connected').style.display = 'inline';
+  });
 
-        .drive-container {
-            grid-area: drive-controls;
-            
-            display: grid;
-            grid-template-rows: 1fr 1fr;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-areas: 
-                "top-left forward top-right"
-                "left back right";
-        }
-        .drive-forward {
-            grid-area: forward;
-        }
-        .drive-back {
-            grid-area: back;
-        }
-        .drive-left {
-            grid-area: left;
-        }
-        .drive-right {
-            grid-area: right;
-        }
+  ros.on('close', function() {
+    console.log('Connection closed.');
+    document.getElementById('connecting').style.display = 'none';
+    document.getElementById('connected').style.display = 'none';
+    document.getElementById('closed').style.display = 'inline';
+  });
 
-        .servo-container {
-            grid-area: servo-controls;
+  // Create a connection to the rosbridge WebSocket server.
+  ros.connect('ws://192.168.2.1:9090');
 
-            display: grid;
-            grid-template-rows: 1fr 1fr;
-            grid-template-columns: 1fr;
-            grid-template-areas: 
-                "look-up"
-                "look-down";
-        }
-        .look-up {
-            grid-area: look-up;
-        }
-        .look-down {
-            grid-area: look-down;
-        }  
+  // Publishing a Topic
+  // ------------------
+/*
+  // First, we create a Topic object with details of the topic's name and message type.
+  var cmdVel = new ROSLIB.Topic({
+    ros : ros,
+    name : '/drive_directions',
+    messageType : 'adeept_awr_interfaces/msg/DriveDirections'
+  });
 
-    </style>
+  // Then we create the payload to be published. The object we pass in to ros.Message matches the
+  // fields defined in the geometry_msgs/Twist.msg definition.
+  var twist = new ROSLIB.Message({
+    direction: 119
+  });
+
+  // And finally, publish.
+  cmdVel.publish(twist);
+*/
+  //Subscribing to a Topic
+  //----------------------
+/*
+  // Like when publishing a topic, we first create a Topic object with details of the topic's name
+  // and message type. Note that we can call publish or subscribe on the same topic object.
+  var listener = new ROSLIB.Topic({
+    ros : ros,
+    name : '/listener',
+    messageType : 'std_msgs/String'
+  });
+
+  // Then we add a callback to be called every time a message is published on this topic.
+  listener.subscribe(function(message) {
+    console.log('Received message on ' + listener.name + ': ' + message.data);
+
+    // If desired, we can unsubscribe from the topic as well.
+    listener.unsubscribe();
+  });
+*/
+
+  // Calling a service
+  // -----------------
+
+  // First, we create a Service client with details of the service's name and service type.
+  var addTwoIntsClient = new ROSLIB.Service({
+    ros : ros,
+    name : '/web_controller',
+    serviceType : 'adeept_awr_interfaces/srv/WebCommand'
+  });
+
+  // Then we create a Service Request. The object we pass in to ROSLIB.ServiceRequest matches the
+  // fields defined in the rospy_tutorials AddTwoInts.srv file.
+  var request = new ROSLIB.ServiceRequest({
+    type: 0,
+    value: 115
+  });
+
+  // Finally, we call the /add_two_ints service and get back the results in the callback. The result
+  // is a ROSLIB.ServiceResponse object.
+  console.log("calling service idiot")
+  addTwoIntsClient.callService(request, function(result) {
+    console.log('Result for service call on ' + addTwoIntsClient.name + ': ' + result.sum);
+  });
+
+/*
+
+  // Advertising a Service
+  // ---------------------
+
+  // The Service object does double duty for both calling and advertising services
+  var setBoolServer = new ROSLIB.Service({
+    ros : ros,
+    name : '/set_bool',
+    serviceType : 'std_srvs/SetBool'
+  });
+
+  // Use the advertise() method to indicate that we want to provide this service
+  setBoolServer.advertise(function(request, response) {
+    console.log('Received service request on ' + setBoolServer.name + ': ' + request.data);
+    response['success'] = true;
+    response['message'] = 'Set successfully';
+    return true;
+  });
+
+  // Setting a param value
+  // ---------------------
+
+  ros.getParams(function(params) {
+    console.log(params);
+  });
+
+  // First, we create a Param object with the name of the param.
+  var maxVelX = new ROSLIB.Param({
+    ros : ros,
+    name : 'max_vel_y'
+  });
+
+  //Then we set the value of the param, which is sent to the ROS Parameter Server.
+  maxVelX.set(0.8);
+  maxVelX.get(function(value) {
+    console.log('MAX VAL: ' + value);
+  });
+
+  // Getting a param value
+  // ---------------------
+
+  var favoriteColor = new ROSLIB.Param({
+    ros : ros,
+    name : 'favorite_color'
+  });
+
+  favoriteColor.set('red');
+  favoriteColor.get(function(value) {
+    console.log('My robot\'s favorite color is ' + value);
+  });
+  */
+  
+</script>
 </head>
-<body class="main-container">
 
-    <h1 class="main-header">Adeept AWR Controller</h1>
-
-    <div class="camera-container">
-        <button class="camera-button" onclick="toggleVideoFeed()">Toggle Video Feed</button>
-        <img id="camera" class="camera-image" style="height: 270px; width: 480px;">
-    </div>
-
-    <div class="servo-container">
-        <button class="look-up">Up</button>
-        <button class="look-down">Down</button>
-    </div>
-
-    <div class="drive-container">
-        <button class="drive-forward" id="w" onmousedown="buttonEvent('w', 'press')" onmouseup="buttonEvent('w', 'release')">w</button>
-        <button class="drive-back" id="s" onmousedown="buttonEvent('s', 'press')" onmouseup="buttonEvent('s', 'release')">s</button>
-        <button class="drive-left" id="a" onmousedown="buttonEvent('a', 'press')" onmouseup="buttonEvent('a', 'release')">a</button>
-        <button class="drive-right" id="d" onmousedown="buttonEvent('d', 'press')" onmouseup="buttonEvent('d', 'release')">d</button>    
-    </div>
-    
-    <script>
-        function buttonEvent(buttonId, action) {
-            fetch('/direction-press', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ buttonId, action })
-            })
-            .then(response => {
-                if (response.ok) {
-                    console.log(`Button ${buttonId} ${action} event sent to the backend.`);
-                } else {
-                    console.error('Failed to send event to the backend.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-        }
-
-        function toggleVideoFeed()
-        {
-            var camera = document.getElementById("camera");
-            if (camera.src === "")
-            {
-                camera.src = "/video_feed";
-            }
-            else
-            {
-                camera.src = "";
-            }
-        }
-    </script>
+<body>
+  <h1>Simple roslib Example</h1>
+  <p>Run the following commands in the terminal then refresh this page. Check the JavaScript
+    console for the output.</p>
+  <ol>
+    <li><tt>roscore</tt></li>
+    <li><tt>rostopic pub /listener std_msgs/String "Hello, World"</tt></li>
+    <li><tt>rostopic echo /cmd_vel</tt></li>
+    <li><tt>rosrun rospy_tutorials add_two_ints_server</tt></li>
+    <li><tt>roslaunch rosbridge_server rosbridge_websocket.launch</tt></li>
+  </ol>
+  <div id="statusIndicator">
+    <p id="connecting">
+      Connecting to rosbridge...
+    </p>
+    <p id="connected" style="color:#00D600; display:none">
+      Connected
+    </p>
+    <p id="error" style="color:#FF0000; display:none">
+      Error in the backend!
+    </p>
+    <p id="closed" style="display:none">
+      Connection closed.
+    </p>
+  </div>
 </body>
 </html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Adeept AWR Web Controller</title>
+    <script src="roslib.js"></script>
+    <style>
+        .main-container {
+            display: grid;
+            grid-template-rows: 0.5fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr;
+            grid-template-areas: 
+                'header header'
+                'camera servo-controls'
+                "empty drive-controls";
+            grid-gap: 10px;
+        }
+
+        .main-header {
+            grid-area: header;
+        }
+
+        .camera-container {
+            grid-area: camera;
+
+            display: grid;
+            grid-template-rows: 1fr 4fr;
+            grid-template-columns: 1fr;
+            grid-template-areas: 
+                "button"
+                "image";
+        }
+        .camera-button {
+            grid-area: button;
+        }
+        .camera-image {
+            grid-area: image;
+        }
+
+        .drive-container {
+            grid-area: drive-controls;
+            
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-areas: 
+                "top-left forward top-right"
+                "left back right";
+        }
+        .drive-forward {
+            grid-area: forward;
+        }
+        .drive-back {
+            grid-area: back;
+        }
+        .drive-left {
+            grid-area: left;
+        }
+        .drive-right {
+            grid-area: right;
+        }
+
+        .servo-container {
+            grid-area: servo-controls;
+
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            grid-template-columns: 1fr;
+            grid-template-areas: 
+                "look-up"
+                "look-down";
+        }
+        .look-up {
+            grid-area: look-up;
+        }
+        .look-down {
+            grid-area: look-down;
+        }  
+
+    </style>
+</head>
+<body class="main-container">
+
+    <h1 class="main-header">Adeept AWR Controller</h1>
+
+    <div class="camera-container">
+        <button class="camera-button" onclick="toggleVideoFeed()">Toggle Video Feed</button>
+        <img id="camera" class="camera-image" style="height: 270px; width: 480px;">
+    </div>
+
+    <div class="servo-container">
+        <button class="look-up" onclick="servoCommand(0)">Up</button>
+        <button class="look-down" onclick="servoCommand(1)">Down</button>
+    </div>
+
+    <div class="drive-container">
+        <button class="drive-forward" id="w" onmousedown="driveCommand('w', 'press')" onmouseup="driveCommand('w', 'release')">w</button>
+        <button class="drive-back" id="s" onmousedown="driveCommand('s', 'press')" onmouseup="driveCommand('s', 'release')">s</button>
+        <button class="drive-left" id="a" onmousedown="driveCommand('a', 'press')" onmouseup="driveCommand('a', 'release')">a</button>
+        <button class="drive-right" id="d" onmousedown="driveCommand('d', 'press')" onmouseup="driveCommand('d', 'release')">d</button>    
+    </div>
+
+    <div id="statusIndicator">
+        <p id="connecting">
+          Connecting to rosbridge...
+        </p>
+        <p id="connected" style="color:#00D600; display:none">
+          Connected
+        </p>
+        <p id="error" style="color:#FF0000; display:none">
+          Error in the backend!
+        </p>
+        <p id="closed" style="display:none">
+          Connection closed.
+        </p>
+      </div>
+    
+    <script>
+        var ros = new ROSLIB.Ros();
+
+        // If there is an error on the backend, an 'error' emit will be emitted.
+        ros.on('error', function(error) {
+        document.getElementById('connecting').style.display = 'none';
+        document.getElementById('connected').style.display = 'none';
+        document.getElementById('closed').style.display = 'none';
+        document.getElementById('error').style.display = 'inline';
+        console.log(error);
+        });
+
+        // Find out exactly when we made a connection.
+        ros.on('connection', function() {
+        console.log('Connection made!');
+        document.getElementById('connecting').style.display = 'none';
+        document.getElementById('error').style.display = 'none';
+        document.getElementById('closed').style.display = 'none';
+        document.getElementById('connected').style.display = 'inline';
+        });
+
+        ros.on('close', function() {
+        console.log('Connection closed.');
+        document.getElementById('connecting').style.display = 'none';
+        document.getElementById('connected').style.display = 'none';
+        document.getElementById('closed').style.display = 'inline';
+        });
+
+        // Create a connection to the rosbridge WebSocket server.
+        ros.connect('ws://192.168.2.1:9090');
+
+
+
+        function driveCommand(buttonId, action) {
+            var webController = new ROSLIB.Service({
+                ros : ros,
+                name : '/web_controller',
+                serviceType : 'adeept_awr_interfaces/srv/WebCommand'
+            });
+
+            var pressRequest = new ROSLIB.ServiceRequest({
+                type: 0,
+                value: buttonId.charCodeAt(0)
+            });
+
+            var releaseRequest = new ROSLIB.ServiceRequest({
+                type: 1,
+                value: -1
+            });
+
+            if (action == "press")
+            {
+                webController.callService(pressRequest, function(result) {
+                    console.log("press result");
+                });
+            }
+            else
+            {
+                webController.callService(releaseRequest, function(result) {
+                    console.log("release result");
+                });
+            }
+        }
+
+        function servoCommand(direction)
+        {
+            var webController = new ROSLIB.Service({
+                ros : ros,
+                name : '/web_controller',
+                serviceType : 'adeept_awr_interfaces/srv/WebCommand'
+            });
+
+            var request = new ROSLIB.ServiceRequest({
+                type: 5,
+                value: direction
+            });
+
+            webController.callService(request, function(result) {
+                console.log("servo result");
+            });
+        }
+    </script>
+</body>
+</html>
