@@ -5,7 +5,7 @@ from rclpy.action import ActionClient
 from adeept_awr_interfaces.srv import WebCommand
 from adeept_awr_interfaces.action import Servo
 
-
+#currently only for actions (rosbridge does not support it, but there is a pull request on git, so it might not be needed in the future)
 class WebControllerNode(Node):
     def __init__(self):
         super().__init__("web_controller_node")
