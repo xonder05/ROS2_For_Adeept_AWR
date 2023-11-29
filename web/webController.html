@@ -3,177 +3,78 @@
 <head>
     <title>Adeept AWR Web Controller</title>
     <script src="roslib.js"></script>
-    <style>
-        .main-container {
-            display: grid;
-            grid-template-rows: 0.5fr 1fr 1fr;
-            grid-template-columns: 1fr 1fr;
-            grid-template-areas: 
-                'header header'
-                'camera servo-controls'
-                "empty drive-controls";
-            grid-gap: 10px;
-        }
-
-        .main-header {
-            grid-area: header;
-        }
-
-        .camera-container {
-            grid-area: camera;
-
-            display: grid;
-            grid-template-rows: 1fr 4fr;
-            grid-template-columns: 1fr;
-            grid-template-areas: 
-                "button"
-                "image";
-        }
-        .camera-button {
-            grid-area: button;
-        }
-        .camera-image {
-            grid-area: image;
-        }
-
-        .drive-container {
-            grid-area: drive-controls;
-            
-            display: grid;
-            grid-template-rows: 1fr 1fr;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-areas: 
-                "top-left forward top-right"
-                "left back right";
-        }
-        .drive-forward {
-            grid-area: forward;
-        }
-        .drive-back {
-            grid-area: back;
-        }
-        .drive-left {
-            grid-area: left;
-        }
-        .drive-right {
-            grid-area: right;
-        }
-
-        .servo-container {
-            grid-area: servo-controls;
-
-            display: grid;
-            grid-template-rows: 1fr 1fr;
-            grid-template-columns: 1fr;
-            grid-template-areas: 
-                "look-up"
-                "look-down";
-        }
-        .look-up {
-            grid-area: look-up;
-        }
-        .look-down {
-            grid-area: look-down;
-        }  
-
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="main-container">
 
     <h1 class="main-header">Adeept AWR Controller</h1>
 
+    <p class="main-status" id="statusIndicator">Connecting to rosbridge...</p>
+
     <div class="camera-container">
-        <button class="camera-button" onclick="subsribe()">Toggle Video Feed</button>
-        <img id="camera" class="camera-image" style="height: 270px; width: 480px;">
+        <button class="camera-button" onclick="cameraToggle()">Toggle Video Feed</button>
+        <img id="camera" class="camera-image">
     </div>
 
     <div class="servo-container">
+        <input class="angle-selector" id="angle_slider" type="range" min="150" max="350" value="300">
         <button class="look-up" onclick="servoCommand(0)">Up</button>
         <button class="look-down" onclick="servoCommand(1)">Down</button>
     </div>
 
     <div class="drive-container">
-        <button class="drive-forward" id="w" onmousedown="driveCommand('w', 'press')" onmouseup="driveCommand('w', 'release')">w</button>
-        <button class="drive-back" id="s" onmousedown="driveCommand('s', 'press')" onmouseup="driveCommand('s', 'release')">s</button>
-        <button class="drive-left" id="a" onmousedown="driveCommand('a', 'press')" onmouseup="driveCommand('a', 'release')">a</button>
-        <button class="drive-right" id="d" onmousedown="driveCommand('d', 'press')" onmouseup="driveCommand('d', 'release')">d</button>    
+        <button class="drive-forward" id="w" onmousedown="driveCommand(8, 'press')" onmouseup="driveCommand(8, 'release')">w</button>
+        <button class="drive-back" id="s" onmousedown="driveCommand(2, 'press')" onmouseup="driveCommand(2, 'release')">s</button>
+        <button class="drive-left" id="a" onmousedown="driveCommand(4, 'press')" onmouseup="driveCommand(4, 'release')">a</button>
+        <button class="drive-right" id="d" onmousedown="driveCommand(6, 'press')" onmouseup="driveCommand(2, 'release')">d</button>    
     </div>
-
-    <div id="statusIndicator">
-        <p id="connecting">
-          Connecting to rosbridge...
-        </p>
-        <p id="connected" style="color:#00D600; display:none">
-          Connected
-        </p>
-        <p id="error" style="color:#FF0000; display:none">
-          Error in the backend!
-        </p>
-        <p id="closed" style="display:none">
-          Connection closed.
-        </p>
-      </div>
     
-
     <script>
         var ros = new ROSLIB.Ros();
 
-        // If there is an error on the backend, an 'error' emit will be emitted.
+        var statusIndicator = document.getElementById("statusIndicator")
         ros.on('error', function(error) {
-        document.getElementById('connecting').style.display = 'none';
-        document.getElementById('connected').style.display = 'none';
-        document.getElementById('closed').style.display = 'none';
-        document.getElementById('error').style.display = 'inline';
-        console.log(error);
+            statusIndicator.innerHTML = "Error in the backend";
+            statusIndicator.style.color = "#FF0000"
+            console.log(error);
         });
 
-        // Find out exactly when we made a connection.
         ros.on('connection', function() {
-        console.log('Connection made!');
-        document.getElementById('connecting').style.display = 'none';
-        document.getElementById('error').style.display = 'none';
-        document.getElementById('closed').style.display = 'none';
-        document.getElementById('connected').style.display = 'inline';
+            statusIndicator.innerHTML = "Connected";
+            statusIndicator.style.color = "#00D600"
+            console.log('Connection made!');
         });
 
         ros.on('close', function() {
-        console.log('Connection closed.');
-        document.getElementById('connecting').style.display = 'none';
-        document.getElementById('connected').style.display = 'none';
-        document.getElementById('closed').style.display = 'inline';
+            statusIndicator.innerHTML = "Connection closed";
+            statusIndicator.style.color = ""
+            console.log('Connection closed.');
         });
 
-        // Create a connection to the rosbridge WebSocket server.
         ros.connect('ws://192.168.2.1:9090');
 
-        function driveCommand(buttonId, action) {
-            var webController = new ROSLIB.Service({
+        function driveCommand(direction, action) {
+            var topic = new ROSLIB.Topic({
                 ros : ros,
-                name : '/web_controller',
-                serviceType : 'adeept_awr_interfaces/srv/WebCommand'
-            });
-
-            var pressRequest = new ROSLIB.ServiceRequest({
-                type: 0,
-                value: buttonId.charCodeAt(0)
-            });
-
-            var releaseRequest = new ROSLIB.ServiceRequest({
-                type: 1,
-                value: -1
+                name : '/drive_directions',
+                messageType : 'adeept_awr_interfaces/msg/DriveDirections'
             });
 
             if (action == "press")
             {
-                webController.callService(pressRequest, function(result) {
-                    console.log("press result");
+                var msg = new ROSLIB.Message({
+                    direction: direction,
+                    speed: 100
                 });
+                topic.publish(msg);
             }
             else
             {
-                webController.callService(releaseRequest, function(result) {
-                    console.log("release result");
+                var msg = new ROSLIB.Message({
+                    direction: 0,
+                    speed: 0
                 });
+                topic.publish(msg);
             }
         }
 
@@ -193,25 +94,102 @@
             webController.callService(request, function(result) {
                 console.log("servo result");
             });
+
+            var angleSlider = document.getElementById("angle_slider");
+            if (direction == 0)
+            {
+                angleSlider.value = Number(angleSlider.value) - 20
+            }
+            else
+            {
+                angleSlider.value = Number(angleSlider.value) + 20
+            }
         }
 
-        function subsribe()
+        const angleSlider = document.getElementById("angle_slider");
+        angleSlider.addEventListener("change", servoTotalCommand);
+        function servoTotalCommand()
         {
-            console.log("subscribed");
-            var listener = new ROSLIB.Topic({
+            var webController = new ROSLIB.Service({
                 ros : ros,
-                name : '/camera_stream',
-                messageType : 'adeept_awr_interfaces/msg/CameraFrame'
+                name : '/web_controller',
+                serviceType : 'adeept_awr_interfaces/srv/WebCommand'
             });
 
-            // Then we add a callback to be called every time a message is published on this topic.
-            listener.subscribe(function(message) {
-                var camera = document.getElementById('camera');
-                camera.src = message.base64_data;
+            var angleSlider = document.getElementById("angle_slider");
+            var request = new ROSLIB.ServiceRequest({
+                type: 4,
+                value: Number(angle_slider.value)
+            });
 
-                //listener.unsubscribe();
+            webController.callService(request, function(result) {
+                console.log("servo result");
             });
         }
+
+        var cameraListener = new ROSLIB.Topic({
+            ros : ros,
+            name : '/camera_stream',
+            messageType : 'adeept_awr_interfaces/msg/CameraFrame'
+        });
+        var cameraListenerEnabled = false;
+        function cameraToggle()
+        {
+            if (cameraListenerEnabled)
+            {
+                cameraListener.unsubscribe();
+                cameraListenerEnabled = false;
+            }
+            else
+            {
+                cameraListener.subscribe(function(message) {
+                    var camera = document.getElementById('camera');
+                    camera.src = message.base64_data;
+                });
+                cameraListenerEnabled = true;
+            }
+        }
+
+        var keyDownFlag = {};
+        document.addEventListener('keydown', event => {
+            if (!keyDownFlag[event.code])
+            {
+                switch (event.key) {
+                    case 'w':
+                        driveCommand(8, 'press')
+                        break;
+                    case 's':
+                        driveCommand(2, 'press')
+                        break;
+                    case 'a':
+                        driveCommand(4, 'press')
+                        break;
+                    case 'd':
+                        driveCommand(6, 'press')
+                        break;
+                    default:
+                        console.log("none")
+                        break;
+                }
+            }
+            keyDownFlag[event.code] = true;
+        });
+
+        
+        document.addEventListener('keyup', event => {
+            switch (event.key) {
+                case 'w':
+                case 's':
+                case 'a':
+                case 'd':
+                    driveCommand(0, 'release')
+                    break;
+                default:
+                    console.log("none")
+                    break;
+            }
+            keyDownFlag[event.code] = false;
+        });
 
     </script>
 </body>

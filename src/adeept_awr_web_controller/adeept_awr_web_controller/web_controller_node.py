@@ -17,18 +17,22 @@ class WebControllerNode(Node):
     def callback(self, request, response):
         if request.type == 5: #servo command
             if (request.value == 0):
-                self.send_goal(1)
+                self.send_goal(1, 20)
             else:
-                self.send_goal(2)
+                self.send_goal(2, 20)
+        elif request.type == 4: #servo total
+            print("type4")
+            self.send_goal(0, request.value)
         else:
             pass
 
         return response
 
-    def send_goal(self, direction):
+    def send_goal(self, direction, value):
+        print("value")
         goal_msg = Servo.Goal()
         goal_msg.mode = direction
-        goal_msg.value = 20
+        goal_msg.value = value
 
         self.action_client.wait_for_server()
 
