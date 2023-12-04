@@ -3,3 +3,12 @@
 /install
 /log
 /src/**/__pycache__
+*.aux
+*.gz
+*.toc
+*.ptc
+*.out
+*.lof
+*.blg
+*.log
+*.bbl
