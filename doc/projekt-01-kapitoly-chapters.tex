@@ -195,14 +195,13 @@ Zdrojové soubory v rámci workspace jsou pak organizovány do packages. Package
 \end{forest}
 
 \subsubsection*{Node} %prepsat aby to bylo stylisticky hezci
-Node neboli uzel je základním prvkem každého ROS2 systému. Každý uzel má za úkol plnit jeden specifický úkol a následně komunikovat s ostatními uzly v systému. Implementačně se jedná o objekt dědící ze třídy Node. 
-
-spin - iterative execution executing control cycle at a specific frequency (timer)
-	 - event oriented execution - control cycle triggered by event (service, action, subsription)
+Celý ROS2 systém je složený z uzlů (Node), které mezi sebou navzájem komunikují. Každý uzel je vlastní výpočetní jednotka, která by měla plnit jeden specifický úkol. Tento přístup je podobný objektově orientovanému návrhu a ROS2 jej také využívá. Implementačně je tedy uzel objekt který dědí ze třídy \verb|Node|.
+Uzly v ROS2 většinou nepotřebují běžet permanentně, ale pouze v monentě, kdy nastane nějaká událost kterou je potřeba obsloužit. Z toho důvodu existuje v ROS2 metoda \verb|spin()|, která uspí vykonávání uzlu, dokud jej není potřeba opět využít. Aby ROS2 šetřil výpočetní prostředky, využívá dva přístupy k určení, kdy bude potřeba uzel vzbudit. Prvním je iterative execution, ten se používá u uzlů, které vykonávájí svou činnost pravidelně na nějaké frekvenci. Například se může jednat o výpočetní uzel, který pravidelně každých x mikrosekund provede výpočet podle hodnot senzorů a odešle výsledek.
+Druhý je event oriented execution. Zde dochází k vyvolání řídícího cyklu jako důsledek nějaké události, typicky se jedná od příchozí zprávu z subscription, service nebo action. Frekvenci spouštění těchto uzlů pak lze odvodit od frekvence příchozích zpráv. Typicky se může jednat o uzel přijímající snímky z kamery na kterých provede výpočet a vrátí odpověď. Frekvence výpočtu je dána příchozími snímky, pokud snímky přestanou přicházet, uzel se nebude spouštět. %cite knizku
 
 \begin{algorithm}[h!]
 	\label{}
-	\caption{\textsc{Základní struktura node objektu}}
+	\caption{\textsc{Struktura a použití Node objektu}}
 	
 	\DontPrintSemicolon
 	\SetAlgoNoLine
@@ -234,13 +233,11 @@ spin - iterative execution executing control cycle at a specific frequency (time
 %other node functions
 
 \subsubsection*{Topic}
-Je základním a také nejčastěji používaným způsobem pomocí kterého spolu ROS2 uzly komunikují. Topic si lze přesdtavit jako analogii hardwarové sběřnice. Prakticky se jedná o přesně pojmenované místo, do kterého může n uzlů posílat data (Publish) a m poslouchat co bylo posláno (Subscribe). Zprávy posílané do topicu mají přesně daný formát a jsou posílány asynchronně. Typickým příkladem použití může být topic, do nějž posílá data uzel ovládající kameru a několik dalších uzlů které tyto data potřebují jej mohou číst. \cite{ros2_introduction}
-
-Následující kód ukazuje jak lze poslouchat co je do topicku zapsáno. Nejprve (typicky v \_\_init\_\_ třídy) vytvořit subscription s callback funkcí. V tato funkce je pak zavolána pokaždé když do topicku přijde nová zpráva. K hodnotám zprávy lze přistupovat pomocí parametru msg (jméno není pevně dané).
+Je základním a také nejčastěji používaným způsobem pomocí kterého spolu ROS2 uzly komunikují. Topic si lze představit jako analogii hardwarové sběrnice. Prakticky se jedná o přesně pojmenované místo, do kterého může n uzlů posílat data (Publish) a m poslouchat co bylo posláno (Subscribe). Zprávy posílané do topicu mají přesný formát určený pomocí Interface a jsou posílány asynchronně. Typickým příkladem použití může být topic, do nějž posílá data uzel ovládající kameru a několik dalších uzlů které tyto data potřebují jej mohou číst. \cite{ros2_introduction}
 
 \begin{algorithm}[h!]
 	\label{}
-	\caption{\textsc{Jednoduchý publisher}}
+	\caption{\textsc{Subsrciber Node}}
 	
 	\DontPrintSemicolon
 	\SetAlgoNoLine
@@ -249,22 +246,18 @@ Následující kód ukazuje jak lze poslouchat co je do topicku zapsáno. Nejprv
 	\SetNlSkip{-1.1em}
 	
 	\BlankLine \Indp\Indpp
-	
-	\texttt{\#přihlášení k odběru zpráv zaslaných na daný topic}\;
 	\texttt{self.create\_subscription(Interface, "topic\_name", self.callback\_function, queue\_size)}\;
 	
 	\BlankLine
-	\texttt{def callback\_function(self, msg: Interface):}\; %find out if the :Interface is required, i believe it is not
+	\texttt{def callback\_function(self, msg):}\;
 	\Indp\Indp
-	\texttt{\#přístup k hodnotám zpráv}\;
-	\texttt{msg.item}\;
+	\texttt{value = msg.item}\;
 \end{algorithm}
-
-Pro posílání vlastních dat do topicu je potřeba opět v init vytvořit publisher. Pro odeslání zprávy je pak potřeba vytvořit instanci třídy, kterou daný topic využívá a naplnit ji daty.
+Tento kód ukazuje, jak se může uzel přihlásit v odebírání zpráv z topicku. Nejprve je potřeba (typicky v konstruktoru třídy) zavolat zděděnou metodu sloužící k inicializaci nějaké ROS2 funkcionality. V tomto případě se jedná o \verb|create_subscription|. Jako parametry potřebuje jméno, interface, callback funkci a délku fronty. Inteface definuje formát zpráv a délka fronty je použita v případě, že uzel nezvládá přijímat zprávy dostatečně rychle. Callback funkce je pak zavolána pokaždé když do topicku přijde nová zpráva. Druhým parametrem callback funkce je předán objekt, který ve svých atributech obsahuje hodnoty dané zprávy.
 
 \begin{algorithm}[h!]
 	\label{}
-	\caption{\textsc{Jednoduchý subscriber}}
+	\caption{\textsc{Publisher Node}}
 	
 	\DontPrintSemicolon
 	\SetAlgoNoLine
@@ -273,19 +266,17 @@ Pro posílání vlastních dat do topicu je potřeba opět v init vytvořit publ
 	\SetNlSkip{-1.1em}
 	
 	\BlankLine \Indp\Indpp
-	
-	\texttt{\#vytvoření proměnné sloužící k odesílání zpráv}\;
 	\texttt{self.publisher = self.create\_publisher(Interface, "topic\_name", queue\_size)}\;
+	
 	\BlankLine
-	\texttt{\#odeslání hodnoty na topic}\;   
 	\texttt{output = Interface()}\;
 	\texttt{output.item = some\_value}\;
 	\texttt{self.publisher.publish(output)}\;
 \end{algorithm}
-
+Odesílání zpráv do topicu demonstruje tento kód. Jeho struktura je podobná předchozímu příkladu. Odeslání zprávy demonstrují řádky 2--4. Nejprve dojde k inicializaci objektu interface, stejného datového typu jako ten, který používá topic. Tento objekt je následně naplněn daty a pomocí metody \verb|publish()| předem vytvořeného publisheru odeslán.
 
 \subsubsection*{Service}
-Sevice funguje stejně jako klasická komunikace přes počítačovou síť klient -- server. Jedná se tedy o synchronní komunikaci kde jedna node poskytuje nějakou službu a ostatní si na ni mohou poslat požadavek. Od service se typicky předpokládá okamžitá odpověď aby nedošlo k narušení (control cycle) volající node. \cite{ros2_introduction}
+Sevice funguje stejně jako klient -- server komunikace známá z počítačových sítí . Jedná se tedy o synchronní komunikaci kde jedna node poskytuje nějakou službu a ostatní si na ni mohou poslat požadavek. Od service se typicky předpokládá okamžitá odpověď aby nedošlo k narušení (control cycle) volajícího uzlu. \cite{ros2_introduction}
 
 \begin{algorithm}[h!]
 	\label{}
@@ -308,6 +299,7 @@ Sevice funguje stejně jako klasická komunikace přes počítačovou síť klie
 	\texttt{return response}\;
 	
 \end{algorithm}
+Změnou oproti předchozím příkladům je přidání nového parametru do callback funkce. Tato funkce má dva důležité parametry, request a response. Request obsahuje konkrétní hodnoty požadavku na server a response je potřeba naplnit výsledky a vrátit z funkce.
 
 \begin{algorithm}[h!]
 	\label{}
@@ -326,18 +318,20 @@ Sevice funguje stejně jako klasická komunikace přes počítačovou síť klie
 	\Indp\Indp
 	\texttt{pass}\;
 	\Indm\Indm
-	\texttt{self.req = Interface.Request()}\;
 
 	\BlankLine
 	\texttt{def send\_request(self):}\;
 	\Indp\Indp
+	\texttt{self.req = Interface.Request()}\;
 	\texttt{self.req.item = some\_value}\;
 	\texttt{self.future = self.cli.call\_async(self.req)}\;
 	\texttt{rclpy.spin\_until\_future\_complete(self, self.future)}\;
-	\texttt{response.item}\;
-	\texttt{return self.future.result()}\;
-		
+	
+	\BlankLine
+	\texttt{response = self.future.result()}\;
+	\texttt{value = response.item}\;
 \end{algorithm}
+Service client narozdíl od topic subscriberu závisí na tom, aby existoval server, který je schopný odpovídat na jeho požadavky. Tato podmínka vyplývá z faktu, že service server by měl odpovídat na dotazy téměř okamžitě a service klient tedy předpokládá, že vždy dostane odpověď. Pokud by neexistoval server, klient by při požadavku skončil v nekonečném čekání. Proto je hned v konstruktoru implementována kontrola, které nedovolí vytvoření uzlu dokud není přítomen server. Čekání na odpověď od serveru, je pak implementována pomocí funkce \verb|spin_until_future_complete()|
 
 \subsubsection*{Action} %cite web documentation
 Jedná se o rozšířenou verzi service. Akce z pravidla vykonává déle trvající požadavek. Například provedení řídícího manévru robota, který je prováděn v reálném světě a jeho provedení není tedy krátkodobá záležitost. Akce pak na rozdíl od service dokáže v průběhu vykonávání této činnosti odesílat průběžné aktualizace o aktuálním stavu provádění zpět volající node. Implementačně funguje akce jako dva service a jeden topic. Cílový (goal) service slouží k zaslání požadavku na server a jeho potvrzení. Výsledkový (result) pak vrací výsledek operace. V průběhu akce pak server posílá aktualizace do topicu.
@@ -354,29 +348,27 @@ Jedná se o rozšířenou verzi service. Akce z pravidla vykonává déle trvaj�
 	
 	\BlankLine \Indp\Indpp
 	
-	\texttt{\#vytvoření action serveru}\;
 	\texttt{self.action\_server = ActionServer(self, Interface, "action\_name", self.callback\_function)}\;
 	
 	\BlankLine
 	\texttt{def callback\_function(self, goal\_handle):}\;
 	\Indp\Indp
-	\texttt{\#přístup k request parametrům}\;
 	\texttt{goal\_handle.request.item}\;
 	
 	\BlankLine
-	\texttt{\#odeslání zpětné vazby volajícímu}\;
+	\tcp{odeslání zpětné vazby volajícímu}
 	\texttt{feedback = Interface.Feedback()}\;
 	\texttt{feedback.item = some\_value}\;
 	\texttt{goal\_handle.publish\_feedback(feedback)}\;
 	
 	\BlankLine
-	\texttt{\#úspěšné ukončení požadavku}\;
+	\tcp{úspěšné ukončení požadavku}
 	\texttt{goal\_handle.succeed()}\;
 	\texttt{result = Interface.Result()}\;
 	\texttt{result.item = some\_value}\;
 	\texttt{return result}\;
 \end{algorithm}
-
+Action server využívá stejné postupy jako předchozí ukázky, pouze jich kombinuje více dohromady. V rámci callback funkce může odesílat průběžně zpětnou vazbu a nakonec jako návrat z funkce předá výsledek.
 
 \begin{algorithm}[h!]
 	\label{}
@@ -393,6 +385,7 @@ Jedná se o rozšířenou verzi service. Akce z pravidla vykonává déle trvaj�
  	\texttt{self.action\_client = ActionClient(self, Interface, "action\_name")}\;
  	
  	\BlankLine
+	\tcp{zaslaní požadavku na server}
  	\texttt{def send\_goal(self):}\;
  	\Indp\Indp
  	\texttt{goal\_msg = Servo.Goal()}\;
@@ -403,30 +396,35 @@ Jedná se o rozšířenou verzi service. Akce z pravidla vykonává déle trvaj�
 	\Indm\Indm
 
 	\BlankLine
+	\tcp{reakce na přijmutí nebo zamítnutí požadavku}
  	\texttt{def response\_callback\_function(self, future):}\;
  	\Indp\Indp
  	\texttt{goal\_handle = future.result()}\;
  	\texttt{if not goal\_handle.accepted:}\;
- 	\texttt{self.get\_logger().info('Goal rejected :(')}\;
+ 	\Indp\Indp
  	\texttt{return}\;
-
- 	\texttt{self.get\_logger().info('Goal accepted :)')}\;
-
+	\Indm\Indm
+	
+	\BlankLine
  	\texttt{self.result\_future = goal\_handle.get\_result\_async()}\;
- 	\texttt{self.result\_future.add\_done\_callback(self.result\_callback)}\;
+ 	\texttt{self.result\_future.add\_done\_callback(self.result\_callback\_function)}\;
 	\Indm\Indm
 
  	\BlankLine
- 	\texttt{def feedback\_callback\_function(self, feedback\_msg):}\;
+ 	\texttt{def feedback\_callback\_function(self, msg):}\;
  	\Indp\Indp
- 	\texttt{self.get\_logger().info('Received feedback: {0}'.format(feedback\_msg.feedback.curr\_position))}\;
+ 	\texttt{feedback = msg.feedback}\;
+ 	\texttt{value = feedback.item}\;
 	\Indm\Indm
 
 	\BlankLine
  	\texttt{def result\_callback\_function(self, future):}\;
  	\Indp\Indp
- 	\texttt{self.get\_logger().info('Result: {0}'.format(future.result().result))}\;
+    \texttt{result = future.result().result}\;
+    \texttt{value = result.item}\;
+    
 \end{algorithm}
+Při pohledu na implementaci action klienta lze dobře vidět vnitřní implementace akcí. První funkce \verb|send_goal()| vypadá podobně jako service client. Dojde zde k zaslání požadavku na server a následné čekání na odpověď. Součástí požadavku je předání feedback topicu a čekání na odpověď není aktivní ale pomocí callback funkce. Druhá \verb|response_callback_function| pak zpracuje výsledek požadavku (přijmutí nebo zamítnutí) a pošle požadavek na result service, který nakonec vrátí výsledek.
 
 \subsubsection*{Interface}
 Interface slouží k určení přesného formátu jednotlivých zpráv, které jsou posílány mezi uzly. ROS2 obsahuje mnoho již vytvořených a vývojáři po celém světě používaných formátů. Tento přístup podporuje znovupoužitelnost vytvořeného kódu a šetří práci. Díky tomu může být software pro ovládání konkrétního kusu hardware naimplementován pouze jednou s využitím standartního rozhraní a všichni ostatní jej pak mohou využít ve svých systémech.
@@ -455,12 +453,105 @@ Poslední je \verb|.action| soubor. Slouží pro komunikaci s action serverem. D
 	float32 current_angle
 \end{verbatim}
 
-
 \subsubsection*{Parametry} %revisit after i use this in code
-Ros2 uzly umí používat parametry, aby bylo možné jim předat hodnoty při spuštění a nemusely být uloženy ve zdrojových kódech. Typicky se přes parametry předávají cesty ke konfiguračním souborům. 
+ROS2 uzly lze spouštět s parametry. Typicky slouží k nastavení hodnot (předání konfiguračního souboru) za běhu programu bez potřeby zásahu do zdrojových kódů. Příkladem může uzel, sloužící k obsluze periferního zařízení a parametrem jsou mu předány čísla GPIO pinů na které je dané zařízení připojeno.
+
+\begin{algorithm}[h!]
+	\label{}
+	\caption{\textsc{Parameters}}
+	
+	\DontPrintSemicolon
+	\SetAlgoNoLine
+	\SetAlgoNlRelativeSize{-1}
+	\SetNlSty{}{}{:}
+	\SetNlSkip{-1.1em}
+	
+	\BlankLine \Indp\Indpp
+	
+	\tcp{deklarace parametru, typicky v konstruktoru}
+    \texttt{self.declare\_parameter('parameter\_name', 'default\_parameter\_value')}\;
+	
+	\BlankLine
+	\tcp{získání hodnoty parametru}
+	\texttt{param = self.get\_parameter('parameter\_name').get\_parameter\_value().string\_value}\;
+	
+	\BlankLine
+	\tcp{nastavení hodnoty parametru}
+	\texttt{new\_param = rclpy.parameter.Parameter(}\;
+	\Indp\Indp
+	\texttt{'parameter\_name',}\;
+	\texttt{rclpy.Parameter.Type.STRING,}\;
+	\texttt{'default\_parameter\_value'}\;
+	\Indm\Indm
+	\texttt{)}\;
+	\texttt{new\_param\_list = [new\_param]}\;
+	\texttt{self.set\_parameters(new\_param\_list)}\;
+
+\end{algorithm}
 
 \subsubsection*{Launch File} %revisit after i do this properly
-Protože každý ros2 uzel by měl mít za úkol jednu jednoduchou úlohu a celý systém se skládá z velkého množství propojených a komunikujících uzlů, stává se spouštění všech uzlů zvláště zdlouhavým. Proto existují launch soubory, které definují které uzly spustit, v jakém namespace a s jakými parametry. Launch soubory lze volat z jiných lauch souborů. %explain the structure here (package, higher level) 
+ROS2 systém se skládá z velkého množství navzájem komunikujících uzlů, a protože spouštění každého uzlu zvlášť by bylo pracné a zdlouhavé, existují launch soubory, které tuto práci usnadňují. Tyto soubory můžou být napsány v pythonu, yaml nebo xml. Čtyři hlavní úkoly které launch soubory plní jsou, spouštění uzlu, volání dalšího launch soubory, nastavení parametrů a proměnných prostředí. Prakticky se launch soubory píší minimálně na dvou úrovních. Na nižší úrovni se využívají jako součást package, kde slouží k spouštění jednotlivých uzlů. Jejich úkolem je nastavit uzel tak, aby nebylo potřeba modifikovat zdrojový kód. Typicky tak nastavuje správný namespace, předávají parametry, konfigurační soubory a případně dochází k přemapování jména topicu. Launch soubory vyšších úrovní pak slouží ke spuštění několika uzlů zároveň a využívají k tomu launch soubory nacházející se v packages.
+
+\begin{algorithm}[h!]
+	\label{}
+	\caption{\textsc{Launch file}}
+	
+	\DontPrintSemicolon
+	\SetAlgoNoLine
+	\SetAlgoNlRelativeSize{-1}
+	\SetNlSty{}{}{:}
+	\SetNlSkip{-1.1em}
+	
+	\BlankLine \Indp\Indpp
+	
+	\texttt{def generate\_launch\_description():}\;
+	\Indp\Indp
+	\texttt{return LaunchDescription([}\;
+	\Indp\Indp
+	\tcp{spuštění konkrétního uzlu}
+	\texttt{Node(}\;
+	\Indp\Indp
+	\texttt{package='package\_name',}\;
+	\texttt{executable='node\_name',}\;
+	\texttt{namespace='namespace\_name',}\;
+	\texttt{parameters=[\{}\;
+	\Indp\Indp
+	\texttt{'param\_name' : param\_value,}\;
+	\Indm\Indm
+	\texttt{\}]}\;
+	\Indm\Indm
+	\texttt{),}\;
+	\texttt{Node(}\;
+	\Indp\Indp
+	\texttt{package='package\_name',}\;
+	\texttt{executable='node\_name',}\;
+	\texttt{remappings=[}\;
+	\Indp\Indp
+	\texttt{('topic\_name', 'different\_topic\_name'),}\;
+	\Indm\Indm		
+	\texttt{]}\;
+	\Indm\Indm	
+	\texttt{),}\;
+	\tcp{zavolání dalšího launch souboru}
+	\texttt{IncludeLaunchDescription(}\;
+	\Indp\Indp
+	\texttt{PythonLaunchDescriptionSource([}\;
+	\Indp\Indp
+	\texttt{PathJoinSubstitution([}\;
+	\texttt{FindPackageShare('package\_name'),}\;
+	\Indp\Indp
+	\texttt{'launch',}\;
+	\texttt{'node\_name.py'}\;
+	\Indm\Indm	
+	\texttt{])}\;
+	\Indm\Indm	
+	\texttt{]),}\;
+	\Indm\Indm	
+	\texttt{)}\;
+	\Indm\Indm	
+	\texttt{])}\;
+		
+\end{algorithm}
 
 \subsection*{Knihovny}
 
