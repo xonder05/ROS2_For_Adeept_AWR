@@ -9,15 +9,54 @@
 \chapter{Úvod}
 %cca strana
 
-\chapter{Teoretická část} %přejmenovat
+\chapter{Použitý Hardware}
+Celá práce je implementována nad existujícím hardwarem. Konkrétně se jedná o stavebnici Adeept AWR 4WD. Její součástí jsou všechny použité motory, serva, čidla a další periferie. Mozkem na kterém poběží software zajišťující ovládání těchto komponent bude mikropočítač Raspberry Pi 4.
 
-\section{Hardware Adeept AWR 4WD a Raspberry Pi}
-Celá práce je implementována nad existujícím hardwarem. Konkrétně se jedná o "stavebnici" Adeept AWR 4WD z níž pochází všechny periferie, jako motory, serva a čidla. Tyto periferie jsou pak ovládány mikropočítačem Raspberry Pi4. V porovnání s běžně používanými mikrokontrolery se jedná o výkonější hardware.
+\subsection*{HW Technologie}
+Nejprve budou představeny obecné hardwarové technologie které jsou následně využívány některými z představovaných periferií.
+
+\subsubsection{I2C}
+Je synchronní sběrnice, která se vyznačuje svou jednoduchostí a nízkou cenou. Využívá dva vodiče SDA (serial data) a SCL (serial clock). Oba vodiče jsou připojeny k napájecímu napětí pomocí pull-up rezistoru a bez vlivu jiného hardwaru zůstávají v logické jedničce. Zařízení která jsou na tuto sběrnici připojeny využívají open drain k úpravě aktuální napěťové úrovně. I2C pak pracuje s dvěma druhy zařízení, master a slave. Master zahajuje, řídí a ukončuje komunikaci na vodiči SDA a po dobu průběhu komunikace generuje hodinový signál na SCL. Typicky se jedná o mikrokontroler. Slave jsou pak ostatní zařízení s nimiž může master komunikovat, typicky různé periferie. \cite{embeded_robotics}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{obrazky-figures/open_drain.pdf}
+	\caption{Open drain}
+	\label{}
+\end{figure}
+
+Přenos jednoho datového rámce zahájí master zařízení přivedením datové sběrnice do nuly. Následující komunikace se skládá z odeslání rámce o délce osmi bitů a potvrzení o úspěšném přenosu dat od přijímajícího zařízení. Toto potvrzení se nazývá ACK a je provedeno podržením datové sběrnice v hodnotě nula po dobu jednoho taktu. Opačný stav se nazývá NACK a indikuje že nastala chyba. Ukončení přenosu je provedeno navrácením datové sběrnice na hodnotu jedna. \cite{um10204}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.75]{obrazky-figures/i2c_data_word.pdf}
+	\caption{}
+	\label{}
+\end{figure}
+
+Na obrázku lze vidět, jak může vypadat přenos jednoho datového slova. V prvním rámci je přenesena sedmi bitová adresa, identifikující slave zařízení se kterým chce máster navázat komunikaci. Osmý bit datového rámce indikuje směr, kterým budou posílány data. V druhém rámci dojde k adresaci konkrétního registru na slave zařízení. A ve třetím, případně dalších, již probíhá samotné posílání dat mezi zařízeními. \cite{an4481}
+
+\subsubsection*{Pulzně šířková modulace}
+Jedná se o techniku, která umožňuje vytvořit pseudo-analogový výstup s použitím číslicových pinů. Mikrokontroléry jsou digitální zařízení a chtěly by tedy s okolním světem komunikovat pomocí číslicových pinů. Reálný svět však nefunguje pouze na úrovni jedniček a nul a proto je často potřeba převádět výstup z mikrokontroléru na analogový signál. Problém je v tom, že převod digitálního signálu na analogový je relativně dlouhá a neefektivní operace. Proto vznikla pulzně šířková modulace (PWM), která umožňuje relativně jednoduše simulovat analogový výstup. \cite{embeded_robotics}
+
+PWM využívá toho, že člověk nedokáže rozpoznat rychlé změny, například led dioda blikající na frekvenci 5000 Hz se člověku jeví jako by svítila permanentně. Mechanická zařízení také mívají relativně velkou latenci a dc motoru tedy nevadí, že místo konstantního analogového napětí dostává periodický číslicový signál.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=1]{obrazky-figures/pwm_duty_cycle.pdf}
+	\caption{}
+	\label{}
+\end{figure}
+
+Při pohledu na klasický digitální signál který rovnoměrně střídá vysokou a nízkou úroveň by šlo říci, že se jedná o PWM signál se střídou 50\%. Střída (duty cycle) udává poměr času, kdy je signál v logické jedničce, ku času, kdy je v nule. Součet těchto hodnot se musí rovnat délce jedné periody. Úpravou tohoto poměru lze simulovat analogový signál.
 
 \subsection*{Adeept AWR 4WD}
+Pohyb tohoto robota zajišťují čtyři pevná kola a zatáčení je tedy realizováno diferenciálním způsobem. To znamená, že jednotlivá kola se mohou otáčet svou vlastní rychlostí a zpomalením kol na jedné straně oproti té druhé lze provést zatáčení robota. Velkou výhodou tohoto přístupu je možnost otáčení robota na místě, naopak nevýhodou pak budou složitější výpočty pokud je potřeba zatočit pod konkrétním úhlem.
+
+\noindent Následující stránky popisují jednotlivé komponenty tohoto robota.
 
 \subsubsection*{Robot HAT}
-Adeept Robot HAT je hardwarová deska, která slouží k rozšíření Rapsberry Pi o další funkcionalitu. K rpi se připojuje pomocí GPIO(General purpuse input outpu) pinů. Deska jako taková obsahuje rozšiřující čipy a rozhraní sloužící k ovládání připojených periferií.
+HAT(hardware attached on top) je hardwarová deska, která slouží k rozšíření mikrokontroléru o další funkcionalitu. Tato konkrétní se k Raspberyy Pi připojuje pomocí GPIO(General purpuse input outpu) pinů. Deska jako taková obsahuje rozšiřující čipy a rozhraní sloužící k ovládání připojených periferií.
 
 \begin{itemize}
 	\item{PCA9685 \cite{pca9685}}
@@ -33,8 +72,9 @@ Adeept Robot HAT je hardwarová deska, která slouží k rozšíření Rapsberry
 		\item{obsahuje full bridge obvod (viz následující obrázek)}
 		\item{umožňuje roztočit motor oběma směry}
 		\item{pomocí PWM lze ovládat rychlost motorů}
+		\item{připojuje motor na externí napájení}
 	\end{itemize}
-	\item{další rozhraní pro připojení periferií (ultrasonic sensor, line tracking)}
+	\item{další rozhraní pro připojení periferií (line tracking)}
 \end{itemize}
 
 \begin{figure}[h!]
@@ -44,71 +84,69 @@ Adeept Robot HAT je hardwarová deska, která slouží k rozšíření Rapsberry
 	\label{}
 \end{figure}
 
-%batery - napájení
-
-\subsubsection{I2C}
-Je synchronní sběrnice, která se vyznačuje svou jednoduchostí a nízkou cenou. Využívá dva vodiče SDA (serial data) a SCL (serial clock). Oba vodiče jsou připojeny k napájecímu napětí pomocí pull-up rezistoru a bez vlivu jiného hardwaru zůstávají v logické jedničce. Zařízení která jsou na tuto sběrnici připojeny využívají open drain k úpravě aktuální napěťové úrovně na sběrnici. I2C pak pracuje s dvěma druhy zařízení, master a slave. Master zahajuje a ukončuje komunikaci, typicky se jedná o mikrokontroler. Slave jsou pak ostatní zařízení s nimiž může master komunikovat, typicky různé periferie. \cite{um10204}
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=0.75]{obrazky-figures/open_drain.pdf}
-	\caption{Open drain}
-	\label{}
-\end{figure}
-
-Přenos jednoho datového rámce zahájí master zařízení přivedením datové sběrnice do nuly. Následující komunikace se skládá z odeslání rámce o délce osmi bitů a potvrzení o úspěšném přenosu dat od přijímajícího zařízení. Toto potvrzení se nazývá ACK a je provedeno podržením datové sběrnice v hodnotě nula po dobu jednoho taktu. Opačný stav se nazývá NACK a indikuje že došlo k chybě. Ukončení přenosu je provedeno navrácením datové sběrnice na hodnotu jedna.
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=0.75]{obrazky-figures/i2c_data_word.pdf}
-	\caption{Na obrázku lze vidět, jak může vypadat přenos jednoho datového slova. V prvním rámci je přenesena sedmi bitová adresa sloužící k výběru slave zařízení se kterým chce máster navázat komunikaci. Doplněná o jeden bit indikující směr, kterým potečou data. V druhém rámci dojde k adresaci konkrétního registru a ve třetím se pošlou samotná data. \cite{an4481}}
-	\label{}
-\end{figure}
-
-\subsubsection*{Pulzně šířková modulace}
-Jedná se o techniku která umožňuje vytvořit pseudo-analogový výstup s použitím digitálních pinů. Mikrokontrolery jsou digitální zařízení a chtěly by tedy s okolním světem komunikovat pomocí digitálních pinů. Reálný svět však nefunguje pouze na úrovni jedniček a nul a je poroto potřeba převádět výstup z mikrokontroleru na analogový signlál. Problém je v tom, že převod digitálního signálu na analogový je relativně dlouhá a neefektivní operace. Proto vznikla pulzně šířková modulace, která umožňuje relativně jednoduše simulovat analogový výstup.
-
-Při pohledu na klasický digitální signál který rovnoměrně střídá vysokou a nízkou úroveň by šlo říci, že se jedná o PWM signál se střídou 50\%. Střída udává poměr času kdy je signál v logické jedničce ku času kdy je v nule. Součet těchto hodnot se musí rovnat délce jedné periody. Úpravou tohoto poměru lze simulovat analogový signál.
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=1]{obrazky-figures/pwm_duty_cycle.pdf}
-	\caption{Signál pro různé hodnoty střídy}
-	\label{}
-\end{figure}
-
+\newpage
 \subsubsection*{DC Motor}
-Pohyb celého autíčka zajišťují čtyři motory. Jsou napájeny pomocí stejnosměrného proudu(dc - direct current). K jejich ovládání a dodání většího proudu než je schopno poskytnout raspberry pi slouží obvod L298P který je součástí Robot HAT.
-Elektrický DC motor se skládá ze dvou hlavních částí, stator a rotor. Stator je statická, vnější část, a typicky se jedná o permanentní magnet. Uvnitř statoru se pak nachází rotor, ten se skládá z elektromagnetů, které při zapnutí reagují s statorem(póly se odpuzují a přitahují) a dojde tak k částečnému pootočení. Při správném spínání a vypínání těchto magnetů lze motor rozběhnout. To zajišťuje komutátor, jedná se o prstenec složený z několika navzájem odizolovaných částí, které jsou připojeny na vývody elektromagnetu. S povrchem prstence jsou pomocí pružin v kontaktu dva kartáče, které jsou připojeny na napájení a zemi. Komutátor se otáčí společně s rotorem a při tomto pohybu se kartáče postupně dotýkají různých částí komutátoru a spínají tak jednotlivé elektromagnety, ty vedou k pootočení rotoru a sepnutí následujícího magnetu.
+Pohyb celého autíčka zajišťují čtyři stejnosměrným proudem(direct current) napájené motory. Motor driver L298P sloužící k ovládání motorů je umístěný na Robot HAT.
 
 \begin{figure}[h!]
 	\centering
-	%\includegraphics[scale=1]{obrazky-figures/dc_motor.pdf}
-	\caption{Signál pro různé hodnoty střídy}
+	\includegraphics[scale=0.50]{obrazky-figures/dc_motor.pdf}
+	\caption{Dc motor}
 	\label{}
 \end{figure}
 
-Dc motor má stator, permanentní magnet. A rotor, cívky do kterých se pak posílá proud tak aby se od statoru odpuzovaly a roztáčí se tak rotor.
-
-\subsubsection*{Led}
+Elektrický DC motor se skládá ze dvou hlavních částí, stator a rotor. Stator je statická, vnější část, a typicky se jedná o permanentní magnet. Uvnitř statoru se pak nachází rotor, ten se skládá z elektromagnetů, které při zapnutí reagují se statorem(póly se odpuzují a přitahují) a dojde tak k částečnému pootočení. Při správném spínání a vypínání těchto magnetů lze motor rozběhnout. To zajišťuje komutátor, jedná se o prstenec složený z několika navzájem odizolovaných částí, které jsou připojeny na vývody elektromagnetu. S povrchem prstence jsou pomocí pružin v kontaktu dva kartáče, které jsou připojeny na napájení a zemi. Komutátor se otáčí společně s rotorem a při tomto pohybu se kartáče postupně dotýkají různých částí komutátoru a spínají tak jednotlivé elektromagnety, ty vedou k pootočení rotoru a sepnutí následujícího magnetu. \cite{embeded_robotics}
 
 \subsubsection*{Servo}
-Adeept AWD 4WD využívá pouze jedno servo, a to na ovládání úhlu kamery. Konkrétně se jedná o model Adeept AD002. Je ovládané pomocí PWM signálu. Generování tohoto signálu zajišťuje čip PCA9685 který je umístěný na Robot HAT.
+Servo je komponenta podobná DC Motoru, jejíž hlavní výhodnou je možnost přesně určit úhel natočení. Na rozdíl od něj se však neotáčí celých 360 stupňů, ale bývá omezena na cca 180 stupňů.
 
-\subsubsection*{Depth module}
-%hc-sr04
-Funguje na principu radaru. Vyšle zvukovou vlnu na frekvenci 40Khz %je v tutorialu adeept
- a uloží si časovou značku. Následně poslouchá než se mu vlna vrátí a tehdy uloží druhou značku. Kdyz pak ví jak rychle se šíří zvuk ve vzduchu dokáže vypočítat vzdálenost od překážky.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.9]{obrazky-figures/servo.pdf}
+	\caption{}
+	\label{}
+\end{figure}
+Při pohledu na vnitřní zapojení serva lze zjistit, že se prakticky jedná o klasický dc motor připojený na převodovku a rozšířený o elektroniku na jeho řízení. K nastavení úhlu serva se využívá PWM signál. Ten je první přeložený na napěťovou úroveň, která je porovnána s aktuálním natočením serva a výsledek udává směr, kterým se bude otáčet motor. Aktuální natočení serva je získáno využitím potenciometru zapojeného na výstupní hřídel serva. \cite{embeded_robotics}
+
+Adeept AWD 4WD využívá pouze jedno servo, a to na ovládání úhlu natočení kamery. Konkrétně se jedná o model Adeept AD002. Generování PWM signálu pro ovládání zajišťuje čip PCA9685 který je součástí Robot HAT.
+
+\subsubsection*{Ultrazvukový senzor hloubky}
+Slouží k určení vzdálenosti mezi robotem a překážkou. Funguje na principu radaru. Vyšle ultrazvukovou vlnu na frekvenci 40Khz %je v tutorialu adeept
+a uloží si časovou značku. Následně poslouchá než se mu vrátí odražená vlna a opět si uloží značku.
+Pro výpočet vzdálenosti lze využít následující vzorec:
 
 $$S = (T_2 - T_1) * V_S / 2$$
-Kde $T_1$ je moment kdy byla vyslána vlna $T_2$ kdy byla vlna přijata a $V_S$ rychlost šíření zvuku ve vzduchu.
 
-\subsubsection*{Line tracking}
-Funguje podobne jako depth module. Vysílá ultračervené tentokrát světlo a sleduje jestli došlo k odrazu. Bílý papír většinu světla odrazí a senzor jej zachytí, naopak černá čára světlo pohltí a senzor tak pozná že našel čáru.
+Kde $T_1$ je moment kdy byla vyslána vlna $T_2$ kdy byla vlna přijata a $V_S$ rychlost šíření zvuku ve vzduchu (cca 340m/s). Výsledek se pak dělí dvěma, protože doba $T_2 - T_1$ je rovna času k překážce a zpět.
+
+Konkrétně se jedná o model hc-sr04, který dokáže změřit vzdálenost od 2cm do 400cm s přesností na 3mm. Ovládání senzoru je pak realizováno pomocí dvou jeho vývodů a to trig a echo. Mikrokontroler vyšle pulz na trig vodiči. Ten zaktivuje senzor, který zahájí měření. To je realizováno osmi čtyřicetihercovými pulzy ze kterých vypočítá výslednou vzdálenost. Po dokončení výpočtu nastaví echo vodič do hodnoty jedna na dobu rovnou času mezi odesláním a zachycením ultrazvukového signálu. \cite{embeded_robotics}
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.75]{obrazky-figures/ultrasonic.pdf}
+	\caption{Ultrasonic}
+	\label{}
+\end{figure}
+
+\subsubsection*{Třícestný senzor pro sledování čáry}
+Modul využívá fakt, zě intenzita světla odraženého od povrchu je závislá na barvě dané plochy. Například černá barva pohltí téměř veškeré světlo, naopak bílá téměř vše odrazí. Používáno je infračervené záření, protože není ovlivněno okolními zdroji světla, odráží se od velkého množství materiálů a je přesné. Jedná se o třícestný modul a skládá se tedy ze setu tří vysílačů a senzorů. Pokud vysílač svítí a senzor nezaznamenává dostatečnou intenzitu odraženého světla, znamená to, že byla nalezena černá čára.
+Komunikace s mikrokontrolerem je realizována pomocí GPIO vstupů, na které jsou připojeny tři vývody z modulu. Každý z nich reprezentuje jeden set vysílače a senzoru. Jednička na výstupu indikuje, že čára byla detekována.
+
+\subsubsection*{WS2812 RGB LED} %najit na tohle nejakou citaci vetsinu informaci odhaduji
+WS2812 je druh adresovatelných LED diod. Pojmem adresovatelných je myšleno, že není každá dioda připojena k mikrokontroleru zvláště, ale sdílejí jeden datový vodič pro nastavování barev. Prakticky to znamená, že pásek, který může obsahovat i stovky diod je připojený jen pomocí tří vodičů. Těmito vodiči jsou napájení, země a vstupní data.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.55]{obrazky-figures/ws2812_led.pdf}
+	\caption{Ultrasonic}
+	\label{}
+\end{figure}
+
+Diody jsou na pásku zapojeny \uv{seriově}, mají DIN a DO porty a přijatá data, která nejsou určena dané diodě přeposílá dále. Komunikace pak vždy začíná klidovým stavem, datový vodič je v nule. Datové slovo se skládá z 24 bitových bloků pro každou diodu. Blok obsahuje tři osmi bitové hodnoty, jednu pro každou barevnou složku a MSB je posíláno první. Diody pak fungují tak, že přijmou prvních 24 bitů podle kterých nastaví svou barvu. Tuto část odeberou z datového slova a zbytek přeposílají na výstup.
 
 \subsection*{Raspberry Pi 4b}
-Jako mozek celého systému je použit mikropočítač Raspberry Pi. Konkrétně se jedná o verzi 4 model B s operační pamětí o velikostí čtyř gigabajtů. Tato verze obsahuje 64bitový procesor, který je potřeba pro spuštění 64 bitového Ubuntu serveru, který je doporučeným operačním systémem pro požití ROS2 na raspberry pi.
-Komunikace s většinou použitých periferií je uskutečněna pomocí General Purpuse Input Output(GPIO) pinů. Jedná se o digitální vývody, které podle potřeby můžou fungovat jako vstup i výstup ze zařízení. Některé z nich pak mají ještě speciální funkce, například GPIO 2 a 3 můžou pracovat jako SDA a SCL připojení pro I2C komunikaci.
+Jako mozek celého systému je použit mikropočítač Raspberry Pi. V porovnání s běžně používanými mikrokontroléry sloužícími pro řízení vestavěných systémů se jedná o výkonnější hardware, který zvládá i komplexnější operace jako běh plnohodnotného operačního systému a zpracování obrazu. Konkrétně se jedná o verzi 4 model B s operační pamětí o velikostí čtyř gigabajtů. Tato verze obsahuje 64bitový procesor, ten je potřeba pro spuštění 64 bitového Ubuntu serveru, který je doporučeným operačním systémem pro požití ROS2 na raspberry pi.
+Komunikace s většinou použitých periferií je uskutečněna pomocí General Purpuse Input Output(GPIO) pinů. Jedná se o číslicové vývody, které podle potřeby můžou fungovat jako vstup i výstup ze zařízení. Některé z nich pak mají ještě speciální funkce, například GPIO 2 a 3 můžou pracovat jako SDA a SCL připojení pro I2C komunikaci.
 
 \begin{figure}[h!]
 	\centering
@@ -117,25 +155,23 @@ Komunikace s většinou použitých periferií je uskutečněna pomocí General 
 	\label{}
 \end{figure}
 
-\subsubsection*{Camera}
+\subsubsection*{Camera} %cite rpi doc
+Přímo k rapsberry pi je připojena oficiální rpi camera v3. Tento modul dokáže nahrávat video až v rozlišení 2304 × 1296 pixelů a 56 snímcích za vteřinu. Avšak pro zpracování, případně analýzu obsahu videa v reálném čase s těmito specifikacemi nemá rpi dostatečný výkon. Prakticky budou využity nižší rozlišení a snímkovací frekvence. 
+%opencv
+
+\chapter{Software pro řízení robota}
+Jak už bylo řečeno software poběží na Raspberry Pi. Jako primární programovací jazyk byl zvolen python, protože je jedním z oficiálních jazyků podporovaných ROS2 a také jsou v něm implementovány potřebné knihovny pro ovládání periferií.
 
 \section{Aktuální software}
-Tento robot je dodáván s ukázkovým softwarem. Ten je implementován v jazyku python a využívá knihovny třetích stran sloužící k nízkoúrovňovému ovládání hardware komponent. Aby byl robot responzivní je celá implementace řešena s použitím python modulů sloužících k realizaci multithreadingu. Tento přístup bezpochyby funguje, avšak i u tohoto relativně malého projektu se takový kód stává poměrně složitým na porozumění.
+Robot Adeept AWR 4WD je dodáván s ukázkovým softwarem. Ten je implementován v jazyce Python a využívá knihovny třetích stran sloužící k nízkoúrovňovému ovládání hardwarových komponent. Aby byl robot responzivní je celá implementace řešena s použitím python modulů pro realizaci multithreadingu.
 
-%koncepce (multithreading, knihovny)
-
-\
-
-
-%zhodnocení (plánované změny a naopak ponechané části)
-
-\section{Seznámení s ROS2} %cite knizku
-ROS2 je middleware sloužící k vývoji a řízení robotů. Middleware je softwarová vrstva běžící nad operačním systémem sloužící k rozšíření jeho funkcionality. Typicky middleware obsahuje knihovny, ovladače, vývojové a monitorovací nástroje. Může také specifikovat doporučené metodologie pro vývoj. ROS2 je již druhá verze tohoto softwaru, která rozšiřuje a opravuje neduhy první verze. Původní ROS1 je považován za de-facto standart pro vývoj robotických aplikací.
-Tato práce využívá ros2 distribuci jménem iron. Distribuce v ROS2 lze popsat jako set operačního systému, knihoven a dalších aplikací, které jsou otestovány a je zaručeno, že jsou navzájem kompatibilní. Velkou výhodou ROS je fakt, že se jedná o open source projekt. Díky tomu kolem něj vznikla velká komunita vývojářů, ale i firem a dalších institucí, které tvoří mnoho souvisejícího obsahu. Existuje tedy velké množství knihoven, dokumentací a návodů které usnadňují vývojářům práci.
+\section{Seznámení s ROS2}
+ROS2 je middleware sloužící k vývoji a řízení robotů. Middleware je softwarová vrstva běžící nad operačním systémem. Jejím úkolem je rozšíření operačního systému o další funkcionalitu. Typickou součástí middlewaru bývají knihovny, ovladače, vývojové a monitorovací nástroje. Může také specifikovat doporučené metodologie pro vývoj. ROS2 je již druhá verze tohoto softwaru, která rozšiřuje a opravuje neduhy první verze. Původní ROS1 je považován za de-facto standart pro vývoj robotických aplikací.
+Tato práce využívá ROS2 distribuci jménem iron. Distribuce v ROS2 lze popsat jako set operačního systému, knihoven a dalších aplikací, které jsou otestovány a je zaručeno, že jsou navzájem kompatibilní. Velkou výhodou ROS je fakt, že se jedná o open source projekt. Díky tomu kolem něj vznikla velká komunita vývojářů, ale i firem a dalších institucí, které tvoří mnoho souvisejícího obsahu. Existuje tedy velké množství knihoven, dokumentací a návodů které usnadňují vývojářům práci. \cite{ros2_introduction}
 
 \subsection*{Vrstvy ROS2}
-Na nejvyšší úrovni, se nachází programátor který interaguje s klientskými knihovnami pro vývoj ROS2 aplikací. Tyto knihovny jsou oficiálně dvě a to rclpy pro python a rclcpp pro C++. Existují také implementace pro další programovací jazyky (rclc, java, C\#), ty jsou však udržovány komunitně. Všechny klientské knihovny pak využívají rcl. RCL je jádro celého ROS implementované v jazyce C. RCL implementuje hlavní ros2 funkcionalitu, kterou následně poskytuje pomocí rozhraní jednotlivým klientským knihovnám. Díky tomuto se funkcionalita implementovaná v pythonu bude chovat stejně jako ta implementovaná v c++. Taky pak kód implementovaný v c++ může komunikovat s tím v pythonu.
-Poslední vrstvou je data distribution service. DDS je komunikační vrstva implementována na UDP protokolu sloužící k předávání informací mezi procesy. Má charakteristiky systémů reálného času, zajišťuje kvalitu a zabezpečení komunikace. Také umožňuje vyhledávání uzlů bez potřeby centralizovaného serveru (využívá k tomu multicast, komunikace mezi uzly je následně unicast).
+Na nejvyšší úrovni, se nachází programátor který interaguje s klientskými knihovnami pro vývoj ROS2 aplikací. Tyto knihovny jsou oficiálně dvě a to rclpy pro python a rclcpp pro C++. Existují také implementace pro další programovací jazyky (rclc, java, C\#), ty jsou však udržovány komunitně. Všechny klientské knihovny pak využívají RCL. RCL je jádro celého ROS implementované v jazyce C. RCL implementuje hlavní ros2 funkcionalitu, kterou následně poskytuje pomocí rozhraní jednotlivým klientským knihovnám. Díky tomuto se funkcionalita implementovaná v pythonu bude chovat stejně jako ta implementovaná v c++. Taky pak kód implementovaný v c++ může komunikovat s tím v pythonu.
+Poslední vrstvou je data distribution service. DDS je komunikační vrstva implementována na UDP protokolu sloužící k předávání informací mezi procesy. Má charakteristiky systémů reálného času, zajišťuje kvalitu a zabezpečení komunikace. Také umožňuje vyhledávání uzlů bez potřeby centralizovaného serveru (využívá k tomu multicast, komunikace mezi uzly je následně unicast). \cite{ros2_introduction}
 
 \begin{figure}[h!]
 	\centering
@@ -146,7 +182,7 @@ Poslední vrstvou je data distribution service. DDS je komunikační vrstva impl
 
 \subsection{Vývoj v ROS2} %cite knizku
 Nejvyšší organizační jednotkou v ROS2 je workspace. Jedná se o složku, která slouží k organizaci zdrojových souborů, jejich instalaci a následné spouštění. ROS2 instalace je také workspace a před použitím je potřeba ji nejprve aktivovat. K tomu v linuxu slouží příkaz \verb|source|. Aktivace workspace je akumulativní a v jeden moment tedy může být aktivních několik workspace. Typicky se první aktivuje základní ros2 instalace, která tvoří takzvanou underlay vrstvu. Vývojový workspace aktivovaný jako druhý se pak nazývá overlay. Pokud má overlay nějaké závislosti, měly by být uspokojeny v underlay.
-Zdrojové soubory v rámci workspace jsou pak organizovány do packages. Package může obsahovat zdrojové soubory, knihovny a definice zpráv. Packages na sobě můžou navzájem záviset (např: package která potřebuje interface závisí na jiné která tento interface definuje).
+Zdrojové soubory v rámci workspace jsou pak organizovány do packages. Package může obsahovat zdrojové soubory, knihovny a definice zpráv. Packages na sobě můžou navzájem záviset (např: package která potřebuje interface závisí na jiné která tento interface definuje). \cite{ros2_introduction}
 
 \vspace*{1em}\noindent
 \begin{forest}
@@ -180,14 +216,14 @@ Zdrojové soubory v rámci workspace jsou pak organizovány do packages. Package
 		]
 		[src {\hspace{4em}\#packages}
 			[package\_name {\hspace{2em}\#příklad jak vypadá python package}
-				[package\_name {\hspace{2em}\#zdrojové soubory}
+				[package\_name {\hspace{2em}\#zdrojové python soubory}
 				]
 				[resource
 				]
 				[test
 				]
-				[package.xml {\hspace{1em}\#metadata o package}]
-				[setup.cfg {\hspace{2em}\#pro ros2 run (spouštění package)}]
+				[package.xml {\hspace{1em}\#metadata infromace o package}]
+				[setup.cfg {\hspace{2em}\#konfigurace pro manuální spouštění uzlu}]
 				[setup.py {\hspace{2.5em}\#instrukce pro kompilátor jak nainstalovat package}]
 			]
 		]
@@ -195,13 +231,13 @@ Zdrojové soubory v rámci workspace jsou pak organizovány do packages. Package
 \end{forest}
 
 \subsubsection*{Node} %prepsat aby to bylo stylisticky hezci
-Celý ROS2 systém je složený z uzlů (Node), které mezi sebou navzájem komunikují. Každý uzel je vlastní výpočetní jednotka, která by měla plnit jeden specifický úkol. Tento přístup je podobný objektově orientovanému návrhu a ROS2 jej také využívá. Implementačně je tedy uzel objekt který dědí ze třídy \verb|Node|.
+Celý ROS2 systém je složený z uzlů (Node), které mezi sebou navzájem komunikují. Každý uzel je vlastní výpočetní jednotka, která by měla plnit jeden specifický úkol. Tento přístup je podobný objektově orientovanému návrhu a ROS2 jej také využívá. Implementačně je tedy uzel objekt, který dědí ze třídy \verb|Node|.
 Uzly v ROS2 většinou nepotřebují běžet permanentně, ale pouze v monentě, kdy nastane nějaká událost kterou je potřeba obsloužit. Z toho důvodu existuje v ROS2 metoda \verb|spin()|, která uspí vykonávání uzlu, dokud jej není potřeba opět využít. Aby ROS2 šetřil výpočetní prostředky, využívá dva přístupy k určení, kdy bude potřeba uzel vzbudit. Prvním je iterative execution, ten se používá u uzlů, které vykonávájí svou činnost pravidelně na nějaké frekvenci. Například se může jednat o výpočetní uzel, který pravidelně každých x mikrosekund provede výpočet podle hodnot senzorů a odešle výsledek.
-Druhý je event oriented execution. Zde dochází k vyvolání řídícího cyklu jako důsledek nějaké události, typicky se jedná od příchozí zprávu z subscription, service nebo action. Frekvenci spouštění těchto uzlů pak lze odvodit od frekvence příchozích zpráv. Typicky se může jednat o uzel přijímající snímky z kamery na kterých provede výpočet a vrátí odpověď. Frekvence výpočtu je dána příchozími snímky, pokud snímky přestanou přicházet, uzel se nebude spouštět. %cite knizku
+Druhý je event oriented execution. Zde dochází k vyvolání řídícího cyklu jako důsledek nějaké události, typicky se jedná od příchozí zprávu z subscription, service nebo action. Frekvenci spouštění těchto uzlů pak lze odvodit od frekvence příchozích zpráv. Typicky se může jednat o uzel přijímající snímky z kamery na kterých provede výpočet a vrátí odpověď. Frekvence výpočtu je dána příchozími snímky, pokud snímky přestanou přicházet, uzel se nebude spouštět. \cite{ros2_introduction}
 
 \begin{algorithm}[h!]
 	\label{}
-	\caption{\textsc{Struktura a použití Node objektu}}
+	\caption{\textsc{Definice a použití Node objektu}}
 	
 	\DontPrintSemicolon
 	\SetAlgoNoLine
@@ -424,7 +460,7 @@ Action server využívá stejné postupy jako předchozí ukázky, pouze jich ko
     \texttt{value = result.item}\;
     
 \end{algorithm}
-Při pohledu na implementaci action klienta lze dobře vidět vnitřní implementace akcí. První funkce \verb|send_goal()| vypadá podobně jako service client. Dojde zde k zaslání požadavku na server a následné čekání na odpověď. Součástí požadavku je předání feedback topicu a čekání na odpověď není aktivní ale pomocí callback funkce. Druhá \verb|response_callback_function| pak zpracuje výsledek požadavku (přijmutí nebo zamítnutí) a pošle požadavek na result service, který nakonec vrátí výsledek.
+Při pohledu na implementaci action klienta lze dobře vidět vnitřní implementace akcí. První funkce \verb|send_goal()| vypadá podobně jako service client. Dojde zde k zaslání požadavku na server a následné čekání na odpověď. Součástí požadavku je předání feedback topicu a čekání na odpověď není aktivní ale pomocí callback funkce. Druhá \\ \verb|response_callback_function| pak zpracuje výsledek požadavku (přijmutí nebo zamítnutí) a pošle požadavek na result service, který nakonec vrátí výsledek.
 
 \subsubsection*{Interface}
 Interface slouží k určení přesného formátu jednotlivých zpráv, které jsou posílány mezi uzly. ROS2 obsahuje mnoho již vytvořených a vývojáři po celém světě používaných formátů. Tento přístup podporuje znovupoužitelnost vytvořeného kódu a šetří práci. Díky tomu může být software pro ovládání konkrétního kusu hardware naimplementován pouze jednou s využitím standartního rozhraní a všichni ostatní jej pak mohou využít ve svých systémech.
@@ -554,18 +590,12 @@ ROS2 systém se skládá z velkého množství navzájem komunikujících uzlů,
 \end{algorithm}
 
 \subsection*{Knihovny}
+%použité ros2 knihovny
 
 
-
-
-\chapter{Implementace} %prejmenovat, hodne todo, vetsina neni naimplementovana
-\section{Struktura kódu}
-\section{Manuální řízení}
-\section{Sledování čáry}
-
+\chapter{Implementace}
 \chapter{Závěr}
 %cca strana
-
 
 %===============================================================================
 
