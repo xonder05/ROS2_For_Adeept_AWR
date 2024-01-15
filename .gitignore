@@ -3,3 +3,4 @@
 /install
 /log
 /src/**/__pycache__
+/launch/__pycache__
