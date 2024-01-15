@@ -33,19 +33,16 @@ def main():
 
     node.get_logger().info(node.get_namespace())
 
+    while(1):
+       try:
+           r = int(input("Enter R: "))
+           g = int(input("Enter G: "))
+           b = int(input("Enter B: "))
 
-    node.send_request(0, 0, 0)
-    node.get_logger().info("sent request")
+           node.send_request(r, g, b)
+
+       except ValueError:
+           pass
 
     rclpy.shutdown()
 
-#    while(1):
-#        try:
-#            r = int(input("Enter R: "))
-#            g = int(input("Enter G: "))
-#            b = int(input("Enter B: "))
-
-#            node.send_request(r, g, b)
-
-#        except ValueError:
-#            pass

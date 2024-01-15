@@ -29,6 +29,10 @@
         <button class="drive-right" id="d" onmousedown="driveCommand(6, 'press')" onmouseup="driveCommand(2, 'release')">d</button>    
     </div>
     
+    <div class="lights-container">
+        <input type="color" onchange="changeColorCommand(this.value)"/>
+    </div>
+
     <script>
         var ros = new ROSLIB.Ros();
 
@@ -190,6 +194,31 @@
             }
             keyDownFlag[event.code] = false;
         });
+
+        function changeColorCommand(selectedColor)
+        {
+            var hexaColorValue = selectedColor.replace(/^#/, '');
+            var decColorValue = parseInt(hexaColorValue, 16);
+            var r = (decColorValue >> 16) & 255;
+            var g = (decColorValue >> 8) & 255;
+            var b = decColorValue & 255;
+
+            var ledController = new ROSLIB.Service({
+                ros : ros,
+                name : '/change_rgb_color',
+                serviceType : 'adeept_awr_interfaces/srv/RBG'
+            });
+
+            var request = new ROSLIB.ServiceRequest({
+                r: r,
+                g: g,
+                b: b
+            });
+
+            ledController.callService(request, function(result) {
+                console.log("color changed");
+            });
+        }
 
     </script>
 </body>

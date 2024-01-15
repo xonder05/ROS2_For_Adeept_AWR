@@ -19,6 +19,10 @@ def generate_launch_description():
             ),
         IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([
+                    FindPackageShare("adeept_awr_output_devices"), '/launch', '/rgb_led_launch.py'])
+            ),
+        IncludeLaunchDescription(
+                PythonLaunchDescriptionSource([
                     FindPackageShare("adeept_awr_input_sensors"), '/launch', '/pi_camera_launch.py'])
             ),
         IncludeLaunchDescription(
