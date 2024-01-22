@@ -1,0 +1,17 @@
+pi_camera_node:
+  ros__parameters:
+    video_capture: '/dev/video0'
+    video_resolution_width: 960
+    video_resolution_height: 540
+    video_framerate: 0.05
+
+ultrasonic_node:
+  ros__parameters:
+    tr_pin: 11
+    ec_pin: 8
+
+line_tracking_node:
+  ros__parameters:
+    left_pin: 19
+    middle_pin: 16
+    right_pin: 20
