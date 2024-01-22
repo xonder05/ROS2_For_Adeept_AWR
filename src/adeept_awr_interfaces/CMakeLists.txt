@@ -29,6 +29,7 @@ set(msg_files
   "msg/DriveDirections.msg"
   "msg/UltrasonicDistance.msg"
   "msg/CameraFrame.msg"
+  "msg/LineTracking.msg"
   )
 
 set(srv_files
