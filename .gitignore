@@ -4,3 +4,6 @@
 /log
 /src/**/__pycache__
 /launch/__pycache__
+/web/node_modules
+web/package.json
+web/package-lock.json
