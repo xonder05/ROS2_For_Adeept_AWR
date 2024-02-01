@@ -1,0 +1,4 @@
+simulator_motor:
+  ros__parameters:
+    input_topic: "drive_directions"
+    output_topic: "/model/vehicle_blue/cmd_vel"
