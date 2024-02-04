@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             "wandering_node = controllers.wandering_node:main",
+            "gamepad_node = controllers.gamepad_node:main",
         ],
     },
 )
