@@ -26,7 +26,8 @@ setup(
         'console_scripts': [
             "ultrasonic_node = adeept_awr_input_sensors.ultrasonic_node:main",
             "pi_camera_node = adeept_awr_input_sensors.pi_camera_node:main",
-            "line_tracking_node = adeept_awr_input_sensors.line_tracking_node:main"
+            "line_tracking_node = adeept_awr_input_sensors.line_tracking_node:main",
+            "sound_recorder_node = adeept_awr_input_sensors.sound_recorder_node:main"
         ],
     },
 )
