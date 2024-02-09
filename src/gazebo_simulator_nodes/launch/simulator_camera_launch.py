@@ -11,20 +11,21 @@ def generate_launch_description():
         'config.yaml'
     )
 
-    simulator_motor = Node(
+    simulator_camera = Node(
         package='gazebo_simulator_nodes',
-        executable='simulator_motor',
-        parameters=[config]
+        executable='simulator_camera',
+        #parameters=[config]
     )
     
-    #ros2 run ros_gz_bridge parameter_bridge /model/adeept_awr/cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist
+    #ros2 run ros_gz_bridge parameter_bridge /camera@sensor_msgs/msg/Image@gz.msgs.Image /camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=['/model/adeept_awr/cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist']
+        arguments=['/simulator_camera@sensor_msgs/msg/Image@gz.msgs.Image',
+                   '/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo']
     )
 
     return launch.LaunchDescription([
-        simulator_motor,
+        simulator_camera,
         bridge,
     ])

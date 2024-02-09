@@ -13,7 +13,7 @@ class SimulatorCameraServo(Node):
         super().__init__("simulator_camera_servo")
         
         self.action_server = ActionServer(self, Servo, 'put_servo_to_pos', self.action_callback)
-        self.publisher = self.create_publisher(Float64, "/model/vehicle_blue/joint/camera_servo_joint/cmd_vel", 10)
+        self.publisher = self.create_publisher(Float64, "/model/adeept_awr/joint/camera_servo_joint/cmd_vel", 10)
         
         self.get_logger().info("InitDone")
 
@@ -36,7 +36,7 @@ class SimulatorCameraServo(Node):
 
     def in_dec_rement_servo(self, direction):
         msg = Float64()
-        msg.data = 0.785 * direction
+        msg.data = 0.3925 * direction
         self.publisher.publish(msg)
         time.sleep(0.5)
         msg.data = 0.0
