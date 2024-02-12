@@ -12,8 +12,18 @@ class SimulatorCameraServo(Node):
     def __init__(self):
         super().__init__("simulator_camera_servo")
         
-        self.action_server = ActionServer(self, Servo, 'put_servo_to_pos', self.action_callback)
-        self.publisher = self.create_publisher(Float64, "/model/adeept_awr/joint/camera_servo_joint/cmd_vel", 10)
+        self.declare_parameters(
+            namespace='',
+            parameters=[
+                ('input_topic', rclpy.Parameter.Type.STRING),
+                ('output_topic', rclpy.Parameter.Type.STRING)
+            ]
+        )
+        self.input_topic = self.get_parameter('input_topic').get_parameter_value().string_value
+        self.output_topic = self.get_parameter('output_topic').get_parameter_value().string_value
+
+        self.action_server = ActionServer(self, Servo, self.input_topic, self.action_callback)
+        self.publisher = self.create_publisher(Float64, self.output_topic, 10)
         
         self.get_logger().info("InitDone")
 

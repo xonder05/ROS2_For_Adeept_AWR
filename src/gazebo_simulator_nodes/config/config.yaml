@@ -2,3 +2,31 @@ simulator_motor:
   ros__parameters:
     input_topic: "drive_directions"
     output_topic: "/model/adeept_awr/cmd_vel"
+
+simulator_motor_bridge:
+  ros__parameters:
+    topic: "/model/adeept_awr/cmd_vel"
+    ros_message_type: "geometry_msgs/msg/Twist"
+    gazebo_message_type: "ignition.msgs.Twist"
+
+simulator_camera:
+  ros__parameters:
+    input_topic: "/simulator_camera"
+    output_topic: "/camera_stream"
+
+simulator_camera_bridge:
+  ros__parameters:
+    topic: "/simulator_camera"
+    ros_message_type: "sensor_msgs/msg/Image"
+    gazebo_message_type: "gz.msgs.Image"
+
+simulator_camera_servo:
+  ros__parameters:
+    input_topic: "/put_servo_to_pos"
+    output_topic: "/model/adeept_awr/joint/camera_servo_joint/cmd_vel"
+
+simulator_camera_servo_bridge:
+  ros__parameters:
+    topic: "/model/adeept_awr/joint/camera_servo_joint/cmd_vel"
+    ros_message_type: "std_msgs/msg/Float64"
+    gazebo_message_type: "gz.msgs.Double"
