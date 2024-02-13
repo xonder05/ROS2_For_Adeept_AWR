@@ -18,7 +18,7 @@ class LineTrackerNode(Node):
         self.line_pin_middle = self.get_parameter('middle_pin').get_parameter_value().integer_value
         self.line_pin_right = self.get_parameter('right_pin').get_parameter_value().integer_value
         
-        self.timer = self.create_timer(1, self.scanLine)
+        self.timer = self.create_timer(0.05, self.scanLine)
         self.publisher = self.create_publisher(LineTracking, "line_visibility", 10)
 
         GPIO.setwarnings(False)
