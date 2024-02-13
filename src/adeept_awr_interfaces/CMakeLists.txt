@@ -30,6 +30,7 @@ set(msg_files
   "msg/UltrasonicDistance.msg"
   "msg/CameraFrame.msg"
   "msg/LineTracking.msg"
+  "msg/SoundBlock.msg"
   )
 
 set(srv_files

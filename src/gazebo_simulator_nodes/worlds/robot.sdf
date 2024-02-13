@@ -1,0 +1,214 @@
+<sdf version="1.6">
+<model name='adeept_awr' canonical_link='chassis'>
+    <pose>0 0 1 0 0 0</pose>
+        <link name='chassis'>
+        <pose relative_to='__model__'>0 0 0.2 0 0 0</pose>
+        
+        <inertial>
+            <mass>2</mass>
+            <inertia>
+                <ixx>0.000303125</ixx>
+                <ixy>0</ixy>
+                <ixz>0</ixz>
+                <iyy>0.000359375</iyy>
+                <iyz>0</iyz>
+                <izz>0.000542708</izz>
+            </inertia>
+        </inertial>
+
+        <visual name='visual'>
+            <geometry>
+                <box>
+                    <size>0.14 0.12 0.075</size>
+                </box>
+            </geometry>
+            <material>
+                <ambient>0.0 0.0 1.0 1</ambient>
+                <diffuse>0.0 0.0 1.0 1</diffuse>
+                <specular>0.0 0.0 1.0 1</specular>
+            </material>
+        </visual>
+        <collision name='collision'>
+            <geometry>
+                <box>
+                    <size>0.14 0.12 0.075</size>
+                </box>
+            </geometry>
+        </collision>
+        </link>
+
+        <link name='camera'>
+            <pose relative_to='chassis'>0.065 0 0.03 0 0 0</pose>
+            <inertial>
+                <mass>0.01</mass>
+                <inertia>
+                    <ixx>3.4725e-06</ixx>
+                    <ixy>0</ixy>
+                    <ixz>0</ixz>
+                    <iyy>4.21875e-06</iyy>
+                    <iyz>0</iyz>
+                    <izz>5.385e-06</izz>
+                </inertia>
+            </inertial>
+            <visual name='visual'>
+                <geometry>
+                    <box>
+                        <size>0.02 0.045 0.03</size>
+                    </box>
+                </geometry>
+                <material>
+                    <ambient>0.0 1.0 0.0 1</ambient>
+                    <diffuse>0.0 1.0 0.0 1</diffuse>
+                    <specular>0.0 1.0 0.0 1</specular>
+                </material>
+            </visual>
+            <collision name='collision'>
+                <geometry>
+                    <box>
+                        <size>0.02 0.045 0.03</size>
+                    </box>
+                </geometry>
+            </collision>
+            
+            <sensor name='camera' type='camera'>
+                <pose>0 0 0 0 0 0</pose>
+                <topic>simulator_camera</topic>
+                <update_rate>30</update_rate>
+                <camera name='__default__'>
+                    <horizontal_fov>1.0469999999999999</horizontal_fov>
+                    <image>
+                        <width>820</width>
+                        <height>540</height>
+                        <format>RGB_INT8</format>
+                    </image>
+                    <clip>
+                        <near>0.01</near>
+                        <far>100</far>
+                    </clip>
+                    <visibility_mask>4294967295</visibility_mask>
+                    <lens>
+                        <type>stereographic</type>
+                        <scale_to_hfov>true</scale_to_hfov>
+                        <cutoff_angle>1.5708</cutoff_angle>
+                        <env_texture_size>256</env_texture_size>
+                    </lens>
+                </camera>
+            </sensor>
+        </link>
+
+        <joint name='camera_servo_joint' type='revolute'>
+            <pose relative_to='camera'/>
+            <parent>chassis</parent>
+            <child>camera</child>
+            <axis>
+                <xyz>0 1 0</xyz>
+                <limit>
+                    <lower>-1.57076</lower>
+                    <upper>0.1745</upper>
+                </limit>
+                <effort>
+                    <min>-10</min>
+                    <max>10</max>
+                </effort>
+            </axis>
+        </joint>
+
+        <plugin name="ignition::gazebo::systems::JointController" filename="libignition-gazebo-joint-controller-system.so">
+            <joint_name>camera_servo_joint</joint_name>
+        </plugin>
+        
+
+        <include>
+            <name>left_front_wheel</name>
+            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/wheel.sdf</uri>
+            <pose relative_to="chassis">0.03 0.075 -0.025 -1.5707 0 0</pose>
+        </include>
+
+        <joint name='left_front_wheel_joint' type='revolute'>
+            <pose relative_to='left_front_wheel'/>
+            <parent>chassis</parent>
+            <child>left_front_wheel::wheel</child>
+            <axis>
+                <xyz>0 0 1</xyz>
+                <limit>
+                    <lower>-1.79769e+308</lower>
+                    <upper>1.79769e+308</upper>
+                </limit>
+            </axis>
+        </joint>
+
+        <include>
+            <name>right_front_wheel</name>
+            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/wheel.sdf</uri>
+            <pose relative_to="chassis">0.03 -0.075 -0.025 -1.5707 0 0</pose>
+        </include>
+
+        <joint name='right_front_wheel_joint' type='revolute'>
+            <pose relative_to='right_front_wheel'/>
+            <parent>chassis</parent>
+            <child>right_front_wheel::wheel</child>
+            <axis>
+                <xyz>0 0 1</xyz>
+                <limit>
+                    <lower>-1.79769e+308</lower>
+                    <upper>1.79769e+308</upper>
+                </limit>
+            </axis>
+        </joint>
+
+        <include>
+            <name>left_rear_wheel</name>
+            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/wheel.sdf</uri>
+            <pose relative_to="chassis">-0.055 0.075 -0.025 -1.5707 0 0</pose>
+        </include>
+
+        <joint name='left_rear_wheel_joint' type='revolute'>
+            <pose relative_to='left_rear_wheel'/>
+            <parent>chassis</parent>
+            <child>left_rear_wheel::wheel</child>
+            <axis>
+                <xyz>0 0 1</xyz>
+                <limit>
+                    <lower>-1.79769e+308</lower>
+                    <upper>1.79769e+308</upper>
+                </limit>
+            </axis>
+        </joint>
+
+        <include>
+            <name>right_rear_wheel</name>
+            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/wheel.sdf</uri>
+            <pose relative_to="chassis">-0.055 -0.075 -0.025 -1.5707 0 0</pose>
+        </include>
+
+        <joint name='right_rear_wheel_joint' type='revolute'>
+            <pose relative_to='right_rear_wheel'/>
+            <parent>chassis</parent>
+            <child>right_rear_wheel::wheel</child>
+            <axis>
+                <xyz>0 0 1</xyz>
+                <limit>
+                    <lower>-1.79769e+308</lower>
+                    <upper>1.79769e+308</upper>
+                </limit>
+            </axis>
+        </joint>
+
+    <plugin name='ignition::gazebo::systems::DiffDrive' filename='libignition-gazebo-diff-drive-system.so'>
+        <left_joint>left_front_wheel_joint</left_joint>
+        <right_joint>right_front_wheel_joint</right_joint>
+        <wheel_separation>0.145</wheel_separation>
+        <wheel_radius>0.0325</wheel_radius>
+        <odom_publish_frequency>1</odom_publish_frequency>
+    </plugin>
+
+    <plugin name='ignition::gazebo::systems::DiffDrive' filename='libignition-gazebo-diff-drive-system.so'>
+        <left_joint>left_rear_wheel_joint</left_joint>
+        <right_joint>right_rear_wheel_joint</right_joint>
+        <wheel_separation>0.145</wheel_separation>
+        <wheel_radius>0.0325</wheel_radius>
+        <odom_publish_frequency>1</odom_publish_frequency>
+    </plugin>
+
+</model>
+</sdf>

@@ -23,6 +23,7 @@ setup(
             "wandering_node = controllers.wandering_node:main",
             "line_following_node = controllers.line_following_node:main",
             "benchmark_node = controllers.benchmark_node:main",
+            "gamepad_node = controllers.gamepad_node:main",
         ],
     },
 )
