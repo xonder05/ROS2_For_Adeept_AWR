@@ -28,6 +28,7 @@ setup(
             "simulator_motor = gazebo_simulator_nodes.simulator_motor:main",
             "simulator_camera_servo = gazebo_simulator_nodes.simulator_camera_servo:main",
             "simulator_camera = gazebo_simulator_nodes.simulator_camera:main",
+            "simulator_ultrasonic = gazebo_simulator_nodes.simulator_ultrasonic:main",
         ],
     },
 )

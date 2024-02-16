@@ -19,19 +19,21 @@ class WanderingNode(Node):
         self.publisher = self.create_publisher(Twist, "/drive_directions", 10)
         self.state = "START"
         self.timer = self.create_timer(1, self.fsm_step)
-
+        self.scan_counter = 0
         self.distance_array = [0] * 5
         self.distance_index = 0
+        self.distance = 0
 
         self.get_logger().info("InitDone")
         self.fsm_step()
 
     def obstacle_callback(self, msg: Bool):
         self.obstacle = msg.data
-        if msg.data and self.state not in ["OBSTACLE", "FIRST_SIDE_OBSTACLE", "SECOND_SIDE_OBSTACLE", "SMALL_OBSTACLE_DETECTED", "CHECK_LIGHT_LEFT", "CHECK_LIGHT_RIGHT", "EVADE_LEFT", "EVADE_RIGHT", "RECENTER_LEFT", "RECENTER_RIGHT", "SCAN_FOR_OBSTACLES", "RESOLVE_SCAN_RESULT"]:
+        if msg.data and self.state not in ["DRIVE", "OBSTACLE", "FIRST_SIDE_OBSTACLE", "SECOND_SIDE_OBSTACLE", "SMALL_OBSTACLE_DETECTED", "CHECK_LIGHT_LEFT", "CHECK_LIGHT_RIGHT", "EVADE_LEFT", "EVADE_RIGHT", "RECENTER_LEFT", "RECENTER_RIGHT", "SCAN_FOR_OBSTACLES", "RESOLVE_SCAN_RESULT"]:
             self.state = "OBSTACLE"
 
     def distance_callback(self, msg: UltrasonicDistance):
+        self.distance = msg.distance
         self.distance_array[self.distance_index] = msg.distance
         self.distance_index = (self.distance_index + 1) % 5 
 
@@ -51,14 +53,56 @@ class WanderingNode(Node):
 
     def fsm_step(self):
         
-        if self.state == "SMALL_OBSTACLE_DETECTED":
+        if self.state == "SCAN_TURN_RESOLVE":
+            
+            if self.scan_counter == 0:
+                self.distance_array1 = []
+                self.scan_counter += 1
+                self.state = "SCAN_STOP"
+                
+                msg = Twist()
+                self.publisher.publish(msg)
+                self.timer.cancel()
+                self.timer = self.create_timer(0, self.fsm_step)    
+
+            elif self.scan_counter > 0 and self.scan_counter < 6:
+                self.distance_array1.append(self.distance)
+                
+                self.state = "SCAN_STOP"
+                self.scan_counter += 1
+                
+                msg = Twist()
+                msg.angular.z = -3.14
+                self.publisher.publish(msg)
+                self.timer.cancel()
+                self.timer = self.create_timer(0.1, self.fsm_step)
+
+            elif self.scan_counter == 6:
+                self.distance_array1.append(self.distance)
+                self.scan_counter = 0
+
+                self.timer.cancel()
+                self.timer = self.create_timer(0, self.fsm_step)    
+                self.state = "RESOLVE_SCAN_RESULT"
+
+            else:
+                pass #err
+            
+        elif self.state == "SCAN_STOP":
+            msg = Twist()
+            self.publisher.publish(msg)
+            self.timer.cancel()
+            self.timer = self.create_timer(0.15, self.fsm_step)    
+            self.state = "SCAN_TURN_RESOLVE"
+        
+        elif self.state == "SMALL_OBSTACLE_DETECTED":
             self.get_logger().info("SMALL_OBSTACLE_DETECTED")
             msg = Twist()
             msg.angular.z = 3.14
             self.publisher.publish(msg)
             self.timer.cancel()
             self.timer = self.create_timer(0.25, self.fsm_step)    
-            self.state = "SCAN_FOR_OBSTACLES"
+            self.state = "SCAN_TURN_RESOLVE"
             
         elif self.state == "SCAN_FOR_OBSTACLES":
             self.get_logger().info("SCAN_FOR_OBSTACLES")
@@ -76,31 +120,60 @@ class WanderingNode(Node):
             self.publisher.publish(msg)
             self.timer.cancel()
 
-            for i in range(0, 5):
-                self.get_logger().info(f"distance index {i} value {self.distance_array[(self.start_index + i) % 5]}")
-                if self.distance_array[(self.start_index + i) % 5] < 0.4:
+            for item in self.distance_array1:
+                print(item)
+
+            left = min(self.distance_array1[0], min(self.distance_array1[1], self.distance_array1[2]))
+            right = min(self.distance_array1[3], min(self.distance_array1[4], self.distance_array1[5]))
+
+            print(f"left: {left}")
+            print(f"right: {right}")
+
+            if left < 0.7 and right > 0.7: #obstacle left
+                self.state = "RECENTER_LEFT"
+                self.timer = self.create_timer(0, self.fsm_step)
+                
+            elif right < 0.7 and left > 0.7: #obstacle right
+                self.state = "EVADE_LEFT"
+                self.timer = self.create_timer(0, self.fsm_step)
+
+            else: #obstacle both or false alarm
+                self.state = "DRIVE"
+                
+                msg = Twist()
+                msg.angular.z = 3.14
+                self.publisher.publish(msg)
+                time.sleep(0.25)
+                msg.angular.z = 0.0
+                self.publisher.publish(msg)
+
+                self.timer = self.create_timer(0, self.fsm_step)
+
+            # for i in range(0, 5):
+            #     self.get_logger().info(f"distance index {i} value {self.distance_array[(self.start_index + i) % 5]}")
+            #     if self.distance_array[(self.start_index + i) % 5] < 0.4:
                     
-                    if i < 2:
-                        self.state = "RECENTER_LEFT"
+            #         if i < 2:
+            #             self.state = "RECENTER_LEFT"
 
-                    elif i > 2:
-                        self.state = "EVADE_LEFT"
+            #         elif i > 2:
+            #             self.state = "EVADE_LEFT"
 
-                    else:
-                        self.state = "OBSTACLE"
+            #         else:
+            #             self.state = "OBSTACLE"
 
-                    self.timer = self.create_timer(0, self.fsm_step)
-                    return
+            #         self.timer = self.create_timer(0, self.fsm_step)
+            #         return
 
-            msg = Twist()
-            msg.angular.z = 3.14
-            self.publisher.publish(msg)
-            time.sleep(0.25)
-            msg.angular.z = 0.0
-            self.publisher.publish(msg)
+            # msg = Twist()
+            # msg.angular.z = 3.14
+            # self.publisher.publish(msg)
+            # time.sleep(0.25)
+            # msg.angular.z = 0.0
+            # self.publisher.publish(msg)
 
-            self.state = "DRIVE"
-            self.timer = self.create_timer(0, self.fsm_step)
+            # self.state = "DRIVE"
+            # self.timer = self.create_timer(0, self.fsm_step)
 
 
         #     msg = Twist()
@@ -168,17 +241,23 @@ class WanderingNode(Node):
             msg_out.linear.x = 0.0
             msg_out.angular.z = 3.14
             self.publisher.publish(msg_out)
+            self.timer.cancel()
             self.timer = self.create_timer(0.5, self.fsm_step)
             self.state = "RECENTER_RIGHT"
 
         elif self.state == "RECENTER_RIGHT":
             self.get_logger().info("RECENTER_RIGHT")
             msg_out = Twist()
+            msg_out.linear.x = 0.2
+            self.publisher.publish(msg_out)
+            time.sleep(1)
+
             msg_out.linear.x = 0.15
             msg_out.angular.z = -0.785
             self.publisher.publish(msg_out)
+            
             self.timer.cancel()
-            self.timer = self.create_timer(2, self.fsm_step)
+            self.timer = self.create_timer(1, self.fsm_step)
             self.state = "DRIVE"
 
         elif self.state == "EVADE_RIGHT":
@@ -187,17 +266,23 @@ class WanderingNode(Node):
             msg_out.linear.x = 0.0
             msg_out.angular.z = -3.14
             self.publisher.publish(msg_out)
+            self.timer.cancel()
             self.timer = self.create_timer(0.25, self.fsm_step)
             self.state = "RECENTER_LEFT"
 
         elif self.state == "RECENTER_LEFT":
             self.get_logger().info("RECENTER_LEFT")
             msg_out = Twist()
+            msg_out.linear.x = 0.2
+            self.publisher.publish(msg_out)
+            time.sleep(1)
+
             msg_out.linear.x = 0.15
             msg_out.angular.z = 0.785
             self.publisher.publish(msg_out)
+
             self.timer.cancel()
-            self.timer = self.create_timer(2, self.fsm_step)
+            self.timer = self.create_timer(1, self.fsm_step)
             self.state = "DRIVE"
 
         elif self.state == "START":

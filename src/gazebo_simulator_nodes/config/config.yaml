@@ -30,3 +30,9 @@ simulator_camera_servo_bridge:
     topic: "/model/adeept_awr/joint/camera_servo_joint/cmd_vel"
     ros_message_type: "std_msgs/msg/Float64"
     gazebo_message_type: "gz.msgs.Double"
+
+simulator_ultrasonic_bridge:
+  ros__parameters:
+    topic: "/simulator_ultrasonic"
+    ros_message_type: "sensor_msgs/msg/LaserScan"
+    gazebo_message_type: "ignition.msgs.LaserScan"
