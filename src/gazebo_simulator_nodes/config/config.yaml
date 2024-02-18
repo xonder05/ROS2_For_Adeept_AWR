@@ -36,3 +36,14 @@ simulator_ultrasonic_bridge:
     topic: "/simulator_ultrasonic"
     ros_message_type: "sensor_msgs/msg/LaserScan"
     gazebo_message_type: "ignition.msgs.LaserScan"
+
+simulator_line_tracking:
+  ros__parameters:
+    gazebo_topic: "/line_tracking"
+    ros_topic: "/line_visibility"
+
+simulator_line_tracking_bridge:
+  ros__parameters:
+    topic: "/line_tracking"
+    ros_message_type: "sensor_msgs/msg/Image"
+    gazebo_message_type: "gz.msgs.Image"

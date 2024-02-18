@@ -29,6 +29,7 @@ setup(
             "simulator_camera_servo = gazebo_simulator_nodes.simulator_camera_servo:main",
             "simulator_camera = gazebo_simulator_nodes.simulator_camera:main",
             "simulator_ultrasonic = gazebo_simulator_nodes.simulator_ultrasonic:main",
+            "simulator_line_tracking = gazebo_simulator_nodes.simulator_line_tracking:main",
         ],
     },
 )
