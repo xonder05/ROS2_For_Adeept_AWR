@@ -7,12 +7,9 @@
         <inertial>
             <mass>2</mass>
             <inertia>
-                <ixx>0.000303125</ixx>
-                <ixy>0</ixy>
-                <ixz>0</ixz>
-                <iyy>0.000359375</iyy>
-                <iyz>0</iyz>
-                <izz>0.000542708</izz>
+                <ixx>0.003338</ixx>
+                <iyy>0.004204</iyy>
+                <izz>0.005667</izz>
             </inertia>
         </inertial>
 
@@ -71,7 +68,6 @@
             </collision>
             
             <sensor name='camera' type='camera'>
-                <pose>0 0 0 0 0 0</pose>
                 <topic>simulator_camera</topic>
                 <update_rate>30</update_rate>
                 <camera name='__default__'>
@@ -117,6 +113,77 @@
             <joint_name>camera_servo_joint</joint_name>
         </plugin>
         
+        <!-- <link name='lidar'>
+            <pose relative_to='chassis'>0 0 0.0425 0 0 0</pose>
+            <inertial>
+                <mass>0.05</mass>
+                <inertia>
+                    <ixx>8.3333e-09</ixx>
+                    <iyy>8.3333e-09</iyy>
+                    <izz>8.3333e-09</izz>
+                  </inertia>
+            </inertial>
+            <visual name='visual'>
+                <geometry>
+                  <box>
+                    <size>0.01 0.01 0.01</size>
+                  </box>
+                </geometry>
+                <material>
+                    <ambient>0.9 0.9 0.9 1</ambient>
+                    <diffuse>0.9 0.9 0.9 1</diffuse>
+                    <specular>0.9 0.9 0.9 1</specular>
+                </material>
+              </visual>
+            <collision name='collision'>
+              <geometry>
+                <box>
+                  <size>0.01 0.01 0.01</size>
+                </box>
+              </geometry>
+            </collision>
+
+            <sensor name='gpu_lidar' type='gpu_lidar'>
+              <topic>simulator_lidar</topic>
+              <update_rate>10</update_rate>
+              <lidar>
+                <scan>
+                  <horizontal>
+                    <samples>720</samples>
+                    <resolution>1</resolution>
+                    <min_angle>-3.14</min_angle>
+                    <max_angle>3.14</max_angle>
+                  </horizontal>
+
+                  <vertical>
+                    <samples>4</samples>
+                    <resolution>1</resolution>
+                    <min_angle>-0.0349</min_angle>
+                    <max_angle>0.0349</max_angle>
+                  </vertical>
+                </scan>
+                <range>
+                  <min>0.080000000000000002</min>
+                  <max>10</max>
+                  <resolution>0.01</resolution>
+                </range>
+                <noise>
+                  <type>none</type>
+                  <mean>0</mean>
+                  <stddev>0</stddev>
+                </noise>
+                <visibility_mask>4294967295</visibility_mask>
+              </lidar>
+            </sensor>
+            <enable_wind>false</enable_wind>
+          </link>
+    
+          <joint name='lidar_joint' type='fixed'>
+            <pose relative_to="lidar"/>
+            <parent>chassis</parent>
+            <child>lidar</child>
+          </joint> -->
+
           <link name='ultrasonic'>
             <pose relative_to='chassis'>0.07 0 -0.02 0 0 0</pose>
             <inertial>
@@ -187,10 +254,46 @@
             <parent>chassis</parent>
             <child>ultrasonic</child>
           </joint>
+    
+        <include>
+          <name>left</name>
+          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/line_tracking.sdf</uri>
+          <pose relative_to='chassis'>0.06 0.03 -0.0375 0 1.57 0</pose>
+        </include>
+
+        <joint name='line_tracking_left_joint' type='fixed'>
+            <pose relative_to='left'/>
+            <parent>chassis</parent>
+            <child>left::line_tracking</child>
+        </joint>
+
+        <include>
+          <name>middle</name>
+          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/line_tracking.sdf</uri>
+          <pose relative_to='chassis'>0.06 0 -0.0375 0 1.57 0</pose>
+        </include>
+
+        <joint name='line_tracking_middle_joint' type='fixed'>
+            <pose relative_to='middle'/>
+            <parent>chassis</parent>
+            <child>middle::line_tracking</child>
+        </joint>
+            
+        <include>
+          <name>right</name>
+          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/line_tracking.sdf</uri>
+          <pose relative_to='chassis'>0.06 -0.03 -0.0375 0 1.57 0</pose>
+        </include>
+
+        <joint name='line_tracking_right_joint' type='fixed'>
+            <pose relative_to='right'/>
+            <parent>chassis</parent>
+            <child>right::line_tracking</child>
+        </joint>
 
         <include>
             <name>left_front_wheel</name>
-            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/wheel.sdf</uri>
+            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/wheel.sdf</uri>
             <pose relative_to="chassis">0.03 0.075 -0.025 -1.5707 0 0</pose>
         </include>
 
@@ -209,7 +312,7 @@
 
         <include>
             <name>right_front_wheel</name>
-            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/wheel.sdf</uri>
+            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/wheel.sdf</uri>
             <pose relative_to="chassis">0.03 -0.075 -0.025 -1.5707 0 0</pose>
         </include>
 
@@ -228,7 +331,7 @@
 
         <include>
             <name>left_rear_wheel</name>
-            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/wheel.sdf</uri>
+            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/wheel.sdf</uri>
             <pose relative_to="chassis">-0.055 0.075 -0.025 -1.5707 0 0</pose>
         </include>
 
@@ -247,7 +350,7 @@
 
         <include>
             <name>right_rear_wheel</name>
-            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/wheel.sdf</uri>
+            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/wheel.sdf</uri>
             <pose relative_to="chassis">-0.055 -0.075 -0.025 -1.5707 0 0</pose>
         </include>
 
@@ -267,7 +370,7 @@
     <plugin name='ignition::gazebo::systems::DiffDrive' filename='libignition-gazebo-diff-drive-system.so'>
         <left_joint>left_front_wheel_joint</left_joint>
         <right_joint>right_front_wheel_joint</right_joint>
-        <wheel_separation>0.145</wheel_separation>
+        <wheel_separation>0.1775</wheel_separation>
         <wheel_radius>0.0325</wheel_radius>
         <odom_publish_frequency>1</odom_publish_frequency>
     </plugin>
@@ -275,7 +378,7 @@
     <plugin name='ignition::gazebo::systems::DiffDrive' filename='libignition-gazebo-diff-drive-system.so'>
         <left_joint>left_rear_wheel_joint</left_joint>
         <right_joint>right_rear_wheel_joint</right_joint>
-        <wheel_separation>0.145</wheel_separation>
+        <wheel_separation>0.1775</wheel_separation>
         <wheel_radius>0.0325</wheel_radius>
         <odom_publish_frequency>1</odom_publish_frequency>
     </plugin>

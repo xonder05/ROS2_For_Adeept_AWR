@@ -85,27 +85,27 @@
     </light>
 
     <include>
-        <name>border1</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/borders.sdf</uri>
-        <pose>0 4 0 0 0 0</pose>
+      <name>border1</name>
+      <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+      <pose>0 4 0 0 0 0</pose>
     </include>
 
     <include>
-        <name>border2</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/borders.sdf</uri>
-        <pose>0 -4 0 0 0 0</pose>
+      <name>border2</name>
+      <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+      <pose>0 -4 0 0 0 0</pose>
     </include>
 
     <include>
-        <name>border3</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/borders.sdf</uri>
-        <pose>4 0 0 0 0 1.57</pose>
+      <name>border3</name>
+      <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+      <pose>4 0 0 0 0 1.57</pose>
     </include>
 
     <include>
-        <name>border4</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/borders.sdf</uri>
-        <pose>-4 0 0 0 0 1.57</pose>
+      <name>border4</name>
+      <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+      <pose>-4 0 0 0 0 1.57</pose>
     </include>
 
     <include>
@@ -188,8 +188,8 @@
     </include>
 
     <include>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/robot.sdf</uri>
+      <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/robot.sdf</uri>
     </include>
-
+    
   </world>
 </sdf>
