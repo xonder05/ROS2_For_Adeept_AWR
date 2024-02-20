@@ -1,5 +1,6 @@
 from setuptools import find_packages, setup
-
+import os
+from glob import glob
 package_name = 'controllers'
 
 setup(
@@ -10,6 +11,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -24,6 +26,8 @@ setup(
             "line_following_node = controllers.line_following_node:main",
             "benchmark_node = controllers.benchmark_node:main",
             "gamepad_node = controllers.gamepad_node:main",
+            "keyboard_node = controllers.keyboard_node:main",
+            "user_interface = controllers.user_interface.user_interface:main",
         ],
     },
 )

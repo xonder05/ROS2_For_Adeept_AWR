@@ -6,6 +6,8 @@ from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
 from adeept_awr_interfaces.srv import RGB
 from adeept_awr_interfaces.action import Servo
+from std_srvs.srv import SetBool
+
 
 import pygame
 
@@ -13,6 +15,11 @@ class GamepadNode(Node):
 
     def __init__(self):
         super().__init__("gamepad_node")
+
+        self.srv = self.create_service(SetBool, "/toggle_gamepad", self.toggle_callback)
+        self.twist_publisher = self.create_publisher(Twist, "/drive_directions", 10)
+        self.action_client = ActionClient(self, Servo, '/put_servo_to_pos')
+        self.timer = self.create_timer(0.01, self.pygame_loop)
 
         pygame.init()
         pygame.joystick.init()
@@ -23,25 +30,22 @@ class GamepadNode(Node):
         else:
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
-
-        self.create_timer(0.01, self.pygame_loop)
-
-        self.drive_axes = [0.0] * 2
-        self.dpad_mode = 0
-        
-        self.rgb_mode = 0
-        self.curr_color = [0] * 3
-
-        #self.twist_subscriber = self.create_subscription(Twist, "/drive_directions", self.obstacle_callback, 10)
-        self.twist_publisher = self.create_publisher(Twist, "/drive_directions", 10)
-        self.led_color_client = self.create_client(RGB, "change_rgb_color")
-        #while not self.led_color_client.wait_for_service(timeout_sec=1.0):
-            #self.get_logger().info("led service not available waiting")
-        
-        self.action_client = ActionClient(self, Servo, 'put_servo_to_pos')
+            self.drive_axes = [0.0] * 2
 
         self.get_logger().info("InitDone")
 
+    def toggle_callback(self, request: SetBool, response: SetBool):
+        self.get_logger().info("callback")
+
+        if request.data:
+            pygame.event.get()
+            self.timer.cancel()
+            self.timer = self.create_timer(0.01, self.pygame_loop)
+        else:
+            self.timer.cancel()
+
+        response.success = True
+        return response
 
     def pygame_loop(self):
         for event in pygame.event.get():
@@ -52,23 +56,22 @@ class GamepadNode(Node):
             elif event.type == pygame.JOYAXISMOTION:
                 msg = Twist()
 
-                if event.axis == 1: #linear
-                    self.drive_axes[1] = -1 * event.value * 0.153475
+                if abs(event.value) < 0.1:
+                    event.value = 0
+
+                if event.axis == 3: #linear
+                    self.drive_axes[1] = -1 * event.value * 0.30695
                     
-                if event.axis == 0: #angular
-                    self.drive_axes[0] = -1 * event.value * 0.785
+                if event.axis == 2: #angular
+                    self.drive_axes[0] = -1 * event.value * 4.385
 
                 msg.linear.x = self.drive_axes[1]
                 msg.angular.z = self.drive_axes[0]
                 self.twist_publisher.publish(msg)
 
-            elif event.type == pygame.JOYBUTTONDOWN:
-                button = event.button
-                self.get_logger().info(f"Button {button} pressed")
-
             elif event.type == pygame.JOYHATMOTION:
-                
-                if self.dpad_mode == 0 and event.value[1] != 0: #servo
+
+                if event.value[1] != 0 and event.value[0] == 0: #servo
                     goal_msg = Servo.Goal()
                     goal_msg.value = 20
 
@@ -80,32 +83,9 @@ class GamepadNode(Node):
                         goal_msg.mode = 2
                         self.get_logger().info(f"dec")
 
-                    #self.action_client.wait_for_server()
-                    #self.goal_future = self.action_client.send_goal_async(goal_msg, self.feedback_callback)
-                    #self.goal_future.add_done_callback(self.response_callback)
-
-                if self.dpad_mode == 1: #rbg
-                    if event.value[0] != 0:
-                        self.rgb_mode = (self.rgb_mode + 1) % 3
-
-                    if event.value[1] == 1:
-                        self.curr_color[self.rgb_mode] = min(self.curr_color[self.rgb_mode] + 32, 255)
-
-                    if event.value[1] == -1:
-                        self.curr_color[self.rgb_mode] = max(self.curr_color[self.rgb_mode] - 32, 0)
-
-                    if event.value[1] != 0:
-                        request = RGB.Request()
-                        request.r = self.curr_color[0]
-                        request.g = self.curr_color[1]
-                        request.b = self.curr_color[2]
-                    
-                        self.get_logger().info(str(request.r))
-                        self.get_logger().info(str(request.g))
-                        self.get_logger().info(str(request.b))
-
-                        #self.future = self.client.call_async(self.request)
-                        #rclpy.spin_until_future_complete(self, self.future)
+                    self.action_client.wait_for_server()
+                    self.goal_future = self.action_client.send_goal_async(goal_msg, self.feedback_callback)
+                    self.goal_future.add_done_callback(self.response_callback)
 
     def response_callback(self, future):
         goal_handle = future.result()
@@ -121,15 +101,10 @@ class GamepadNode(Node):
     def result_callback(self, future):
         result = future.result().result
         self.get_logger().info('Result: {0}'.format(result))
-        rclpy.shutdown()
 
     def feedback_callback(self, feedback_msg):
         feedback = feedback_msg.feedback
         self.get_logger().info('Received feedback: {0}'.format(feedback.curr_position))
-
-
-
-
 
 
 def main():
