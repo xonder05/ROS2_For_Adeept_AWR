@@ -5,6 +5,7 @@ from geometry_msgs.msg import Twist
 from adeept_awr_interfaces.msg import LineTracking
 
 import time
+import math
 
 class BenchmarkNode(Node):
 
@@ -51,25 +52,25 @@ class BenchmarkNode(Node):
         self.get_logger().info("Turn 90 degrees to the left -- press enter to start")
         input()
         msg = Twist()
-        msg.angular.z = 3.14
+        msg.angular.z = math.pi
         self.motor_publisher.publish(msg)
         time.sleep(0.5)
         msg = Twist()
         self.motor_publisher.publish(msg)
 
-        self.get_logger().info("Turn 90 degrees to the right -- press enter to start")
+        self.get_logger().info("Turn 180 degrees to the right -- press enter to start")
         input()
         msg = Twist()
-        msg.angular.z = -3.14
+        msg.angular.z = -math.pi
         self.motor_publisher.publish(msg)
-        time.sleep(0.5)
+        time.sleep(1)
         msg = Twist()
         self.motor_publisher.publish(msg)
 
         self.get_logger().info("Turn 360 degrees to the left -- press enter to start")
         input()
         msg = Twist()
-        msg.angular.z = 3.14
+        msg.angular.z = math.pi
         self.motor_publisher.publish(msg)
         time.sleep(2)
         msg = Twist()

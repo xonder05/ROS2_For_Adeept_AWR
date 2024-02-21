@@ -3,20 +3,46 @@ from rclpy.node import Node
 
 from geometry_msgs.msg import Twist
 from adeept_awr_interfaces.msg import LineTracking
+from std_srvs.srv import SetBool
+from std_msgs.msg import String
 
 class LineFollowingNode(Node):
 
     def __init__(self):
         super().__init__("line_following_node")
+        
+        self.declare_parameters(
+            namespace='',
+            parameters=[
+                ('start_right_away', False),
+            ]
+        )
+
+        self.state_publisher = self.create_publisher(String, "/line_tracking_state", 10)
+        self.srv = self.create_service(SetBool, "/toggle_line_following", self.toggle_callback)
         self.line_visibility_subscriber = self.create_subscription(LineTracking, "/line_visibility", self.callback, 10)
         self.publisher = self.create_publisher(Twist, "/drive_directions", 10)
         self.state = ""
         self.next_state = ""
-        self.timer = self.create_timer(0.05, self.fsm_next_state)
-
         self.line_status = LineTracking()
-
+        
+        self.timer = self.create_timer(0.05, self.fsm_next_state)
+        if not self.get_parameter('start_right_away').get_parameter_value().bool_value:
+            self.timer.cancel()
+        
         self.get_logger().info("InitDone")
+
+    def toggle_callback(self, request: SetBool, response: SetBool):
+        if request.data:
+            self.timer.cancel()
+            self.timer = self.create_timer(0.05, self.fsm_next_state)
+        else:
+            msg = Twist()
+            self.publisher.publish(msg)
+            self.timer.cancel()
+
+        response.success = True
+        return response
 
     def callback(self, msg: LineTracking):
         self.line_status.left = msg.left
@@ -57,49 +83,49 @@ class LineFollowingNode(Node):
             self.state = self.next_state
 
         if self.state == "BREAK":
-            self.get_logger().info("BREAK")
+            self.state_publisher.publish(String(data = "BREAK"))
             msg = Twist()
             msg.linear.x = 0.0
             msg.angular.z = 0.0
             self.publisher.publish(msg)
 
         elif self.state == "NO_LINE": # 0 0 0
-            self.get_logger().info("NO_LINE")
+            self.state_publisher.publish(String(data = "NO_LINE"))
             msg = Twist()
             msg.linear.x = 0.0
             msg.angular.z = 0.0
             self.publisher.publish(msg)
 
         elif self.state == "FORWARD": # 0 1 0 / 1 1 1
-            self.get_logger().info("FORWARD")
+            self.state_publisher.publish(String(data = "FORWARD"))
             msg = Twist()
             msg.linear.x = 0.15
             msg.angular.z = 0.0
             self.publisher.publish(msg)
 
         elif self.state == "STEER_LIGHT_LEFT": # 0 1 1
-            self.get_logger().info("STEER_LIGHT_LEFT")
+            self.state_publisher.publish(String(data = "STEER_LIGHT_LEFT"))
             msg = Twist()
             msg.linear.x = 0.1
             msg.angular.z = 1.0
             self.publisher.publish(msg)
 
         elif self.state == "STEER_LEFT": # 0 0 1
-            self.get_logger().info("STEER_LEFT")
+            self.state_publisher.publish(String(data = "STEER_LEFT"))
             msg = Twist()
             msg.linear.x = 0.0
             msg.angular.z = 2.0
             self.publisher.publish(msg)
 
         elif self.state == "STEER_LIGHT_RIGHT": # 1 1 0
-            self.get_logger().info("STEER_LIGHT_RIGHT")
+            self.state_publisher.publish(String(data = "STEER_LIGHT_RIGHT"))
             msg = Twist()
             msg.linear.x = 0.1
             msg.angular.z = -1.0
             self.publisher.publish(msg)
 
         elif self.state == "STEER_RIGHT": # 1 0 0
-            self.get_logger().info("STEER_RIGHT")
+            self.state_publisher.publish(String(data = "STEER_RIGHT"))
             msg = Twist()
             msg.linear.x = 0.0
             msg.angular.z = -2.0

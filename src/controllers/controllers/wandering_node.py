@@ -5,6 +5,8 @@ from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
 from std_msgs.msg import Int8
 from adeept_awr_interfaces.msg import UltrasonicDistance
+from std_srvs.srv import SetBool
+from std_msgs.msg import String
 
 import random
 import time
@@ -13,19 +15,45 @@ class WanderingNode(Node):
 
     def __init__(self):
         super().__init__("wandering_node")
+        
+        self.declare_parameters(
+            namespace='',
+            parameters=[
+                ('start_right_away', False),
+            ]
+        )
+
+        self.srv = self.create_service(SetBool, "/toggle_wandering", self.toggle_callback)
         self.ultrasonic_subscriber = self.create_subscription(UltrasonicDistance, "/ultrasonic_distance", self.distance_callback, 10)
         self.obstacle_subscriber = self.create_subscription(Bool, "/obstacle_detected", self.obstacle_callback, 10)
         self.side_obstacle_subscriber = self.create_subscription(Int8, "/side_obstacle", self.side_obstacle_callback, 10)
         self.publisher = self.create_publisher(Twist, "/drive_directions", 10)
-        
+        self.state_publisher = self.create_publisher(String, "/wandering_state", 10)
+
+
         self.timer = self.create_timer(1, self.fsm_step)
+        if not self.get_parameter('start_right_away').get_parameter_value().bool_value:
+            self.timer.cancel()
 
         self.state = "START"
         self.scan_counter = 0
         self.distance = 0
 
         self.get_logger().info("InitDone")
-        self.fsm_step()
+
+    def toggle_callback(self, request: SetBool, response: SetBool):
+        
+        if request.data:
+            self.state = "DRIVE"
+            self.timer.cancel()
+            self.timer = self.create_timer(0.1, self.fsm_step)
+        else:
+            msg = Twist()
+            self.publisher.publish(msg)
+            self.timer.cancel()
+
+        response.success = True
+        return response
 
     def distance_callback(self, msg: UltrasonicDistance):
         self.distance = msg.distance
@@ -45,9 +73,10 @@ class WanderingNode(Node):
                 pass
 
     def fsm_step(self):
-        
+
         if self.state == "START":
-            self.get_logger().info("START")
+            self.state_publisher.publish(String(data = "START"))
+
             if random.random() < 0.5:
                 self.state = "DRIVE"
             else:
@@ -55,7 +84,7 @@ class WanderingNode(Node):
             self.fsm_step()
 
         elif self.state == "PAUSE":
-            self.get_logger().info("PAUSE")
+            self.state_publisher.publish(String(data = "PAUSE"))
             self.state = "START"
             
             msg = Twist()
@@ -65,7 +94,7 @@ class WanderingNode(Node):
             self.timer = self.create_timer(1, self.fsm_step)
 
         elif self.state == "TURN":
-            self.get_logger().info("TURN")
+            self.state_publisher.publish(String(data = "TURN"))
             self.state = "DRIVE"
             speed = random.uniform(-0.785, 0.785)
             msg = Twist()
@@ -77,7 +106,7 @@ class WanderingNode(Node):
             self.timer = self.create_timer(duration, self.fsm_step)
 
         elif self.state == "DRIVE":
-            self.get_logger().info("DRIVE")
+            self.state_publisher.publish(String(data = "DRIVE"))
             self.state = "PAUSE"
 
             speed = random.uniform(0, 0.30695)
@@ -92,8 +121,9 @@ class WanderingNode(Node):
             self.timer = self.create_timer(duration, self.fsm_step)
 
         elif self.state == "OBSTACLE":
+            self.state_publisher.publish(String(data = "OBSTACLE"))
             self.state = "FIRST_SIDE_OBSTACLE"
-            self.get_logger().info("OBSTACLE")
+
             self.timer.cancel()
             
             #reverse
@@ -116,7 +146,8 @@ class WanderingNode(Node):
             self.timer = self.create_timer(0.5, self.fsm_step)
         
         elif self.state == "FIRST_SIDE_OBSTACLE":
-            self.get_logger().info("FIRST_SIDE_OBSTACLE")
+            self.state_publisher.publish(String(data = "FIRST_SIDE_OBSTACLE"))
+
             if self.obstacle:
                 self.state = "SECOND_SIDE_OBSTACLE"
                 msg = Twist()
@@ -130,7 +161,7 @@ class WanderingNode(Node):
                 self.fsm_step()
 
         elif self.state == "SECOND_SIDE_OBSTACLE":
-            self.get_logger().info("SECOND_SIDE_OBSTACLE")
+            self.state_publisher.publish(String(data = "SECOND_SIDE_OBSTACLE"))
             self.state = "DRIVE"
             if self.obstacle:
                 msg = Twist()
@@ -147,7 +178,7 @@ class WanderingNode(Node):
                 self.fsm_step()
 
         elif self.state == "SMALL_OBSTACLE_DETECTED":
-            self.get_logger().info("SMALL_OBSTACLE_DETECTED")
+            self.state_publisher.publish(String(data = "SMALL_OBSTACLE_DETECTED"))
             msg = Twist()
             msg.angular.z = 3.14
             self.publisher.publish(msg)
@@ -156,7 +187,7 @@ class WanderingNode(Node):
             self.state = "SCAN_TURN_RESOLVE"
 
         elif self.state == "SCAN_TURN_RESOLVE":
-            self.get_logger().info("SCAN_TURN_RESOLVE")
+            self.state_publisher.publish(String(data = "SMALL_OBSTACLE_DETECTED"))
             if self.scan_counter == 0:
                 self.distance_array = []
                 self.scan_counter += 1
@@ -191,7 +222,8 @@ class WanderingNode(Node):
                 pass #err
             
         elif self.state == "SCAN_STOP":
-            self.get_logger().info("SCAN_STOP")
+            self.state_publisher.publish(String(data = "SCAN_STOP"))
+
             msg = Twist()
             self.publisher.publish(msg)
             self.timer.cancel()
@@ -199,7 +231,8 @@ class WanderingNode(Node):
             self.state = "SCAN_TURN_RESOLVE"
         
         elif self.state == "RESOLVE_SCAN_RESULT":
-            self.get_logger().info("RESOLVE_SCAN_RESULT")
+            self.state_publisher.publish(String(data = "RESOLVE_SCAN_RESULT"))
+
             msg = Twist()
             self.publisher.publish(msg)
             self.timer.cancel()
@@ -228,7 +261,8 @@ class WanderingNode(Node):
                 self.timer = self.create_timer(0, self.fsm_step)
 
         elif self.state == "EVADE_LEFT":
-            self.get_logger().info("EVADE_LEFT")
+            self.state_publisher.publish(String(data = "EVADE_LEFT"))
+
             msg_out = Twist()
             msg_out.linear.x = 0.0
             msg_out.angular.z = 3.14
@@ -238,7 +272,7 @@ class WanderingNode(Node):
             self.state = "RECENTER_RIGHT"
 
         elif self.state == "RECENTER_RIGHT":
-            self.get_logger().info("RECENTER_RIGHT")
+            self.state_publisher.publish(String(data = "RECENTER_RIGHT"))
             msg_out = Twist()
             msg_out.linear.x = 0.2
             self.publisher.publish(msg_out)
@@ -253,7 +287,7 @@ class WanderingNode(Node):
             self.state = "DRIVE"
 
         elif self.state == "RECENTER_LEFT":
-            self.get_logger().info("RECENTER_LEFT")
+            self.state_publisher.publish(String(data = "RECENTER_LEFT"))
             msg_out = Twist()
             msg_out.linear.x = 0.2
             self.publisher.publish(msg_out)

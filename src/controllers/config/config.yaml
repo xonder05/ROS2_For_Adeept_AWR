@@ -1,0 +1,15 @@
+wandering_node:
+  ros__parameters:
+    start_right_away: True
+
+line_following_node:
+  ros__parameters:
+    start_right_away: True
+
+gamepad_node:
+  ros__parameters:
+    start_right_away: True
+
+keyboard_node:
+  ros__parameters:
+    start_right_away: True

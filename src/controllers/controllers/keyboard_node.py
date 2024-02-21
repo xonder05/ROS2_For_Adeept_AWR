@@ -10,12 +10,19 @@ from std_srvs.srv import SetBool
 
 from pynput import keyboard
 
-
 class KeyboardNode(Node):
 
     def __init__(self):
         super().__init__("keyboard_node")
 
+        self.declare_parameters(
+            namespace='',
+            parameters=[
+                ('start_right_away', False),
+            ]
+        )
+
+        self.srv = self.create_service(SetBool, "/toggle_keyboard", self.toggle_callback)
         self.twist_publisher = self.create_publisher(Twist, "/drive_directions", 10)
         self.action_client = ActionClient(self, Servo, '/put_servo_to_pos')
 
@@ -24,13 +31,26 @@ class KeyboardNode(Node):
 
         self.get_logger().info("InitDone")
 
-        with keyboard.Listener(on_press=self.key_press_callback,on_release=self.key_release_callback) as listener:
-            listener.join()
+        self.listener = keyboard.Listener(on_press=self.key_press_callback,on_release=self.key_release_callback)
+        if self.get_parameter('start_right_away').get_parameter_value().bool_value:
+            self.listener.start()
+
+    def toggle_callback(self, request: SetBool, response: SetBool):
+        if request.data:
+            self.listener.stop()
+            self.listener = keyboard.Listener(on_press=self.key_press_callback,on_release=self.key_release_callback)
+            self.listener.start()
+        else:
+            msg = Twist()
+            self.twist_publisher.publish(msg)
+            self.listener.stop()
+
+        response.success = True
+        return response
+
 
     def key_press_callback(self, key):
         try:
-            print(f'Key {key.char} pressed')
-
             if (key.char == "w"):
                 self.linear = 0.3
                 self.publish_twist()
@@ -54,13 +74,10 @@ class KeyboardNode(Node):
             else:
                 pass
 
-        except AttributeError:
-            print(f'Special key {key} pressed')
+        except AttributeError: pass
 
     def key_release_callback(self, key):
         try:
-            print(f'Key {key} released')
-        
             if (key.char == "w" or key.char == "s"):
                 self.linear = 0.0
                 self.publish_twist()
@@ -69,8 +86,7 @@ class KeyboardNode(Node):
                 self.angular = 0.0
                 self.publish_twist()
 
-        except AttributeError:
-            print(f'Special key {key} released')
+        except AttributeError: pass
         
     def publish_twist(self):
         msg = Twist()
