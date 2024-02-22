@@ -72,14 +72,12 @@ class DCMotorNode(Node):
             GPIO.output(self.motor_left_backward_pin, GPIO.HIGH)
             GPIO.output(self.motor_left_forward_pin, GPIO.LOW)
             pwm_A.start(100)
-            #time.sleep(0.01)
             pwm_A.ChangeDutyCycle(speed)
         
         elif speed < 0:
             GPIO.output(self.motor_left_backward_pin, GPIO.LOW)
             GPIO.output(self.motor_left_forward_pin, GPIO.HIGH)
             pwm_A.start(100)
-            #time.sleep(0.01)
             pwm_A.ChangeDutyCycle(-speed)
 
     def right_side_motor(self, speed):
@@ -87,14 +85,12 @@ class DCMotorNode(Node):
             GPIO.output(self.motor_right_backward_pin, GPIO.HIGH)
             GPIO.output(self.motor_right_forward_pin, GPIO.LOW)
             pwm_B.start(100)
-            #time.sleep(0.01)
             pwm_B.ChangeDutyCycle(speed)
         
         elif speed < 0:
             GPIO.output(self.motor_right_backward_pin, GPIO.LOW)
             GPIO.output(self.motor_right_forward_pin, GPIO.HIGH)
             pwm_B.start(100)
-            #time.sleep(0.01)
             pwm_B.ChangeDutyCycle(-speed)
 
     def callback(self, msg: Twist):
@@ -105,54 +101,23 @@ class DCMotorNode(Node):
         if self.obstacle and msg.linear.x > 0:
             return
 
-        HALF_DISTANCE_BETWEEN_WHEELS = 0.07 #m
+        HALF_DISTANCE_BETWEEN_WHEELS = 0.075 #m
         WHEEL_RADIUS = 0.035 #m
-        MAX_MOTOR_ROTATION_SPEED = 8.77 #rad/s
-        MAX_LINEAR_SPEED = 0.30695 #m/s
+        MAX_MOTOR_ROTATION_SPEED = 19.8967 #rad/s
+        MAX_LINEAR_SPEED = 0.6964 #m/s
         MAX_ANGULAR_SPEED = 4.385 #rad/s
 
         linear_speed = msg.linear.x
         angular_speed = msg.angular.z
 
-        # linear_percentage = abs(linear_speed) / MAX_LINEAR_SPEED * 100
-        # angular_percentage = abs(angular_speed) / MAX_ANGULAR_SPEED * 100
-
-        # #if required speeds exceed motor capabilities
-        # if angular_percentage > 100:
-        #     linear_speed = 0
-        #     angular_speed = MAX_ANGULAR_SPEED
-
-        # elif linear_percentage + angular_percentage > 100:
-        #     linear_speed = (linear_speed / linear_percentage) * (100 - angular_percentage)
-
         left_motor_speed = (linear_speed - angular_speed * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS
         right_motor_speed = (linear_speed + angular_speed * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS
 
-        if left_motor_speed > MAX_MOTOR_ROTATION_SPEED:
-            left_motor_speed = MAX_MOTOR_ROTATION_SPEED
+        left_motor_speed = max(min(left_motor_speed, MAX_MOTOR_ROTATION_SPEED), -MAX_MOTOR_ROTATION_SPEED)
+        left_motor_speed = max(min(right_motor_speed, MAX_MOTOR_ROTATION_SPEED), -MAX_MOTOR_ROTATION_SPEED)
 
-        if right_motor_speed > MAX_MOTOR_ROTATION_SPEED:
-            right_motor_speed = MAX_MOTOR_ROTATION_SPEED
-
-        if left_motor_speed < -MAX_MOTOR_ROTATION_SPEED:
-            left_motor_speed = -MAX_MOTOR_ROTATION_SPEED
-
-        if right_motor_speed < -MAX_MOTOR_ROTATION_SPEED:
-            right_motor_speed = -MAX_MOTOR_ROTATION_SPEED
-
-        if left_motor_speed > 0:
-            normalized_left_motor_speed = (left_motor_speed / MAX_MOTOR_ROTATION_SPEED) * 100
-        elif left_motor_speed < 0:
-            normalized_left_motor_speed = (left_motor_speed / MAX_MOTOR_ROTATION_SPEED) * 100
-        else:
-            normalized_left_motor_speed = 0
-
-        if right_motor_speed > 0:
-            normalized_right_motor_speed = (right_motor_speed / MAX_MOTOR_ROTATION_SPEED) * 100
-        elif right_motor_speed < 0:
-            normalized_right_motor_speed = (right_motor_speed / MAX_MOTOR_ROTATION_SPEED) * 100
-        else:
-            normalized_right_motor_speed = 0
+        normalized_left_motor_speed = (left_motor_speed / MAX_MOTOR_ROTATION_SPEED) * 100
+        normalized_right_motor_speed = (right_motor_speed / MAX_MOTOR_ROTATION_SPEED) * 100
 
         if abs(normalized_left_motor_speed) < 20:
             normalized_left_motor_speed = 0
