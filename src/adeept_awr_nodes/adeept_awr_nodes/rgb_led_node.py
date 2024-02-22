@@ -15,7 +15,7 @@ class RGBLedNode(Node):
     def changeColorCallback(self, request, response):
         self.get_logger().info("callback")
 
-        subprocess.run(['sudo', 'python3', "/home/pi/ros2_ws/src/adeept_awr_output_devices/adeept_awr_output_devices/led_controller.py"] + [str(request.r), str(request.g), str(request.b)])
+        subprocess.run(['sudo', 'python3', "/home/pi/ros2_ws/src/adeept_awr_nodes/adeept_awr_nodes/led_controller.py"] + [str(request.r), str(request.g), str(request.b)])
 
         return response
     

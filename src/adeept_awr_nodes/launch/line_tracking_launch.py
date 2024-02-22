@@ -4,7 +4,7 @@ import launch_ros.actions
 from ament_index_python.packages import get_package_share_directory
 
 config = os.path.join(
-      get_package_share_directory('adeept_awr_input_sensors'),
+      get_package_share_directory('adeept_awr_nodes'),
       'config',
       'sensors_config.yaml'
       )
@@ -12,7 +12,7 @@ config = os.path.join(
 def generate_launch_description():
     return launch.LaunchDescription([
         launch_ros.actions.Node(
-            package='adeept_awr_input_sensors',
+            package='adeept_awr_nodes',
             executable='line_tracking_node',
             name='line_tracking_node',
             parameters=[config]
