@@ -26,7 +26,7 @@ setup(
     entry_points={
         'console_scripts': [
             "simulator_motor = gazebo_simulator_nodes.simulator_motor:main",
-            "simulator_camera_servo = gazebo_simulator_nodes.simulator_camera_servo:main",
+            "simulator_servo = gazebo_simulator_nodes.simulator_servo:main",
             "simulator_camera = gazebo_simulator_nodes.simulator_camera:main",
             "simulator_ultrasonic = gazebo_simulator_nodes.simulator_ultrasonic:main",
             "simulator_line_tracking = gazebo_simulator_nodes.simulator_line_tracking:main",

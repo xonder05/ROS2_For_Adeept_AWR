@@ -19,7 +19,7 @@ def generate_launch_description():
             ),
         IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([
-                    FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_camera_servo_launch.py'])
+                    FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_servo_launch.py'])
             ),
         IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([
@@ -27,6 +27,6 @@ def generate_launch_description():
             ),
         IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([
-                    FindPackageShare("gazebo_simulator_nodes"), '/launch', 'simulator_line_tracking_launch.py'])
+                    FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_line_tracking_launch.py'])
             ),
     ])

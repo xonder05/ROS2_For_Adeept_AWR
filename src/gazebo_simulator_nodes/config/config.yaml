@@ -1,7 +1,7 @@
 simulator_motor:
   ros__parameters:
-    input_topic: "drive_directions"
-    output_topic: "/model/adeept_awr/cmd_vel"
+    gazebo_topic: "/drive_directions"
+    ros_topic: "/model/adeept_awr/cmd_vel"
 
 simulator_motor_bridge:
   ros__parameters:
@@ -11,8 +11,8 @@ simulator_motor_bridge:
 
 simulator_camera:
   ros__parameters:
-    input_topic: "/simulator_camera"
-    output_topic: "/camera_stream"
+    gazebo_topic: "/simulator_camera"
+    ros_topic: "/camera_stream"
 
 simulator_camera_bridge:
   ros__parameters:
@@ -20,17 +20,24 @@ simulator_camera_bridge:
     ros_message_type: "sensor_msgs/msg/Image"
     gazebo_message_type: "gz.msgs.Image"
 
-simulator_camera_servo:
+simulator_servo:
   ros__parameters:
-    input_topic: "/put_servo_to_pos"
-    output_topic: "/model/adeept_awr/joint/camera_servo_joint/cmd_vel"
+    ros_action: "/put_servo_to_pos"
+    gazebo_topic: "/model/adeept_awr/joint/camera_servo_joint/cmd_vel"
 
-simulator_camera_servo_bridge:
+simulator_servo_bridge:
   ros__parameters:
     topic: "/model/adeept_awr/joint/camera_servo_joint/cmd_vel"
     ros_message_type: "std_msgs/msg/Float64"
     gazebo_message_type: "gz.msgs.Double"
 
+simulator_ultrasonic:
+  ros__parameters:
+    gazebo_topic_name: "/simulator_ultrasonic"
+    obstacle_warning_distance: 0.15
+    side_obstacle_minimum_detection_distance: 0.3
+    side_obstacle_maximum_detection_distance: 0.7
+    
 simulator_ultrasonic_bridge:
   ros__parameters:
     topic: "/simulator_ultrasonic"
@@ -41,6 +48,10 @@ simulator_line_tracking:
   ros__parameters:
     gazebo_topic: "/line_tracking"
     ros_topic: "/line_visibility"
+    left_sensor_name: "adeept_awr/left/line_tracking/camera"
+    middle_sensor_name: "adeept_awr/middle/line_tracking/camera"
+    right_sensor_name: "adeept_awr/right/line_tracking/camera"
+    line_detection_threshold: 50
 
 simulator_line_tracking_bridge:
   ros__parameters:

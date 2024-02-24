@@ -15,9 +15,9 @@ def generate_launch_description():
     with open(config_file, 'r') as f:
         config_contents = yaml.safe_load(f)
 
-    simulator_camera_servo = Node(
+    simulator_servo = Node(
         package='gazebo_simulator_nodes',
-        executable='simulator_camera_servo',
+        executable='simulator_servo',
         parameters=[config_file]
     )
     
@@ -26,13 +26,13 @@ def generate_launch_description():
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=[
-            config_contents["simulator_camera_servo_bridge"]["ros__parameters"]["topic"] + '@' + 
-            config_contents["simulator_camera_servo_bridge"]["ros__parameters"]["ros_message_type"] + '@' + 
-            config_contents["simulator_camera_servo_bridge"]["ros__parameters"]["gazebo_message_type"]
+            config_contents["simulator_servo_bridge"]["ros__parameters"]["topic"] + '@' + 
+            config_contents["simulator_servo_bridge"]["ros__parameters"]["ros_message_type"] + '@' + 
+            config_contents["simulator_servo_bridge"]["ros__parameters"]["gazebo_message_type"]
         ]
     )
 
     return launch.LaunchDescription([
-        simulator_camera_servo,
+        simulator_servo,
         bridge,
     ])

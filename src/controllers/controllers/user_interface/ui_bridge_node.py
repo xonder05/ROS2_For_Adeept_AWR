@@ -2,11 +2,11 @@ import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import String
-from adeept_awr_interfaces.msg import UltrasonicDistance
 from adeept_awr_interfaces.msg import LineTracking
 from std_srvs.srv import SetBool 
 from std_msgs.msg import String
 from sensor_msgs.msg import CompressedImage
+from std_msgs.msg import Float32
 
 import numpy as np
 
@@ -17,7 +17,7 @@ class UiBridgeNode(Node):
         self.subscriber = self.create_subscription(CompressedImage, "/camera_stream", self.camera_callback, 10)
         self.first = True
 
-        self.subscriber = self.create_subscription(UltrasonicDistance, "/ultrasonic_distance", self.ultrasonic_callback, 10)
+        self.subscriber = self.create_subscription(Float32, "/ultrasonic_distance", self.ultrasonic_callback, 10)
         self.subscriber = self.create_subscription(LineTracking, "/line_visibility", self.line_visibility_callback, 10)
         
         self.subscriber = self.create_subscription(String, "/wandering_state", self.wandering_state_callback, 10)
@@ -31,8 +31,8 @@ class UiBridgeNode(Node):
     def put_window(self, qt):
         self.qt = qt
 
-    def ultrasonic_callback(self, msg: UltrasonicDistance):
-        self.qt.update_ultrasonic_label(msg.distance)
+    def ultrasonic_callback(self, msg: Float32):
+        self.qt.update_ultrasonic_label(msg.data)
 
     def line_visibility_callback(self, msg: LineTracking):
         self.qt.update_line_tracking_label(msg.left, msg.middle, msg.right)
