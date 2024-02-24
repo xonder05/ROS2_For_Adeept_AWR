@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton
 from PyQt5 import uic
 from PyQt5.QtCore import QByteArray
-import base64
 from PyQt5.QtGui import QPixmap, QImage, QImageReader
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QPainterPath
 from PyQt5.QtCore import Qt
@@ -41,19 +40,12 @@ class MainWindow(QMainWindow):
 
         self.show()
 
-    def update_image(self, base64_image):
-        base64_data = base64_image[len('data:image/jpeg;base64,'):]
-        image_bytes = base64.b64decode(base64_data)
-        pixmap = QPixmap()
-        pixmap.loadFromData(image_bytes)
-        pixmap = pixmap.scaled(int(round(self.size().width() / 2, 0)), int(round(self.size().height() / 2, 0)))
+    def update_image(self, np_image_data_array):
+        image = QImage.fromData(np_image_data_array)
+        pixmap = QPixmap.fromImage(image)
         self.video_stream_label.setPixmap(pixmap)
-        self.video_stream_label.setGeometry(50, 150, pixmap.width() + 50, pixmap.height() + 150)  # Adjust the geometry as needed
 
     def update_ultrasonic_label(self, distance):
-
-        self.node.get_logger().info(f"ultra callback value: {distance}")
-
         if math.isinf(distance):
             self.ultrasonic_distance_indicator.setValue(450)
             self.ultrasonic_distance_indicator.setFormat(f"{distance}")

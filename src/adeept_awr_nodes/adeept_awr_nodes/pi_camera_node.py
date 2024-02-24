@@ -1,10 +1,9 @@
 import rclpy
 from rclpy.node import Node
+
+from sensor_msgs.msg import CompressedImage
+
 import cv2
-
-import base64
-
-from adeept_awr_interfaces.msg import CameraFrame
 
 class PiCameraNode(Node):
     def __init__(self):
@@ -15,7 +14,7 @@ class PiCameraNode(Node):
         self.declare_parameter('video_resolution_height', rclpy.Parameter.Type.INTEGER)
         self.declare_parameter('video_framerate', rclpy.Parameter.Type.DOUBLE)
 
-        self.publisher = self.create_publisher(CameraFrame, "camera_stream", 10)
+        self.publisher = self.create_publisher(CompressedImage, "camera_stream", 10)
         self.timer = self.create_timer(self.get_parameter('video_framerate').get_parameter_value().double_value, 
                                        self.get_frame)
         
@@ -32,16 +31,11 @@ class PiCameraNode(Node):
         ret, frame = self.cap.read()
 
         if ret:
-            _, buffer = cv2.imencode('.jpg', frame)            
+            ros_image = CompressedImage()
+            ros_image.format = "jpeg"
+            ros_image.data = cv2.imencode('.jpg', frame)[1].tobytes()
+            self.publisher.publish(ros_image)
             
-            base64_str = base64.b64encode(buffer).decode('utf-8')
-            data_uri = 'data:image/jpeg;base64,' + base64_str
-            
-            msg = CameraFrame()
-            msg.base64_data = data_uri
-            self.publisher.publish(msg)
-
-
 def main():
     rclpy.init()
     node = PiCameraNode()

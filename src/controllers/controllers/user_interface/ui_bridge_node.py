@@ -2,17 +2,19 @@ import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import String
-from adeept_awr_interfaces.msg import CameraFrame
 from adeept_awr_interfaces.msg import UltrasonicDistance
 from adeept_awr_interfaces.msg import LineTracking
 from std_srvs.srv import SetBool 
 from std_msgs.msg import String
+from sensor_msgs.msg import CompressedImage
+
+import numpy as np
 
 class UiBridgeNode(Node):
     def __init__(self):
         super().__init__('ui_bridge_node')
 
-        self.subscriber = self.create_subscription(CameraFrame, "/camera_stream", self.camera_callback, 10)
+        self.subscriber = self.create_subscription(CompressedImage, "/camera_stream", self.camera_callback, 10)
         self.first = True
 
         self.subscriber = self.create_subscription(UltrasonicDistance, "/ultrasonic_distance", self.ultrasonic_callback, 10)
@@ -73,5 +75,6 @@ class UiBridgeNode(Node):
         request.data = action
         self.keyboard_toggle_client.call_async(request)
 
-    def camera_callback(self, msg: CameraFrame):
-        self.qt.update_image(msg.base64_data)
+    def camera_callback(self, msg: CompressedImage):
+        np_array = np.frombuffer(msg.data, np.uint8)
+        self.qt.update_image(np_array)
