@@ -12,11 +12,16 @@ class DCMotorNode(Node):
 
     def __init__(self):
         super().__init__("dc_motor_node")
+        
         self.init_params()
-        self.subscriber = self.create_subscription(Twist, "drive_directions", self.callback, 10)
+        
+        self.subscriber = self.create_subscription(Twist, "/drive_directions", self.callback, 10)
         self.obstacle_subscriber = self.create_subscription(Bool, "/obstacle_detected", self.obstacle_callback, 10)
+        
         self.init_gpio()
+        
         self.obstacle = False
+        
         self.get_logger().info("InitDone")
 
     def init_params(self):
@@ -28,16 +33,21 @@ class DCMotorNode(Node):
                 ('motor_left_forward_pin', rclpy.Parameter.Type.INTEGER),
                 ('motor_right_enable_pin', rclpy.Parameter.Type.INTEGER),
                 ('motor_right_backward_pin', rclpy.Parameter.Type.INTEGER),
-                ('motor_right_forward_pin', rclpy.Parameter.Type.INTEGER)
+                ('motor_right_forward_pin', rclpy.Parameter.Type.INTEGER),
+                ('half_distance_between_wheels', rclpy.Parameter.Type.DOUBLE),
+                ('wheel_radius', rclpy.Parameter.Type.DOUBLE),
+                ('max_motor_rotation_speed', rclpy.Parameter.Type.DOUBLE),
             ]
         )
-        
         self.motor_left_enable_pin = self.get_parameter('motor_left_enable_pin').get_parameter_value().integer_value
         self.motor_left_backward_pin = self.get_parameter('motor_left_backward_pin').get_parameter_value().integer_value
         self.motor_left_forward_pin = self.get_parameter('motor_left_forward_pin').get_parameter_value().integer_value
         self.motor_right_enable_pin = self.get_parameter('motor_right_enable_pin').get_parameter_value().integer_value
         self.motor_right_backward_pin = self.get_parameter('motor_right_backward_pin').get_parameter_value().integer_value
         self.motor_right_forward_pin = self.get_parameter('motor_right_forward_pin').get_parameter_value().integer_value
+        self.half_distance_between_wheels = self.get_parameter('half_distance_between_wheels').get_parameter_value().double_value
+        self.wheel_radius = self.get_parameter('wheel_radius').get_parameter_value().double_value
+        self.max_motor_rotation_speed = self.get_parameter('max_motor_rotation_speed').get_parameter_value().double_value
 
     def init_gpio(self):
         GPIO.setwarnings(False)
@@ -67,8 +77,9 @@ class DCMotorNode(Node):
         GPIO.output(self.motor_left_enable_pin, GPIO.LOW)
         GPIO.output(self.motor_right_enable_pin, GPIO.LOW)
 
+    #controlling h-bridge circuite
     def left_side_motor(self, speed):
-        if speed > 0:
+        if speed >= 0:
             GPIO.output(self.motor_left_backward_pin, GPIO.HIGH)
             GPIO.output(self.motor_left_forward_pin, GPIO.LOW)
             pwm_A.start(100)
@@ -80,8 +91,9 @@ class DCMotorNode(Node):
             pwm_A.start(100)
             pwm_A.ChangeDutyCycle(-speed)
 
+    #controlling h-bridge circuite
     def right_side_motor(self, speed):
-        if speed > 0:
+        if speed >= 0:
             GPIO.output(self.motor_right_backward_pin, GPIO.HIGH)
             GPIO.output(self.motor_right_forward_pin, GPIO.LOW)
             pwm_B.start(100)
@@ -94,39 +106,30 @@ class DCMotorNode(Node):
             pwm_B.ChangeDutyCycle(-speed)
 
     def callback(self, msg: Twist):
+
+        #no need to do calculations if the request is to stop
         if msg.linear.x == 0 and msg.angular.z == 0:
             self.stopMotors()
             return
 
+        #don't move forward when obstacle is detected
         if self.obstacle and msg.linear.x > 0:
             return
-
-        HALF_DISTANCE_BETWEEN_WHEELS = 0.075 #m
-        WHEEL_RADIUS = 0.035 #m
-        MAX_MOTOR_ROTATION_SPEED = 19.8967 #rad/s
-        MAX_LINEAR_SPEED = 0.6964 #m/s
-        MAX_ANGULAR_SPEED = 4.385 #rad/s
 
         linear_speed = msg.linear.x
         angular_speed = msg.angular.z
 
-        left_motor_speed = (linear_speed - angular_speed * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS
-        right_motor_speed = (linear_speed + angular_speed * HALF_DISTANCE_BETWEEN_WHEELS) / WHEEL_RADIUS
+        #calculate speed for each side from linear and angular components
+        left_motor_speed = (linear_speed - angular_speed * self.half_distance_between_wheels) / self.wheel_radius
+        right_motor_speed = (linear_speed + angular_speed * self.half_distance_between_wheels) / self.wheel_radius
 
-        left_motor_speed = max(min(left_motor_speed, MAX_MOTOR_ROTATION_SPEED), -MAX_MOTOR_ROTATION_SPEED)
-        left_motor_speed = max(min(right_motor_speed, MAX_MOTOR_ROTATION_SPEED), -MAX_MOTOR_ROTATION_SPEED)
+        #crop speeds that are more than what motors can handle
+        left_motor_speed = max(min(left_motor_speed, self.max_motor_rotation_speed), -self.max_motor_rotation_speed)
+        right_motor_speed = max(min(right_motor_speed, self.max_motor_rotation_speed), -self.max_motor_rotation_speed)
 
-        normalized_left_motor_speed = (left_motor_speed / MAX_MOTOR_ROTATION_SPEED) * 100
-        normalized_right_motor_speed = (right_motor_speed / MAX_MOTOR_ROTATION_SPEED) * 100
-
-        if abs(normalized_left_motor_speed) < 20:
-            normalized_left_motor_speed = 0
-
-        if abs(normalized_right_motor_speed) < 20:
-            normalized_right_motor_speed = 0
-
-        self.get_logger().info(str(normalized_left_motor_speed))
-        self.get_logger().info(str(normalized_right_motor_speed))
+        #map speed to pwm duty cycle value
+        normalized_left_motor_speed = (left_motor_speed / self.max_motor_rotation_speed) * 100
+        normalized_right_motor_speed = (right_motor_speed / self.max_motor_rotation_speed) * 100
 
         self.left_side_motor(normalized_left_motor_speed)
         self.right_side_motor(normalized_right_motor_speed)
@@ -139,8 +142,7 @@ class DCMotorNode(Node):
         else:
             self.obstacle = False 
 
-
-def main(args=None):
+def main():
     rclpy.init()
     node = DCMotorNode()
     rclpy.spin(node)

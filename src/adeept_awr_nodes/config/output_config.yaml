@@ -1,8 +1,0 @@
-dc_motor_node:
-  ros__parameters:
-    motor_left_enable_pin: 4
-    motor_left_forward_pin: 26
-    motor_left_backward_pin: 21
-    motor_right_enable_pin: 17
-    motor_right_forward_pin: 27
-    motor_right_backward_pin: 18

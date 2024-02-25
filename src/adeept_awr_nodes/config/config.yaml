@@ -1,0 +1,40 @@
+dc_motor_node:
+  ros__parameters:
+    motor_left_enable_pin: 4
+    motor_left_forward_pin: 26
+    motor_left_backward_pin: 21
+    motor_right_enable_pin: 17
+    motor_right_forward_pin: 27
+    motor_right_backward_pin: 18
+    half_distance_between_wheels: 0.075 #m
+    wheel_radius: 0.035 #m
+    max_motor_rotation_speed: 19.8967 #rad/s
+
+servo_node:
+  ros__parameters:
+    control_board_channel: 0
+    default_position: 300
+    rotation_limit_up: 150 #almost vertical
+    rotation_limit_down: 350 #something below horizontal
+
+pi_camera_node:
+  ros__parameters:
+    video_capture: '/dev/video0'
+    video_resolution_width: 960
+    video_resolution_height: 540
+    video_framerate: 0.05
+
+ultrasonic_node:
+  ros__parameters:
+    tr_pin: 11
+    ec_pin: 8
+    obstacle_warning_distance: 0.15 #m
+    side_obstacle_minimum_detection_distance: 0.2 #m
+    side_obstacle_maximum_detection_distance: 0.7 #m
+
+line_tracking_node:
+  ros__parameters:
+    left_pin: 19
+    middle_pin: 16
+    right_pin: 20
+    scanning_period: 0.05
