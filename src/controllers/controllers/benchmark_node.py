@@ -2,7 +2,6 @@ import rclpy
 from rclpy.node import Node
 
 from geometry_msgs.msg import Twist
-from adeept_awr_interfaces.msg import LineTracking
 
 import time
 import math

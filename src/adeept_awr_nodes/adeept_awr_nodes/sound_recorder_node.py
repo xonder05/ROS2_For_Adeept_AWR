@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 
-from adeept_awr_interfaces.msg import SoundBlock
+from interfaces.msg import SoundBlock
 
 import sounddevice as sd
 

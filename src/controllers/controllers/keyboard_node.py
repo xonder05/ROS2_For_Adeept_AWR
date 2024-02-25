@@ -3,9 +3,7 @@ from rclpy.node import Node
 from rclpy.action import ActionClient
 
 from geometry_msgs.msg import Twist
-from std_msgs.msg import Bool
-from adeept_awr_interfaces.srv import RGB
-from adeept_awr_interfaces.action import Servo
+from interfaces.action import Servo
 from std_srvs.srv import SetBool
 
 from pynput import keyboard

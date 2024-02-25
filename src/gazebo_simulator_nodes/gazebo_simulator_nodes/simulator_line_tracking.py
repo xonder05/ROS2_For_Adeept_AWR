@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 
 from sensor_msgs.msg import Image
-from adeept_awr_interfaces.msg import LineTracking
+from interfaces.msg import LineTracking
 
 class SimulatorLineTracking(Node):
     def __init__(self):

@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 
-from adeept_awr_interfaces.srv import RGB
+from interfaces.srv import RGB
 
 import subprocess
 

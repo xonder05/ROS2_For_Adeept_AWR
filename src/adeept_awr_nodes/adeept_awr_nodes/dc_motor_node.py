@@ -3,10 +3,8 @@ from rclpy.node import Node
 
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
-import time
 
 import RPi.GPIO as GPIO
-GPIO.cleanup()
 
 class DCMotorNode(Node):
 
@@ -50,6 +48,7 @@ class DCMotorNode(Node):
         self.max_motor_rotation_speed = self.get_parameter('max_motor_rotation_speed').get_parameter_value().double_value
 
     def init_gpio(self):
+        GPIO.cleanup()
         GPIO.setwarnings(False)
         GPIO.setmode(GPIO.BCM)
 

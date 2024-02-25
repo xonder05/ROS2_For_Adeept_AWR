@@ -4,7 +4,7 @@ from rclpy.node import Node
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
 from std_msgs.msg import Int8
-from adeept_awr_interfaces.msg import UltrasonicDistance
+from interfaces.msg import UltrasonicDistance
 from std_srvs.srv import SetBool
 from std_msgs.msg import String
 
