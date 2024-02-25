@@ -4,7 +4,7 @@ from rclpy.node import Node
 import sounddevice as sd
 import soundfile as sf
 
-from adeept_awr_interfaces.msg import SoundBlock
+from interfaces.msg import SoundBlock
 import numpy as np
 
 class SoundPlayerNode(Node):

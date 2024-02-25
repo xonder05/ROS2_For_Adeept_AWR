@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 
 from geometry_msgs.msg import Twist
-from adeept_awr_interfaces.msg import LineTracking
+from interfaces.msg import LineTracking
 from std_srvs.srv import SetBool
 from std_msgs.msg import String
 

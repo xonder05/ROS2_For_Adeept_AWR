@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionServer
 
-from adeept_awr_interfaces.action import Servo
+from interfaces.action import Servo
 
 import Adafruit_PCA9685
 import time

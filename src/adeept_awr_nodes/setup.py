@@ -25,14 +25,13 @@ setup(
     entry_points={
         'console_scripts': [
             "dc_motor_node = adeept_awr_nodes.dc_motor_node:main",
-            "rgb_led_node = adeept_awr_nodes.rgb_led_node:main",
             "servo_node = adeept_awr_nodes.servo_node:main",
-            "sound_player_node = adeept_awr_nodes.sound_player_node:main",
-            "ultrasonic_node = adeept_awr_nodes.ultrasonic_node:main",
             "pi_camera_node = adeept_awr_nodes.pi_camera_node:main",
+            "ultrasonic_node = adeept_awr_nodes.ultrasonic_node:main",
             "line_tracking_node = adeept_awr_nodes.line_tracking_node:main",
+            "rgb_led_node = adeept_awr_nodes.rgb_led_node:main",
+            "sound_player_node = adeept_awr_nodes.sound_player_node:main",
             "sound_recorder_node = adeept_awr_nodes.sound_recorder_node:main",
-            "web_controller_node = adeept_awr_nodes.web_controller_node:main",
         ],
     },
 )

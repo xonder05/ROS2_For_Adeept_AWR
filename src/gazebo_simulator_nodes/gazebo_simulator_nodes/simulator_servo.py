@@ -3,7 +3,7 @@ from rclpy.node import Node
 from rclpy.action import ActionServer
 
 from std_msgs.msg import Float64
-from adeept_awr_interfaces.action import Servo
+from interfaces.action import Servo
 
 import time
 

@@ -1,10 +1,10 @@
 import rclpy
 from rclpy.node import Node
 
+from interfaces.msg import LineTracking
+
 import RPi.GPIO as GPIO
 import time
-
-from adeept_awr_interfaces.msg import LineTracking
 
 class LineTrackerNode(Node):
 
