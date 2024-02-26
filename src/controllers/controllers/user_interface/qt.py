@@ -4,6 +4,7 @@ from PyQt5.QtCore import QByteArray
 from PyQt5.QtGui import QPixmap, QImage, QImageReader
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QPainterPath
 from PyQt5.QtCore import Qt
+import controllers.user_interface.global_variables
 
 import math
 
@@ -68,9 +69,9 @@ class MainWindow(QMainWindow):
         self.node = node
 
     def closeEvent(self, event):
-        self.node.destroy_node()
+        controllers.user_interface.global_variables.executeEventLoop = False
         event.accept()
-
+    
     def create_vector_image(self, filled=False):
         pixmap = QPixmap(int(self.size().width() / 25), int(self.size().width() / 25))
         pixmap.fill(Qt.transparent)

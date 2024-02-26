@@ -1,5 +1,5 @@
 import sys
-import threading
+import controllers.user_interface.global_variables
 
 import rclpy
 from controllers.user_interface.ui_bridge_node import UiBridgeNode
@@ -17,9 +17,11 @@ def main():
     node.put_window(window)
     window.put_node(node)
 
-    ros_thread_instance = threading.Thread(target=rclpy.spin, args=(node,))
-    ros_thread_instance.start()
-    
-    app.exec_()
+    while controllers.user_interface.global_variables.executeEventLoop:
+        rclpy.spin_once(node, timeout_sec=0.001)
+        app.processEvents()
 
+    window.close()
+    app.quit()
+    node.destroy_node()
     rclpy.shutdown()

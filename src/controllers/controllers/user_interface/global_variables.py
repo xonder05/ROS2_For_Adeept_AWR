@@ -1,0 +1,2 @@
+global executeEventLoop
+executeEventLoop = True
