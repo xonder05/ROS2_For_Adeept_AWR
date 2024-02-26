@@ -12,17 +12,14 @@
                 <mass>0.1</mass>
                 <inertia>
                     <ixx>2.60416667e-06</ixx>
-                    <ixy>0</ixy>
-                    <ixz>0</ixz>
                     <iyy>2.60416667e-06</iyy>
-                    <iyz>0</iyz>
                     <izz>8.68055556e-07</izz>
                 </inertia>
             </inertial>
             <visual name='visual'>
                 <geometry>
                     <cylinder>
-                        <radius>0.0325</radius>
+                        <radius>0.035</radius>
                         <length>0.02</length>
                     </cylinder>
                 </geometry>
