@@ -7,9 +7,8 @@ from launch.conditions import IfCondition
 
 def generate_launch_description():
 
-    world_select_arg = DeclareLaunchArgument('world_select', default_value='neco')
+    world_select_arg = DeclareLaunchArgument('world_select', default_value='')
     world_select_val = LaunchConfiguration('world_select')
-
 
     main_world = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
