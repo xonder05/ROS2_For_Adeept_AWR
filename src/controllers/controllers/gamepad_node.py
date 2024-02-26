@@ -2,9 +2,9 @@ import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
 
+from std_srvs.srv import SetBool
 from geometry_msgs.msg import Twist
 from interfaces.action import Servo
-from std_srvs.srv import SetBool
 
 import pygame
 
@@ -13,15 +13,30 @@ class GamepadNode(Node):
     def __init__(self):
         super().__init__("gamepad_node")
 
-        self.srv = self.create_service(SetBool, "/toggle_gamepad", self.toggle_callback)
-        self.twist_publisher = self.create_publisher(Twist, "/drive_directions", 10)
-        self.action_client = ActionClient(self, Servo, '/put_servo_to_pos')
+        self.declare_parameters(
+            namespace='',
+            parameters=[
+                ('start_right_away', rclpy.Parameter.Type.BOOL),
+                ('maximum_linear_speed', rclpy.Parameter.Type.DOUBLE),
+                ('maximum_angular_speed', rclpy.Parameter.Type.DOUBLE),
+            ]
+        )
+        self.start_right_away = self.get_parameter('start_right_away').get_parameter_value().bool_value
+        self.maximum_linear_speed = self.get_parameter('maximum_linear_speed').get_parameter_value().double_value
+        self.maximum_angular_speed = self.get_parameter('maximum_angular_speed').get_parameter_value().double_value
+
+        self.service = self.create_service(SetBool, "/toggle_gamepad", self.toggle_callback)
+        self.publisher = self.create_publisher(Twist, "/drive_directions", 10)
+        self.servo_action_client = ActionClient(self, Servo, '/put_servo_to_pos')
+
         self.timer = self.create_timer(0.01, self.pygame_loop)
+        if not self.start_right_away:
+            self.timer.cancel()
 
         pygame.init()
         pygame.joystick.init()
         if pygame.joystick.get_count() == 0:
-            self.get_logger().error("No joysticks/controllers found.")
+            self.get_logger().error("No controllers found, Exiting")
             self.destroy_node()
             return
         else:
@@ -31,9 +46,8 @@ class GamepadNode(Node):
 
         self.get_logger().info("InitDone")
 
+    #allows stoping of the event loop (used from user interface)
     def toggle_callback(self, request: SetBool, response: SetBool):
-        self.get_logger().info("callback")
-
         if request.data:
             pygame.event.get()
             self.timer.cancel()
@@ -44,65 +58,55 @@ class GamepadNode(Node):
         response.success = True
         return response
 
+    #main event loop for reading gamepad input
     def pygame_loop(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.get_logger().info("Exiting due to QUIT event.")
-                self.destroy_node()
 
-            elif event.type == pygame.JOYAXISMOTION:
+            #joystics
+            if event.type == pygame.JOYAXISMOTION:
                 msg = Twist()
 
+                #deadzone
                 if abs(event.value) < 0.1:
                     event.value = 0
 
-                if event.axis == 3: #linear
-                    self.drive_axes[1] = -1 * event.value * 0.30695
-                    
-                if event.axis == 2: #angular
-                    self.drive_axes[0] = -1 * event.value * 4.385
+                #linear (right joystic forward and back)
+                if event.axis == 3: 
+                    self.drive_axes[1] = -1 * event.value * self.maximum_linear_speed
+                
+                #angular (right joystic left and right)
+                if event.axis == 2: 
+                    self.drive_axes[0] = -1 * event.value * self.maximum_angular_speed
 
                 msg.linear.x = self.drive_axes[1]
                 msg.angular.z = self.drive_axes[0]
-                self.twist_publisher.publish(msg)
+                self.publisher.publish(msg)
 
+            #dpad
             elif event.type == pygame.JOYHATMOTION:
 
-                if event.value[1] != 0 and event.value[0] == 0: #servo
+                #servo (ignore left, right and combined directions)
+                if event.value[1] != 0 and event.value[0] == 0: 
                     goal_msg = Servo.Goal()
                     goal_msg.value = 20
 
-                    if event.value[1] == 1: #increment
+                    #increment (up)
+                    if event.value[1] == 1: 
                         goal_msg.mode = 1
-                        self.get_logger().info(f"inc")
 
-                    if event.value[1] == -1: #decrement
+                    #decrement (down)
+                    if event.value[1] == -1: 
                         goal_msg.mode = 2
-                        self.get_logger().info(f"dec")
 
-                    self.action_client.wait_for_server()
-                    self.goal_future = self.action_client.send_goal_async(goal_msg, self.feedback_callback)
+                    self.servo_action_client.wait_for_server()
+                    self.goal_future = self.servo_action_client.send_goal_async(goal_msg)
                     self.goal_future.add_done_callback(self.response_callback)
 
     def response_callback(self, future):
         goal_handle = future.result()
         if not goal_handle.accepted:
-            self.get_logger().info('Goal rejected :(')
+            self.get_logger().info('Action server rejected request')
             return
-
-        self.get_logger().info('Goal accepted :)')
-
-        self.result_future = goal_handle.get_result_async()
-        self.result_future.add_done_callback(self.result_callback)
-
-    def result_callback(self, future):
-        result = future.result().result
-        self.get_logger().info('Result: {0}'.format(result))
-
-    def feedback_callback(self, feedback_msg):
-        feedback = feedback_msg.feedback
-        self.get_logger().info('Received feedback: {0}'.format(feedback.curr_position))
-
 
 def main():
     rclpy.init()

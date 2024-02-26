@@ -8,8 +8,10 @@ line_following_node:
 
 gamepad_node:
   ros__parameters:
-    start_right_away: True
+    maximum_linear_speed: 0.7
+    maximum_angular_speed: 6.28
 
 keyboard_node:
   ros__parameters:
-    start_right_away: True
+    linear_speed: 0.5
+    angular_speed: 3.14
