@@ -36,6 +36,7 @@ set(msg_files
 set(srv_files
   "srv/RGB.srv"
   "srv/WebCommand.srv"
+  "srv/SetFloat32.srv"
   )
 
 set(action_files
