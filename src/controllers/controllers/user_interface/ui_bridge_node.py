@@ -2,11 +2,12 @@ import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import String
-from adeept_awr_interfaces.msg import LineTracking
+from interfaces.msg import LineTracking
 from std_srvs.srv import SetBool 
 from std_msgs.msg import String
 from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import Float32
+from interfaces.srv import SetFloat32
 
 import numpy as np
 
@@ -21,12 +22,16 @@ class UiBridgeNode(Node):
         self.subscriber = self.create_subscription(LineTracking, "/line_visibility", self.line_visibility_callback, 10)
         
         self.subscriber = self.create_subscription(String, "/wandering_state", self.wandering_state_callback, 10)
-        self.subscriber = self.create_subscription(String, "/line_tracking_state", self.line_tracking_state_callback, 10)
+        self.subscriber = self.create_subscription(String, "/line_following_state", self.line_following_state_callback, 10)
 
         self.gamepad_toggle_client = self.create_client(SetBool, "/toggle_gamepad")
         self.line_following_toggle_client = self.create_client(SetBool, "/toggle_line_following")
         self.wandering_toggle_client = self.create_client(SetBool, "/toggle_wandering")
         self.keyboard_toggle_client = self.create_client(SetBool, "/toggle_keyboard")
+        self.wandering_multiplier_client = self.create_client(SetFloat32, "/set_multiplier")
+        self.line_following_multiplier_client = self.create_client(SetFloat32, "/line_following_node/set_multiplier")
+
+        self.get_logger().info("InitDone")
 
     def put_window(self, qt):
         self.qt = qt
@@ -40,7 +45,7 @@ class UiBridgeNode(Node):
     def wandering_state_callback(self, msg: String):
         self.qt.update_wandering_state_label(msg.data)
 
-    def line_tracking_state_callback(self, msg: String):
+    def line_following_state_callback(self, msg: String):
         self.qt.update_line_tracking_state_label(msg.data)
 
     def gamepad_toggle(self, action):        
@@ -78,3 +83,19 @@ class UiBridgeNode(Node):
     def camera_callback(self, msg: CompressedImage):
         np_array = np.frombuffer(msg.data, np.uint8)
         self.qt.update_image(np_array)
+
+    def wandering_multipler(self, value):
+        while not self.wandering_multiplier_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info("service not available waiting")
+
+        request = SetFloat32.Request()
+        request.data = value
+        self.wandering_multiplier_client.call_async(request)
+
+    def line_following_multipler(self, value):
+        while not self.line_following_multiplier_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info("service not available waiting")
+
+        request = SetFloat32.Request()
+        request.data = value
+        self.line_following_multiplier_client.call_async(request)

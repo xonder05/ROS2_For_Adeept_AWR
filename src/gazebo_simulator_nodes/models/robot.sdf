@@ -70,7 +70,7 @@
                 <camera name='__default__'>
                     <horizontal_fov>1.0469999999999999</horizontal_fov>
                     <image>
-                        <width>820</width>
+                        <width>960</width>
                         <height>540</height>
                         <format>RGB_INT8</format>
                     </image>

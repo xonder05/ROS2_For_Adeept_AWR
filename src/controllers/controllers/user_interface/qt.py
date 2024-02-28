@@ -1,9 +1,10 @@
-from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton, QColorDialog
 from PyQt5 import uic
 from PyQt5.QtCore import QByteArray
-from PyQt5.QtGui import QPixmap, QImage, QImageReader
+from PyQt5.QtGui import QPixmap, QImage, QImageReader, QColor
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QPainterPath
 from PyQt5.QtCore import Qt
+
 import controllers.user_interface.global_variables
 
 import math
@@ -28,7 +29,16 @@ class MainWindow(QMainWindow):
         self.keyboard_start_button.clicked.connect(lambda: self.node.keyboard_toggle(True))
         self.keyboard_stop_button.clicked.connect(lambda: self.node.keyboard_toggle(False))
 
-        self.video_stream_label.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/camera_placeholder.png").scaled(int(round(self.size().width() / 2, 0)), int(round(self.size().height() / 2, 0))))
+        self.wandering_adeept_button.clicked.connect(lambda: self.node.wandering_multipler(2.0))
+        self.wandering_gazebo_button.clicked.connect(lambda: self.node.wandering_multipler(0.0))
+
+        self.line_following_adeept_button.clicked.connect(lambda: self.node.line_following_multipler(1.5))
+        self.line_following_gazebo_button.clicked.connect(lambda: self.node.line_following_multipler(1.0))
+
+        self.camera_width = int(round( (self.size().width() / 3) * 2, 0))
+        self.camera_height = int((self.camera_width / 16) * 9)
+
+        self.video_stream_label.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/camera_placeholder.png").scaled(self.camera_width, self.camera_height))
         self.video_stream_label.setScaledContents(True)
 
         self.line_tracking_left_label.setPixmap(self.create_vector_image())
@@ -39,11 +49,16 @@ class MainWindow(QMainWindow):
         self.ultrasonic_distance_indicator.setValue(0)
         self.ultrasonic_distance_indicator.setFormat("")
 
+        # self.button = QPushButton('Pick a Color', self)
+        # self.button.clicked.connect(self.showColorDialog)
+        # self.button.setGeometry(50, 50, 200, 100)
+
         self.show()
 
     def update_image(self, np_image_data_array):
         image = QImage.fromData(np_image_data_array)
         pixmap = QPixmap.fromImage(image)
+        pixmap = pixmap.scaled(self.camera_width, self.camera_height)
         self.video_stream_label.setPixmap(pixmap)
 
     def update_ultrasonic_label(self, distance):
@@ -93,3 +108,8 @@ class MainWindow(QMainWindow):
         painter.end()
 
         return pixmap
+    
+    # def showColorDialog(self):
+    #     color = QColorDialog.getColor()
+    #     if color.isValid():
+    #         self.node.get_logger().info(f"selected color {color.name()}")

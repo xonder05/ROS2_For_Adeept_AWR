@@ -17,11 +17,11 @@
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
    </property>
-   <layout class="QGridLayout" name="gridLayout" columnstretch="1,1">
+   <layout class="QGridLayout" name="gridLayout" columnstretch="2,1">
     <item row="0" column="1" rowspan="2">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>3</number>
       </property>
       <widget class="QWidget" name="gamepad_tab">
        <attribute name="title">
@@ -134,34 +134,8 @@
         <string>Wandering</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
-         <widget class="QLabel" name="wandering_label">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Current state: </string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="4">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="3">
-         <widget class="QPushButton" name="wandering_stop_button">
+        <item row="0" column="4">
+         <widget class="QPushButton" name="wandering_start_button">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -169,7 +143,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Stop</string>
+           <string>Start</string>
           </property>
          </widget>
         </item>
@@ -186,8 +160,8 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="wandering_start_button">
+        <item row="0" column="5">
+         <widget class="QPushButton" name="wandering_stop_button">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -195,7 +169,59 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Start</string>
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="wandering_label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Current state: </string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="6">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="3">
+         <widget class="QPushButton" name="wandering_gazebo_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Use Gazebo</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="wandering_adeept_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Use Adeept</string>
           </property>
          </widget>
         </item>
@@ -206,7 +232,7 @@
         <string>Line Following</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="2">
+        <item row="0" column="4">
          <widget class="QPushButton" name="line_following_start_button">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -219,18 +245,18 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="3">
-         <widget class="QPushButton" name="line_following_stop_button">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+        <item row="1" column="0" colspan="6">
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-          <property name="text">
-           <string>Stop</string>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
           </property>
-         </widget>
+         </spacer>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="line_following_label">
@@ -245,23 +271,37 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0" colspan="4">
-         <spacer name="verticalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+        <item row="0" column="3">
+         <widget class="QPushButton" name="line_following_gazebo_button">
+          <property name="text">
+           <string>Use Gazebo</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QPushButton" name="line_following_stop_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-         </spacer>
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
         </item>
         <item row="0" column="1">
          <widget class="QLabel" name="line_following_state_label">
           <property name="text">
            <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="line_following_adeept_button">
+          <property name="text">
+           <string>Use Adeept</string>
           </property>
          </widget>
         </item>
