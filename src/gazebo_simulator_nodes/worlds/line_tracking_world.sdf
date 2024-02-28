@@ -42,14 +42,14 @@
             <visual name="visual">
               <geometry>
                 <mesh>
-                  <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/untitled.dae</uri>
+                  <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/line_plane.dae</uri>
                 </mesh>
               </geometry>
             </visual>
             <collision name='collision'>
               <geometry>
-                  <mesh>s
-                      <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/untitled.dae</uri>
+                  <mesh>
+                      <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/line_plane.dae</uri>
                   </mesh>
               </geometry>
           </collision>
