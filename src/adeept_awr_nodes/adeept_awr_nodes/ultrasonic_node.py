@@ -16,6 +16,7 @@ class UltrasonicNode(Node):
             parameters=[
                 ('tr_pin', rclpy.Parameter.Type.INTEGER),
                 ('ec_pin', rclpy.Parameter.Type.INTEGER),
+                ('ec_timeout', rclpy.Parameter.Type.DOUBLE),
                 ('obstacle_warning_distance', rclpy.Parameter.Type.DOUBLE),
                 ('side_obstacle_minimum_detection_distance', rclpy.Parameter.Type.DOUBLE),
                 ('side_obstacle_maximum_detection_distance', rclpy.Parameter.Type.DOUBLE)
@@ -23,6 +24,7 @@ class UltrasonicNode(Node):
         )
         self.tr_pin = self.get_parameter('tr_pin').get_parameter_value().integer_value
         self.ec_pin = self.get_parameter('ec_pin').get_parameter_value().integer_value
+        self.ec_timeout = self.get_parameter('ec_timeout').get_parameter_value().double_value
         self.obstacle_warning_distance = self.get_parameter('obstacle_warning_distance').get_parameter_value().double_value
         self.side_obstacle_minimum_detection_distance = self.get_parameter('side_obstacle_minimum_detection_distance').get_parameter_value().double_value
         self.side_obstacle_maximum_detection_distance = self.get_parameter('side_obstacle_maximum_detection_distance').get_parameter_value().double_value
@@ -33,7 +35,7 @@ class UltrasonicNode(Node):
         self.timer = self.create_timer(0.1, self.checkdist)
 
         GPIO.setmode(GPIO.BCM)
-        GPIO.setup(self.tr_pin, GPIO.OUT,initial=GPIO.LOW)
+        GPIO.setup(self.tr_pin, GPIO.OUT, initial=GPIO.LOW)
         GPIO.setup(self.ec_pin, GPIO.IN)
         
         self.previous_distance = 0
@@ -41,22 +43,28 @@ class UltrasonicNode(Node):
         self.get_logger().info("InitDone")
 
     def checkdist(self):
+        start_time = time.time()
 
-        #trigger distance mesurement on the sensor
+        #order sensor to mesure distance
         GPIO.output(self.tr_pin, GPIO.HIGH)
         time.sleep(0.000015)
         GPIO.output(self.tr_pin, GPIO.LOW)
         
-        #listening to the sensor
-        while not GPIO.input(self.ec_pin): # When the module no longer receives the initial sound wave
-            pass
-        t1 = time.time() # Note the time when the initial sound wave is emitted
+        #wait until sensor starts transmiting results
+        while not GPIO.input(self.ec_pin):
+            if time.time() - start_time > self.ec_timeout:
+                return
         
-        while GPIO.input(self.ec_pin): # When the module receives the return sound wave
-            pass
-        t2 = time.time() # Note the time when the return sound wave is captured
+        t1 = time.time() #note start of the echo
+
+        #wait until sensor stops transmiting results
+        while GPIO.input(self.ec_pin):
+            if time.time() - start_time > self.ec_timeout:
+                return
         
-        #calculate the distance based on the speed of sound proparation in air
+        t2 = time.time() #note end of echo
+        
+        #calculate the distance from captured time stamps and speed of sound in air
         distance = round((t2-t1)*340/2,2)
 
         #publish calculated distance
