@@ -28,6 +28,7 @@ ultrasonic_node:
   ros__parameters:
     tr_pin: 11
     ec_pin: 8
+    ec_timeout: 0.05
     obstacle_warning_distance: 0.15 #m
     side_obstacle_minimum_detection_distance: 0.2 #m
     side_obstacle_maximum_detection_distance: 0.7 #m
