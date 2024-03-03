@@ -6,13 +6,8 @@ while
 do echo "Unexpected value entered!"; done
 
 while
-    read -p "Install python modules used by controllers (including pyqt)? [y/n]: " install_python
+    read -p "Install python modules used to control hw devices? [y/n]: " install_python
     ! [[ "$install_python" =~ ^[yn]$ ]]
-do echo "Unexpected value entered!"; done
-
-while
-    read -p "Install Gazebo? [y/n]: " install_gazebo
-    ! [[ "$install_gazebo" =~ ^[yn]$ ]]
 do echo "Unexpected value entered!"; done
 
 while
@@ -26,7 +21,7 @@ if [[ "$install_ros" =~ "y" ]]; then
     sudo add-apt-repository universe -y
     sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg && \
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
-    sudo apt update && sudo apt install ros-iron-desktop python3-colcon-common-extensions -y
+    sudo apt update && sudo apt install ros-iron-ros-base python3-colcon-common-extensions -y
 
     sudo -u $SUDO_USER bash -c '
         grep -qF "source /opt/ros/iron/setup.bash" ~/.bashrc || echo "source /opt/ros/iron/setup.bash" >> ~/.bashrc
@@ -36,15 +31,10 @@ fi
 
 if [[ "$install_python" =~ "y" ]]; then
     echo "Instaling pip packages"
-    sudo apt update && sudo apt install python3-pip -y
+    sudo apt update && sudo apt install python3-pip python3-opencv -y
     sudo -u $SUDO_USER bash -c '
-        pip install PyQt5 pygame pynput
+        pip install RPi.GPIO adafruit-pca9685 rpi-ws281x 
     '
-fi
-
-if [[ "$install_gazebo" =~ "y" ]]; then
-    echo "Instaling Gazebo simulator"
-    sudo apt update && sudo apt-get install ros-iron-ros-gz -y
 fi
 
 if [[ "$setup_workspace" =~ "y" ]]; then
