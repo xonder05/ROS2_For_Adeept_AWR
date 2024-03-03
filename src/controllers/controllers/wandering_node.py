@@ -49,7 +49,7 @@ class WanderingNode(Node):
         if not self.start_right_away:
             self.timer.cancel()
 
-        self.state = State.PAUSE
+        self.state = State.DRIVE
         self.cautious_mode = True
         self.scan_counter = 0
         self.distance = 0
