@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
         self.line_following_adeept_button.clicked.connect(lambda: self.node.line_following_multipler(1.5))
         self.line_following_gazebo_button.clicked.connect(lambda: self.node.line_following_multipler(1.0))
 
-        self.camera_width = int(round( (self.size().width() / 3) * 2, 0))
+        self.camera_width = int(round((self.size().width() / 5) * 3, 0))
         self.camera_height = int((self.camera_width / 16) * 9)
 
         self.video_stream_label.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/camera_placeholder.png").scaled(self.camera_width, self.camera_height))
