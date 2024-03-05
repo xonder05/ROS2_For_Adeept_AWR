@@ -86,151 +86,151 @@
   
       <include>
         <name>obstacle1</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>-3.5 -2 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle2</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>3.5 2 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle3</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>-1.5 -0.5 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle4</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>1.5 0.8 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle5</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>-3 2.5 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle6</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>2.5 1.5 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle7</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>-1.5 3 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle8</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>0 1 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle9</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>3 3 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle10</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>-2 0 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle11</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>1.5 -2.5 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle12</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>-3 0.5 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle13</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>1.5 3.5 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle14</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>-2.5 -1.5 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle15</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>0.5 -1 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle16</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>3.5 -3.5 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle17</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>-1 1.5 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle18</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>2.5 -0.5 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle19</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>-0.2 -2.5 0.125 0 0 0</pose>
       </include>
       
       <include>
         <name>obstacle20</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/obstacle.sdf</uri>
+        <uri>model://worlds/objects/obstacle.sdf</uri>
         <pose>1 0.1 0.125 0 0 0</pose>
       </include>
       
 
       <include>
         <name>border1</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+        <uri>model://worlds/objects/borders.sdf</uri>
         <pose>0 4 0 0 0 0</pose>
       </include>
 
       <include>
         <name>border2</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+        <uri>model://worlds/objects/borders.sdf</uri>
         <pose>0 -4 0 0 0 0</pose>
       </include>
 
       <include>
         <name>border3</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+        <uri>model://worlds/objects/borders.sdf</uri>
         <pose>4 0 0 0 0 1.57</pose>
       </include>
 
       <include>
         <name>border4</name>
-        <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+        <uri>model://worlds/objects/borders.sdf</uri>
         <pose>-4 0 0 0 0 1.57</pose>
       </include>
 
       <include>
-          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/robot.sdf</uri>
+          <uri>model://models/robot.sdf</uri>
       </include>
 
     </world>

@@ -31,6 +31,7 @@ if [[ "$install_ros" =~ "y" ]]; then
     sudo -u $SUDO_USER bash -c '
         grep -qF "source /opt/ros/iron/setup.bash" ~/.bashrc || echo "source /opt/ros/iron/setup.bash" >> ~/.bashrc
         grep -qF "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" ~/.bashrc || echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc
+        grep -qF "export GZ_SIM_RESOURCE_PATH=\"\$HOME/ros2_ws/src/gazebo_simulator_nodes\"" ~/.bashrc || echo "export GZ_SIM_RESOURCE_PATH=\"\$HOME/ros2_ws/src/gazebo_simulator_nodes\"" >> ~/.bashrc
     '
 fi
 
