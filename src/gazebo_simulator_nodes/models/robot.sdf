@@ -254,7 +254,7 @@
     
         <include>
           <name>left</name>
-          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/line_tracking.sdf</uri>
+          <uri>model://models/line_tracking.sdf</uri>
           <pose relative_to='chassis'>0.06 0.03 -0.0375 0 1.57 0</pose>
         </include>
 
@@ -266,7 +266,7 @@
 
         <include>
           <name>middle</name>
-          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/line_tracking.sdf</uri>
+          <uri>model://models/line_tracking.sdf</uri>
           <pose relative_to='chassis'>0.06 0 -0.0375 0 1.57 0</pose>
         </include>
 
@@ -278,7 +278,7 @@
             
         <include>
           <name>right</name>
-          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/line_tracking.sdf</uri>
+          <uri>model://models/line_tracking.sdf</uri>
           <pose relative_to='chassis'>0.06 -0.03 -0.0375 0 1.57 0</pose>
         </include>
 
@@ -290,7 +290,7 @@
 
         <include>
             <name>left_front_wheel</name>
-            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/wheel.sdf</uri>
+            <uri>model://models/wheel.sdf</uri>
             <pose relative_to="chassis">0.03 0.075 -0.025 -1.5707 0 0</pose>
         </include>
 
@@ -309,7 +309,7 @@
 
         <include>
             <name>right_front_wheel</name>
-            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/wheel.sdf</uri>
+            <uri>model://models/wheel.sdf</uri>
             <pose relative_to="chassis">0.03 -0.075 -0.025 -1.5707 0 0</pose>
         </include>
 
@@ -328,7 +328,7 @@
 
         <include>
             <name>left_rear_wheel</name>
-            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/wheel.sdf</uri>
+            <uri>model://models/wheel.sdf</uri>
             <pose relative_to="chassis">-0.055 0.075 -0.025 -1.5707 0 0</pose>
         </include>
 
@@ -347,7 +347,7 @@
 
         <include>
             <name>right_rear_wheel</name>
-            <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/wheel.sdf</uri>
+            <uri>model://models/wheel.sdf</uri>
             <pose relative_to="chassis">-0.055 -0.075 -0.025 -1.5707 0 0</pose>
         </include>
 

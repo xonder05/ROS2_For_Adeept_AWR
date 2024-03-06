@@ -42,14 +42,14 @@
             <visual name="visual">
               <geometry>
                 <mesh>
-                  <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/line_plane.dae</uri>
+                  <uri>model://worlds/objects/line_plane.dae</uri>
                 </mesh>
               </geometry>
             </visual>
             <collision name='collision'>
               <geometry>
                   <mesh>
-                      <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/line_plane.dae</uri>
+                      <uri>model://worlds/objects/line_plane.dae</uri>
                   </mesh>
               </geometry>
           </collision>
@@ -58,30 +58,30 @@
 
       <include>
           <name>border1</name>
-          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+          <uri>model://worlds/objects/borders.sdf</uri>
           <pose>0 4 0 0 0 0</pose>
       </include>
   
       <include>
           <name>border2</name>
-          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+          <uri>model://worlds/objects/borders.sdf</uri>
           <pose>0 -4 0 0 0 0</pose>
       </include>
   
       <include>
           <name>border3</name>
-          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+          <uri>model://worlds/objects/borders.sdf</uri>
           <pose>4 0 0 0 0 1.57</pose>
       </include>
   
       <include>
           <name>border4</name>
-          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/worlds/objects/borders.sdf</uri>
+          <uri>model://worlds/objects/borders.sdf</uri>
           <pose>-4 0 0 0 0 1.57</pose>
       </include>
   
       <include>
-          <uri>/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/robot.sdf</uri>
+          <uri>model://models/robot.sdf</uri>
       </include>
 
     </world>
