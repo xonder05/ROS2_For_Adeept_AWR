@@ -7,16 +7,16 @@
         <inertial>
             <mass>2</mass>
             <inertia>
-                <ixx>0.003338</ixx>
-                <iyy>0.004204</iyy>
-                <izz>0.005667</izz>
+                <ixx>0.0033375</ixx>
+                <iyy>0.0042042</iyy>
+                <izz>0.0056667</izz>
             </inertia>
         </inertial>
 
         <visual name='visual'>
             <geometry>
                 <box>
-                    <size>0.14 0.12 0.075</size>
+                    <size>0.13 0.12 0.075</size>
                 </box>
             </geometry>
             <material>
@@ -35,13 +35,13 @@
         </link>
 
         <link name='camera'>
-            <pose relative_to='chassis'>0.065 0 0.03 0 0 0</pose>
+            <pose relative_to='chassis'>0.06 0 0.03 0 0 0</pose>
             <inertial>
                 <mass>0.01</mass>
                 <inertia>
-                    <ixx>3.4725e-06</ixx>
-                    <iyy>4.21875e-06</iyy>
-                    <izz>5.385e-06</izz>
+                    <ixx>2.4375e-06</ixx>
+                    <iyy>1.084e-06</iyy>
+                    <izz>2.0208e-06</izz>
                 </inertia>
             </inertial>
             <visual name='visual'>
@@ -115,9 +115,9 @@
             <inertial>
                 <mass>0.05</mass>
                 <inertia>
-                    <ixx>8.3333e-09</ixx>
-                    <iyy>8.3333e-09</iyy>
-                    <izz>8.3333e-09</izz>
+                    <ixx>8.3333e-07</ixx>
+                    <iyy>8.3333e-07</iyy>
+                    <izz>8.3333e-07</izz>
                   </inertia>
             </inertial>
             <visual name='visual'>
@@ -182,14 +182,14 @@
           </joint>
 
           <link name='ultrasonic'>
-            <pose relative_to='chassis'>0.07 0 -0.02 0 0 0</pose>
+            <pose relative_to='chassis'>0.065 0 -0.02 0 0 0</pose>
             <inertial>
-                <mass>0.05</mass>
+                <mass>0.01</mass>
                 <inertia>
-                    <ixx>8.3333e-09</ixx>
-                    <iyy>8.3333e-09</iyy>
-                    <izz>8.3333e-09</izz>
-                  </inertia>
+                  <ixx>1.6666e-07</ixx>
+                  <iyy>1.6666e-07</iyy>
+                  <izz>1.6666e-07</izz>
+                </inertia>
             </inertial>
             <visual name='visual'>
                 <geometry>
@@ -255,7 +255,7 @@
         <include>
           <name>left</name>
           <uri>model://models/line_tracking.sdf</uri>
-          <pose relative_to='chassis'>0.06 0.03 -0.0375 0 1.57 0</pose>
+          <pose relative_to='chassis'>0.055 0.03 -0.0375 0 1.57 0</pose>
         </include>
 
         <joint name='line_tracking_left_joint' type='fixed'>
@@ -267,7 +267,7 @@
         <include>
           <name>middle</name>
           <uri>model://models/line_tracking.sdf</uri>
-          <pose relative_to='chassis'>0.06 0 -0.0375 0 1.57 0</pose>
+          <pose relative_to='chassis'>0.055 0 -0.0375 0 1.57 0</pose>
         </include>
 
         <joint name='line_tracking_middle_joint' type='fixed'>
@@ -275,11 +275,11 @@
             <parent>chassis</parent>
             <child>middle::line_tracking</child>
         </joint>
-            
+
         <include>
           <name>right</name>
           <uri>model://models/line_tracking.sdf</uri>
-          <pose relative_to='chassis'>0.06 -0.03 -0.0375 0 1.57 0</pose>
+          <pose relative_to='chassis'>0.055 -0.03 -0.0375 0 1.57 0</pose>
         </include>
 
         <joint name='line_tracking_right_joint' type='fixed'>
@@ -287,11 +287,11 @@
             <parent>chassis</parent>
             <child>right::line_tracking</child>
         </joint>
-
+            
         <include>
             <name>left_front_wheel</name>
             <uri>model://models/wheel.sdf</uri>
-            <pose relative_to="chassis">0.03 0.075 -0.025 -1.5707 0 0</pose>
+            <pose relative_to="chassis">0.045 0.075 -0.025 -1.5707 0 0</pose>
         </include>
 
         <joint name='left_front_wheel_joint' type='revolute'>
@@ -310,7 +310,7 @@
         <include>
             <name>right_front_wheel</name>
             <uri>model://models/wheel.sdf</uri>
-            <pose relative_to="chassis">0.03 -0.075 -0.025 -1.5707 0 0</pose>
+            <pose relative_to="chassis">0.045 -0.075 -0.025 -1.5707 0 0</pose>
         </include>
 
         <joint name='right_front_wheel_joint' type='revolute'>
@@ -329,7 +329,7 @@
         <include>
             <name>left_rear_wheel</name>
             <uri>model://models/wheel.sdf</uri>
-            <pose relative_to="chassis">-0.055 0.075 -0.025 -1.5707 0 0</pose>
+            <pose relative_to="chassis">-0.05 0.075 -0.025 -1.5707 0 0</pose>
         </include>
 
         <joint name='left_rear_wheel_joint' type='revolute'>
@@ -348,7 +348,7 @@
         <include>
             <name>right_rear_wheel</name>
             <uri>model://models/wheel.sdf</uri>
-            <pose relative_to="chassis">-0.055 -0.075 -0.025 -1.5707 0 0</pose>
+            <pose relative_to="chassis">-0.05 -0.075 -0.025 -1.5707 0 0</pose>
         </include>
 
         <joint name='right_rear_wheel_joint' type='revolute'>

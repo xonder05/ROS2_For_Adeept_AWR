@@ -2,11 +2,11 @@
     <model name="line_tracking">
         <link name="line_tracking">
             <inertial>
-                <mass>0.01</mass>
+                <mass>0.001</mass>
                 <inertia>
-                    <ixx>3.4725e-06</ixx>
-                    <iyy>4.21875e-06</iyy>
-                    <izz>5.385e-06</izz>
+                    <ixx>1.6666e-08</ixx>
+                    <iyy>1.6666e-08</iyy>
+                    <izz>1.6666e-08</izz>
                 </inertia>
             </inertial>
             <visual name='visual'>
