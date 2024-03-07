@@ -35,6 +35,8 @@ if [[ "$install_python" =~ "y" ]]; then
     sudo -u $SUDO_USER bash -c '
         pip install RPi.GPIO adafruit-pca9685 rpi-ws281x 
     '
+    sudo apt update && sudo apt install raspi-config -y
+    sudo raspi-config nonint do_legacy 0
 fi
 
 if [[ "$setup_workspace" =~ "y" ]]; then
