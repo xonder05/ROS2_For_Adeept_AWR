@@ -10,4 +10,4 @@ gamepad_node:
 keyboard_node:
   ros__parameters:
     linear_speed: 0.5
-    angular_speed: 3.14
+    angular_speed: 6.28

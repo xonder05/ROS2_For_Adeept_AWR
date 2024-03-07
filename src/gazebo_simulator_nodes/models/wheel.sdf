@@ -9,7 +9,7 @@
     <model name="wheel">
         <link name="wheel">
             <inertial>
-                <mass>0.1</mass>
+                <mass>0.05</mass>
                 <inertia>
                     <ixx>2.60416667e-06</ixx>
                     <iyy>2.60416667e-06</iyy>
