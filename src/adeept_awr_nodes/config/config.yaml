@@ -39,3 +39,7 @@ line_tracking_node:
     middle_pin: 16
     right_pin: 20
     scanning_period: 0.05
+
+imu_node:
+  ros__parameters:
+    scanning_period: 0.1

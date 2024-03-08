@@ -32,6 +32,7 @@ setup(
             "rgb_led_node = adeept_awr_nodes.rgb_led_node:main",
             "sound_player_node = adeept_awr_nodes.sound_player_node:main",
             "sound_recorder_node = adeept_awr_nodes.sound_recorder_node:main",
+            "imu_node = adeept_awr_nodes.imu_node:main",
         ],
     },
 )
