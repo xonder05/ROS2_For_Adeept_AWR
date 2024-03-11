@@ -13,7 +13,7 @@ class DCMotorNode(Node):
         
         self.init_params()
         
-        self.subscriber = self.create_subscription(Twist, "/drive_directions", self.callback, 10)
+        self.subscriber = self.create_subscription(Twist, "/cmd_vel", self.callback, 10)
         self.obstacle_subscriber = self.create_subscription(Bool, "/ultrasonic_obstacle_warning", self.obstacle_callback, 10)
         
         self.init_gpio()

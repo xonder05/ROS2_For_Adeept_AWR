@@ -18,7 +18,7 @@ class ImuNode(Node):
         )
         self.scanning_period = self.get_parameter('scanning_period').get_parameter_value().double_value
         
-        self.subscriber = self.create_subscription(Twist, "/drive_directions", self.twist_callback, 10)
+        self.subscriber = self.create_subscription(Twist, "/cmd_vel", self.twist_callback, 10)
         self.publisher = self.create_publisher(Twist, "/imu_node/sensor_reading", 10)
         self.colision_publisher = self.create_publisher(Bool, "/imu_node/colision_warning", 10)
         self.timer = self.create_timer(0.2, self.timer_callback)

@@ -40,7 +40,7 @@ class WanderingNode(Node):
         self.ultrasonic_subscriber = self.create_subscription(Float32, "/ultrasonic_distance", self.distance_callback, 10)
         self.obstacle_subscriber = self.create_subscription(Bool, "/ultrasonic_obstacle_warning", self.obstacle_callback, 10)
         self.side_obstacle_subscriber = self.create_subscription(Bool, "/ultrasonic_obstacle_disappearance_warning", self.side_obstacle_callback, 10)
-        self.publisher = self.create_publisher(Twist, "/drive_directions", 10)
+        self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         self.state_publisher = self.create_publisher(String, "/wandering_state", 10)
         self.toggle_service = self.create_service(SetBool, "/toggle_wandering", self.toggle_callback)
         self.multiplier_service = self.create_service(SetFloat32, "/set_multiplier", self.multiplier_callback)
@@ -86,7 +86,7 @@ class WanderingNode(Node):
         self.obstacle = msg.data
         
         #only react when going forward
-        if msg.data and ( self.state == State.PAUSE or self.state == State.SCAN_START ):
+        if msg.data and ( self.state == State.PAUSE or self.state == State.SCAN_START or self.state == State.SCAN_LOG_DISTANCE_AND_TURN or self.state == State.SCAN_STOP_AND_WAIT_FOR_DISTANCE_READING):
             self.state = State.OBSTACLE
             self.timer.cancel()
             self.timer = self.create_timer(0, self.fsm_step)
@@ -200,6 +200,7 @@ class WanderingNode(Node):
             self.state_publisher.publish(String(data = State.SCAN_START.name))
             self.timer.cancel()
 
+            self.scan_counter = 0
             msg = Twist()
             msg.angular.z = self.base_angular_speed if self.multiplier == 0 else self.base_angular_speed * self.multiplier
             self.publisher.publish(msg)
