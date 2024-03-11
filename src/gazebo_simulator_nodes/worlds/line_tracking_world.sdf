@@ -80,9 +80,9 @@
           <pose>-4 0 0 0 0 1.57</pose>
       </include>
   
-      <include>
+      <!-- <include>
           <uri>model://models/robot.sdf</uri>
-      </include>
+      </include> -->
 
     </world>
   </sdf>

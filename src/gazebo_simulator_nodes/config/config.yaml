@@ -1,6 +1,6 @@
 simulator_motor:
   ros__parameters:
-    gazebo_topic: "/drive_directions"
+    gazebo_topic: "/cmd_vel"
     ros_topic: "/model/adeept_awr/cmd_vel"
 
 simulator_motor_bridge:
@@ -48,9 +48,9 @@ simulator_line_tracking:
   ros__parameters:
     gazebo_topic: "/line_tracking"
     ros_topic: "/line_visibility"
-    left_sensor_name: "adeept_awr/left/line_tracking/camera"
-    middle_sensor_name: "adeept_awr/middle/line_tracking/camera"
-    right_sensor_name: "adeept_awr/right/line_tracking/camera"
+    left_sensor_name: "adeept_awr/base_link/line_tracking_left"
+    middle_sensor_name: "adeept_awr/base_link/line_tracking_middle"
+    right_sensor_name: "adeept_awr/base_link/line_tracking_right"
     line_detection_threshold: 50
 
 simulator_line_tracking_bridge:

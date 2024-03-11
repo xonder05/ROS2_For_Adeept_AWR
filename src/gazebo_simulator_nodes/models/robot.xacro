@@ -21,7 +21,7 @@
     <xacro:ultrasonic/>
 
     <xacro:camera/>
-    <xacro:servo name="camera_servo" child="camera" origin_position="${chassis_length/2} 0 0.03" axis="0 1 0" limit_lower="0.3925" limit_upper="1.57"/>
+    <xacro:servo name="camera_servo" child="camera" origin_position="${chassis_length/2} 0 0.03" axis="0 1 0" limit_lower="0.3925" limit_upper="-1.57"/>
 
     <xacro:line_tracking suffix="left" origin="0.055 0.03 -0.0375" />
     <xacro:line_tracking suffix="middle" origin="0.055 0 -0.0375" />
