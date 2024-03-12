@@ -14,6 +14,9 @@ setup(
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch'), glob(os.path.join('launch', '*launch.[pxy][yma]*'))),
         (os.path.join('share', package_name, 'config'), glob(os.path.join('config', '*.yaml'))),
+        (os.path.join('share', package_name, 'models'), glob(os.path.join('models', '*.sdf'))),
+        (os.path.join('share', package_name, 'models'), glob(os.path.join('models', '*.urdf'))),
+        (os.path.join('share', package_name, 'models'), glob(os.path.join('models', '*.xacro'))),
         (os.path.join('share', package_name, 'worlds'), glob(os.path.join('worlds', '*world.sdf'))),
     ],
     install_requires=['setuptools'],
@@ -30,6 +33,8 @@ setup(
             "simulator_camera = gazebo_simulator_nodes.simulator_camera:main",
             "simulator_ultrasonic = gazebo_simulator_nodes.simulator_ultrasonic:main",
             "simulator_line_tracking = gazebo_simulator_nodes.simulator_line_tracking:main",
+            'state_publisher = gazebo_simulator_nodes.state_publisher:main',
+            'simulator_lidar = gazebo_simulator_nodes.simulator_lidar:main',
         ],
     },
 )

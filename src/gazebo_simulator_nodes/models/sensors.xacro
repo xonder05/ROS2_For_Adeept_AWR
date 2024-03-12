@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
     
-    <xacro:macro name="laser_frame">
+    <xacro:macro name="lidar">
 
-        <xacro:cylinder_link name="laser_frame" mass="0.01" radius="0.01" length="0.005"/>    
-        <xacro:fixed_joint name="laser_frame" child="laser_frame" origin_position="0 0 0.0425"/>
+        <xacro:cylinder_link name="lidar" mass="0.01" radius="0.01" length="0.005"/>    
+        <xacro:fixed_joint name="lidar" child="lidar" origin_position="0 0 0.0425"/>
       
-        <gazebo reference="laser_frame">
+        <gazebo reference="lidar">
           <material>Gazebo/Red</material>
           <sensor name='gpu_lidar' type='gpu_lidar'>
             <topic>simulator_lidar</topic>

@@ -58,3 +58,15 @@ simulator_line_tracking_bridge:
     topic: "/line_tracking"
     ros_message_type: "sensor_msgs/msg/Image"
     gazebo_message_type: "gz.msgs.Image"
+
+simulator_lidar:
+  ros__parameters:
+    gazebo_topic: "/simulator_lidar"
+    ros_topic: "/scan"
+    frame_id: "lidar"
+
+simulator_lidar_bridge:
+  ros__parameters:
+    topic: "/simulator_lidar"
+    ros_message_type: "sensor_msgs/msg/LaserScan"
+    gazebo_message_type: "ignition.msgs.LaserScan"

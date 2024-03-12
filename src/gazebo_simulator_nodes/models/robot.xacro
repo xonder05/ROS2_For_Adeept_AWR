@@ -17,7 +17,7 @@
     <xacro:diff_drive/>
     <!-- <xacro:joint_state_publisher/> -->
 
-    <xacro:laser_frame/>
+    <xacro:lidar/>
     <xacro:ultrasonic/>
 
     <xacro:camera/>
