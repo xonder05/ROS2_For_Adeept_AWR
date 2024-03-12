@@ -3,11 +3,10 @@
     
     <xacro:macro name="lidar">
 
-        <xacro:cylinder_link name="lidar" mass="0.01" radius="0.01" length="0.005"/>    
-        <xacro:fixed_joint name="lidar" child="lidar" origin_position="0 0 0.0425"/>
+        <xacro:cylinder_link name="lidar" mass="0.01" radius="0.025" length="0.02"/>    
+        <xacro:fixed_joint name="lidar" child="lidar" origin_position="0 0 0.05"/>
       
         <gazebo reference="lidar">
-          <material>Gazebo/Red</material>
           <sensor name='gpu_lidar' type='gpu_lidar'>
             <topic>simulator_lidar</topic>
             <update_rate>20</update_rate>
@@ -50,7 +49,6 @@
   <xacro:fixed_joint name="ultrasonic" child="ultrasonic" origin_position="0.065 0 -0.02"/>
 
   <gazebo reference="ultrasonic">
-    <material>Gazebo/Red</material>
   
     <sensor name='gpu_lidar_ultra' type='gpu_lidar'>
       <topic>simulator_ultrasonic</topic>
