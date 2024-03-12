@@ -31,10 +31,10 @@ setup(
             "simulator_motor = gazebo_simulator_nodes.simulator_motor:main",
             "simulator_servo = gazebo_simulator_nodes.simulator_servo:main",
             "simulator_camera = gazebo_simulator_nodes.simulator_camera:main",
-            "simulator_ultrasonic = gazebo_simulator_nodes.simulator_ultrasonic:main",
             "simulator_line_tracking = gazebo_simulator_nodes.simulator_line_tracking:main",
-            'state_publisher = gazebo_simulator_nodes.state_publisher:main',
+            "simulator_ultrasonic = gazebo_simulator_nodes.simulator_ultrasonic:main",
             'simulator_lidar = gazebo_simulator_nodes.simulator_lidar:main',
+            'simulator_odometry = gazebo_simulator_nodes.simulator_odometry:main',
         ],
     },
 )

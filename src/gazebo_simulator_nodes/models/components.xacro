@@ -144,10 +144,6 @@
     <gazebo>
         <plugin name="ignition::gazebo::systems::JointStatePublisher" filename="libignition-gazebo-joint-state-publisher-system.so">
             <update_rate>10</update_rate>
-            <joint_name>left_wheel_joint</joint_name>
-            <joint_name>right_wheel_joint</joint_name>
-            <joint_name>left_rear_wheel_joint</joint_name>
-            <joint_name>right_rear_wheel_joint</joint_name>
             <topic>joint_states</topic>
         </plugin>
     </gazebo>
