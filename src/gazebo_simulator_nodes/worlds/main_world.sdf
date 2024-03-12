@@ -186,10 +186,6 @@
         <uri>https://fuel.gazebosim.org/1.0/OpenRobotics/models/RoboCup 3D Simulation Ball</uri>
         <pose>-2.5 -2.5 0.5 0 0 0</pose>
     </include>
-
-    <!-- <include>
-      <uri>model://models/robot.sdf</uri>
-    </include> -->
     
   </world>
 </sdf>
