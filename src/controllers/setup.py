@@ -29,6 +29,7 @@ setup(
             "gamepad_node = controllers.gamepad_node:main",
             "keyboard_node = controllers.keyboard_node:main",
             "user_interface = controllers.user_interface.user_interface:main",
+            "motor_controller_node = controllers.motor_controller_node:main",
         ],
     },
 )

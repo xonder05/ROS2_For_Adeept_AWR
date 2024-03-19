@@ -41,6 +41,7 @@ set(srv_files
 
 set(action_files
   "action/Servo.action"
+  "action/MCC.action"
   )
 
 rosidl_generate_interfaces(${PROJECT_NAME}
