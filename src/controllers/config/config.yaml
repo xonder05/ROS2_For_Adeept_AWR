@@ -11,3 +11,9 @@ keyboard_node:
   ros__parameters:
     linear_speed: 0.5
     angular_speed: 6.28
+
+motor_controller_node:
+  ros__parameters:
+    base_turning_speed: 6.28
+    imu_topic: "/imu_node/sensor_reading"
+    commands_topic: "/motor_command"

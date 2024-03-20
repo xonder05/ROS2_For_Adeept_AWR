@@ -1,74 +1,81 @@
 import rclpy
 from rclpy.node import Node
-from rclpy.action import ActionServer
+from rclpy.action import ActionServer, GoalResponse
 
 from geometry_msgs.msg import Twist
 from interfaces.action import MCC
 
-import time
+import threading
 
 class MotorControllerNode(Node):
 
     def __init__(self):
         super().__init__("motor_controller_node")
 
-        # self.declare_parameters(
-        #     namespace='',
-        #     parameters=[
-        #         ('maximum_angular_speed', rclpy.Parameter.Type.DOUBLE),
-        #     ]
-        # )
-        # self.maximum_angular_speed = self.get_parameter('maximum_angular_speed').get_parameter_value().double_value
+        self.declare_parameters(
+            namespace='',
+            parameters=[
+                ('base_turning_speed', rclpy.Parameter.Type.DOUBLE),
+                ('imu_topic', rclpy.Parameter.Type.STRING),
+                ('commands_topic', rclpy.Parameter.Type.STRING),
+            ]
+        )
+        self.base_turning_speed = self.get_parameter('base_turning_speed').get_parameter_value().double_value
+        self.imu_topic = self.get_parameter('imu_topic').get_parameter_value().string_value
+        self.commands_topic = self.get_parameter('commands_topic').get_parameter_value().string_value
 
-        self.subscriber = self.create_subscription(Twist, "/imu_node/sensor_reading", self.imu_callback, 10)
-        self.action_server = ActionServer(self, MCC, '/motor_command',
-                                        handle_accepted_callback=self.action_callback, execute_callback=self.execute_callback)
+        self.subscriber = self.create_subscription(Twist, self.imu_topic, self.imu_callback, 10)
+        self.action_server = ActionServer(self, MCC, self.commands_topic,
+                                            goal_callback=self.goal_callback,
+                                            handle_accepted_callback=self.handle_accepted_callback,
+                                            execute_callback=self.execute_callback)
         self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
 
         self.current_angle = 0
+        self.goal_handle = None
 
         self.get_logger().info("InitDone")
 
+    #getting imu readings
     def imu_callback(self, msg):
         self.current_angle = msg.angular.z
 
-    def action_callback(self, goal_handle):
-        if goal_handle.request.command == 0:
-            
-            self.goal_angle = self.current_angle + goal_handle.request.value
-            
-            msg = Twist()
-            if self.goal_angle < self.current_angle:
-                msg.angular.z = 4.7
-                self.direction = True 
-            elif self.goal_angle > self.current_angle:
-                msg.angular.z = -4.7
-                self.direction = False
-            else: return #did you just order me to turn zero degrees?
-            self.publisher.publish(msg)
+        if self.goal_handle is not None and self.goal_handle.is_active:
+            if self.direction:
+                if self.goal_angle >= self.current_angle:
+                    self.goal_handle.execute()
+            else:
+                if self.goal_angle <= self.current_angle:
+                    self.goal_handle.execute()
 
-            self.goal_handle = goal_handle
-            self.timer = self.create_timer(0.1, self.action_completion_callback)
-            
-    def action_completion_callback(self):
-        if self.direction:
-            if self.goal_angle < self.current_angle:
-                self.get_logger().info(f"goal: {self.goal_angle}, angle: {self.current_angle}")
-                return    
+    #only one action at a time, two nodes should not control the motor simultaneously
+    def goal_callback(self, goal_handle):
+        if self.goal_handle is not None and self.goal_handle.is_active:
+            return GoalResponse.REJECT
         else:
-            if self.goal_angle > self.current_angle:
-                self.get_logger().info(f"goal: {self.goal_angle}, angle: {self.current_angle}")
-                return
+            return GoalResponse.ACCEPT
 
+    #calculate target angle and start turning
+    def handle_accepted_callback(self, goal_handle):
+        self.goal_angle = self.current_angle + (goal_handle.request.angle * 0.95)
+        
         msg = Twist()
+        if self.goal_angle < self.current_angle:
+            msg.angular.z = self.base_turning_speed
+            self.direction = True 
+        elif self.goal_angle > self.current_angle:
+            msg.angular.z = -self.base_turning_speed
+            self.direction = False
+        else: return
         self.publisher.publish(msg)
 
-        self.timer.cancel()
-
-        self.goal_handle.execute()
-
+        self.goal_handle = goal_handle
+    
+    #target angle reached
     def execute_callback(self, goal_handle):
-        self.get_logger().info("suceed in execute")
+        msg = Twist()
+        self.publisher.publish(msg)
+        
         goal_handle.succeed()
         result = MCC.Result()
         return result

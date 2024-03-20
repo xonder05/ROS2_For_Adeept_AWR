@@ -1,6 +1,3 @@
-int8 command #command 0 (turn) value (radians)
-float32 value
+float32 angle
 ---
-float32 end_position
 ---
-float32 curr_position
