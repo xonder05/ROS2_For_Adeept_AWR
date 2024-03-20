@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="robot">
+
+    <xacro:include filename="properties.xacro"/>
+    <xacro:include filename="components.xacro"/>
+    <xacro:include filename="sensors.xacro"/>
+
+
+    <link name="base_link"/>
+
+    <link name="base_footprint"/>
+    <xacro:fixed_joint name="base_footprint" parent="base_link" child="base_footprint"/>
+
+    <xacro:box_link name="chassis" mass="2" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}" material="black"/>  
+    <xacro:fixed_joint name="chassis" parent="base_link" child="chassis" origin_position="0 0 0.1"/>
+
+    <xacro:diff_drive/>
+    <xacro:joint_state_publisher/>
+
+    <xacro:lidar/>
+    <xacro:ultrasonic/>
+
+    <xacro:camera/>
+    <xacro:servo name="camera_servo" child="camera" origin_position="${chassis_length/2} 0 0.03" axis="0 1 0" limit_lower="-1.57" limit_upper="0.3925"/>
+
+    <xacro:line_tracking suffix="left" origin="0.055 0.03 -0.0375" />
+    <xacro:line_tracking suffix="middle" origin="0.055 0 -0.0375" />
+    <xacro:line_tracking suffix="right" origin="0.055 -0.03 -0.0375" />
+
+</robot>

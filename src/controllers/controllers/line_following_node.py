@@ -33,7 +33,7 @@ class LineFollowingNode(Node):
         self.start_right_away = self.get_parameter('start_right_away').get_parameter_value().bool_value
 
         self.line_visibility_subscriber = self.create_subscription(LineTracking, "/line_visibility", self.line_visibility_callback, 10)
-        self.publisher = self.create_publisher(Twist, "/drive_directions", 10)
+        self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         self.state_publisher = self.create_publisher(String, "/line_following_state", 10)
         self.toggle_service = self.create_service(SetBool, "/toggle_line_following", self.toggle_callback)
         self.multiplier_service = self.create_service(SetFloat32, "/line_following_node/set_multiplier", self.multiplier_callback)

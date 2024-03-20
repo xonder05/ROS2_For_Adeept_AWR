@@ -73,6 +73,24 @@ def generate_launch_description():
         ])
     )
 
+    lidar = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_lidar_launch.py'
+        ])
+    )
+
+    odometry = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_odometry_launch.py'
+        ])
+    )
+
+    joint_states = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_joint_states_launch.py'
+        ])
+    )
+
     return LaunchDescription([
         world_select_arg,
         main_world,
@@ -80,8 +98,14 @@ def generate_launch_description():
         line_following_world,
         
         motor,        
-        camera,
+        joint_states,
         servo,
-        ultrasonic,
+
+        camera,
         line_following,
+
+        ultrasonic,
+        lidar,
+
+        odometry,
     ])

@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+<xacro:macro name="box_link" params="name mass x y z material:=red">
+  
+    <link name="${name}">
+        
+        <inertial>
+            <mass value="${mass}" />
+            <inertia ixx="${(1/12) * mass * (y*y+z*z)}" ixy="0.0" ixz="0.0"
+                    iyy="${(1/12) * mass * (x*x+z*z)}" iyz="0.0"
+                    izz="${(1/12) * mass * (x*x+y*y)}" />
+        </inertial>
+
+        <visual>
+            <geometry>
+                <box size="${x} ${y} ${z}"/>
+            </geometry>
+            <material name="${material}"/>
+        </visual>
+
+        <collision>
+            <geometry>
+                <box size="${x} ${y} ${z}"/>
+            </geometry>
+        </collision>
+  
+    </link>
+
+</xacro:macro>
+
+<xacro:macro name="cylinder_link" params="name mass radius length material:=red">
+  
+  <link name="${name}">
+    
+        <inertial>
+            <mass value="${mass}" />
+            <inertia ixx="${(1/12) * mass * (3*radius*radius + length*length)}" ixy="0.0" ixz="0.0"
+                    iyy="${(1/12) * mass * (3*radius*radius + length*length)}" iyz="0.0"
+                    izz="${(1/2) * mass * (radius*radius)}" />
+        </inertial>
+        
+        <visual>
+            <geometry>
+                <cylinder radius="${radius}" length="${length}"/>
+            </geometry>
+            <material name="${material}"/>
+        </visual>
+        
+        <collision>
+            <geometry>
+                <cylinder radius="${radius}" length="${length}"/>
+            </geometry>
+        </collision>
+
+    </link>
+
+</xacro:macro>
+
+<xacro:macro name="fixed_joint" params="name parent:=chassis child origin_position:='0 0 0' origin_orientation:='0 0 0'">
+
+  <joint name="${name}_joint" type="fixed">
+    <parent link="${parent}"/>
+    <child link="${child}"/>
+    <origin xyz="${origin_position}" rpy="${origin_orientation}"/>
+  </joint>
+
+</xacro:macro>
+
+<xacro:macro name="continuous_joint" params="name parent:=chassis child origin_position:='0 0 0' origin_orientation:='0 0 0' axis='0 0 0'">
+    
+    <joint name="${name}_joint" type="continuous">
+        <parent link="${parent}"/>
+        <child link="${child}"/>
+        <origin xyz="${origin_position}" rpy="${origin_orientation}"/>
+        <axis xyz="${axis}"/>
+    </joint>
+
+</xacro:macro>
+
+<xacro:macro name="diff_drive" params="">
+
+    <xacro:cylinder_link name="left_front_wheel" mass="0.05" radius="${wheel_radius}" length="0.02" material="yellow"/>
+    <xacro:continuous_joint name="left_front_wheel" child="left_front_wheel" origin_position="0.045 0.075 -0.025" origin_orientation="-1.5707 0 0" axis="0 0 1"/>
+    
+    <xacro:cylinder_link name="right_front_wheel" mass="0.05" radius="${wheel_radius}" length="0.02" material="yellow"/>    
+    <xacro:continuous_joint name="right_front_wheel" child="right_front_wheel" origin_position="0.045 -0.075 -0.025" origin_orientation="-1.5707 0 0" axis="0 0 1"/>
+
+    <xacro:cylinder_link name="left_rear_wheel" mass="0.05" radius="${wheel_radius}" length="0.02" material="yellow"/>    
+    <xacro:continuous_joint name="left_rear_wheel" child="left_rear_wheel" origin_position="-0.05 0.075 -0.025" origin_orientation="-1.5707 0 0" axis="0 0 1"/>
+
+    <xacro:cylinder_link name="right_rear_wheel" mass="0.05" radius="${wheel_radius}" length="0.02" material="yellow"/>    
+    <xacro:continuous_joint name="right_rear_wheel" child="right_rear_wheel" origin_position="-0.05 -0.075 -0.025" origin_orientation="-1.5707 0 0" axis="0 0 1"/>
+
+    <gazebo>
+        <plugin name='ignition::gazebo::systems::DiffDrive' filename='libignition-gazebo-diff-drive-system.so'>
+            <left_joint>left_front_wheel_joint</left_joint>
+            <right_joint>right_front_wheel_joint</right_joint>
+            <wheel_separation>${wheel_separation}</wheel_separation>
+            <wheel_radius>${wheel_radius}</wheel_radius>
+
+            <odometry_frame>odom</odometry_frame>
+            <robot_base_frame>base_link</robot_base_frame>
+
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+            <publish_wheel_tf>true</publish_wheel_tf>
+        </plugin>
+
+        <plugin name='ignition::gazebo::systems::DiffDrive' filename='libignition-gazebo-diff-drive-system.so'>
+            <left_joint>left_rear_wheel_joint</left_joint>
+            <right_joint>right_rear_wheel_joint</right_joint>
+            <wheel_separation>${wheel_separation}</wheel_separation>
+            <wheel_radius>${wheel_radius}</wheel_radius>
+            <odom_publish_frequency>1</odom_publish_frequency>
+        </plugin>
+    </gazebo>
+
+</xacro:macro>
+
+<xacro:macro name="servo" params="name parent:=chassis child 
+                                origin_position:='0 0 0' origin_orientation:='0 0 0' axis='0 0 0'
+                                limit_lower:=-3.14, limit_upper:=3.14">
+    
+    <joint name="${name}_joint" type="revolute">
+        <parent link="${parent}"/>
+        <child link="${child}"/>
+        <origin xyz="${origin_position}" rpy="${origin_orientation}"/>
+        <axis xyz="${axis}"/>
+        <limit lower="${limit_lower}" upper="${limit_upper}" effort="10" velocity="3.14"/>
+    </joint>
+    
+    <gazebo>
+        <plugin name="ignition::gazebo::systems::JointController" filename="libignition-gazebo-joint-controller-system.so">
+            <joint_name>${name}_joint</joint_name>
+        </plugin>
+    </gazebo>
+
+</xacro:macro>
+
+
+<xacro:macro name="joint_state_publisher">
+
+    <gazebo>
+        <plugin name="ignition::gazebo::systems::JointStatePublisher" filename="libignition-gazebo-joint-state-publisher-system.so">
+            <update_rate>10</update_rate>
+            <topic>joint_states</topic>
+        </plugin>
+    </gazebo>
+
+</xacro:macro>
+
+</robot>

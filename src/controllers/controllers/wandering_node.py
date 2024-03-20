@@ -78,7 +78,7 @@ class WanderingNode(Node):
         self.obstacle = msg.data
         
         #only react when going forward
-        if msg.data and ( self.state == State.PAUSE or self.state == State.SCAN_START ):
+        if msg.data and ( self.state == State.PAUSE or self.state == State.SCAN_START or self.state == State.SCAN_LOG_DISTANCE_AND_TURN or self.state == State.SCAN_STOP_AND_WAIT_FOR_DISTANCE_READING):
             self.state = State.OBSTACLE
             self.timer.cancel()
             self.timer = self.create_timer(0, self.fsm_step)
@@ -194,6 +194,7 @@ class WanderingNode(Node):
             self.state_publisher.publish(String(data = State.SCAN_START.name))
             self.timer.cancel()
 
+            self.scan_counter = 0
             self.call_motor_controller(0.785)
 
             self.state = State.SCAN_LOG_DISTANCE_AND_TURN
