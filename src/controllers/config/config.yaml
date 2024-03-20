@@ -15,5 +15,5 @@ keyboard_node:
 motor_controller_node:
   ros__parameters:
     base_turning_speed: 6.28
-    imu_topic: "/imu_node/sensor_reading"
+    imu_topic: "/imu_data"
     commands_topic: "/motor_command"

@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from rclpy.action import ActionServer, GoalResponse
+from rclpy.action import ActionServer, GoalResponse, CancelResponse
 
 from geometry_msgs.msg import Twist
 from interfaces.action import MCC
@@ -28,11 +28,13 @@ class MotorControllerNode(Node):
         self.action_server = ActionServer(self, MCC, self.commands_topic,
                                             goal_callback=self.goal_callback,
                                             handle_accepted_callback=self.handle_accepted_callback,
-                                            execute_callback=self.execute_callback)
+                                            execute_callback=self.execute_callback,
+                                            cancel_callback=self.cancel_callback)
         self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
 
         self.current_angle = 0
         self.goal_handle = None
+        self.waited = False
 
         self.get_logger().info("InitDone")
 
@@ -40,35 +42,48 @@ class MotorControllerNode(Node):
     def imu_callback(self, msg):
         self.current_angle = msg.angular.z
 
+        if self.goal_handle is not None and self.goal_handle.is_cancel_requested:
+            self.goal_handle.execute()
+            return
+
         if self.goal_handle is not None and self.goal_handle.is_active:
-            if self.direction:
-                if self.goal_angle >= self.current_angle:
+            distance = (self.current_angle - self.goal_angle)
+            
+            if abs(distance) < 0.02:
+                if self.waited:
+                    self.waited = False
                     self.goal_handle.execute()
+                    return
+                else:
+                    self.waited = True
+                    speed = 0.0
+            elif abs(distance) < 0.3:
+                speed = 3.14
+            elif abs(distance < 1):
+                speed = 4.71
             else:
-                if self.goal_angle <= self.current_angle:
-                    self.goal_handle.execute()
+                speed = 6.24
+    
+            msg = Twist()
+            if distance > 0:
+                msg.angular.z = speed
+            else:
+                msg.angular.z = -speed
+            self.publisher.publish(msg)
 
     #only one action at a time, two nodes should not control the motor simultaneously
-    def goal_callback(self, goal_handle):
+    def goal_callback(self, goal_request):
         if self.goal_handle is not None and self.goal_handle.is_active:
+            self.get_logger().info(f"rejecting goal {goal_request.angle}")
             return GoalResponse.REJECT
         else:
             return GoalResponse.ACCEPT
 
-    #calculate target angle and start turning
-    def handle_accepted_callback(self, goal_handle):
-        self.goal_angle = self.current_angle + (goal_handle.request.angle * 0.95)
-        
-        msg = Twist()
-        if self.goal_angle < self.current_angle:
-            msg.angular.z = self.base_turning_speed
-            self.direction = True 
-        elif self.goal_angle > self.current_angle:
-            msg.angular.z = -self.base_turning_speed
-            self.direction = False
-        else: return
-        self.publisher.publish(msg)
+    def cancel_callback(self, goal):
+        return CancelResponse.ACCEPT
 
+    def handle_accepted_callback(self, goal_handle):
+        self.goal_angle = self.current_angle + (goal_handle.request.angle)
         self.goal_handle = goal_handle
     
     #target angle reached
@@ -76,7 +91,11 @@ class MotorControllerNode(Node):
         msg = Twist()
         self.publisher.publish(msg)
         
-        goal_handle.succeed()
+        if goal_handle.is_cancel_requested:
+            goal_handle.abort()
+        else:
+            goal_handle.succeed()
+        
         result = MCC.Result()
         return result
 

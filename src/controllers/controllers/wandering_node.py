@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
+from action_msgs.msg import GoalStatus
 
 from std_msgs.msg import Float32
 from std_msgs.msg import Bool
@@ -41,6 +42,7 @@ class WanderingNode(Node):
         self.ultrasonic_subscriber = self.create_subscription(Float32, "/ultrasonic_distance", self.distance_callback, 10)
         self.obstacle_subscriber = self.create_subscription(Bool, "/ultrasonic_obstacle_warning", self.obstacle_callback, 10)
         self.side_obstacle_subscriber = self.create_subscription(Bool, "/ultrasonic_obstacle_disappearance_warning", self.side_obstacle_callback, 10)
+        # self.not_moving_subscriber = self.create_subscription(Bool, "/not_moving_warning", self.obstacle_callback, 10)
         self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         self.state_publisher = self.create_publisher(String, "/wandering_state", 10)
         self.toggle_service = self.create_service(SetBool, "/toggle_wandering", self.toggle_callback)
@@ -54,6 +56,7 @@ class WanderingNode(Node):
         self.cautious_mode = True
         self.scan_counter = 0
         self.distance = 0
+        self.goal_handle = None
 
         self.get_logger().info("InitDone")
 
@@ -78,20 +81,39 @@ class WanderingNode(Node):
         self.obstacle = msg.data
         
         #only react when going forward
-        if msg.data and ( self.state == State.PAUSE or self.state == State.SCAN_START or self.state == State.SCAN_LOG_DISTANCE_AND_TURN or self.state == State.SCAN_STOP_AND_WAIT_FOR_DISTANCE_READING):
+        if msg.data and ( self.state == State.PAUSE or self.state == State.SCAN_START or self.state == State.SCAN_LOG_DISTANCE_AND_TURN or self.state == State.SCAN_WAIT_FOR_DISTANCE_READING):
             self.state = State.OBSTACLE
             self.timer.cancel()
+
+            if self.goal_handle is not None and self.controller_state == "working":
+                self.cancel_future = self.goal_handle.cancel_goal_async()
+                self.cancel_future.add_done_callback(self.obstacle_second_part)
+            else:
+                self.timer = self.create_timer(0, self.fsm_step)
+
+    def obstacle_second_part(self, future):
+        handle = future.result()
+        if len(handle.goals_canceling) > 0:
             self.timer = self.create_timer(0, self.fsm_step)
+        else:
+            pass
 
     def side_obstacle_callback(self, msg: Bool):
-        
         #only react when going forward
         if msg.data and ( self.state == State.PAUSE or self.state == State.SCAN_START ):
             self.state = State.SCAN_START
             self.timer.cancel()
-            self.timer = self.create_timer(0, self.fsm_step)
+
+            if self.goal_handle is not None and self.controller_state == "working":
+                self.cancel_future = self.goal_handle.cancel_goal_async()
+                self.cancel_future.add_done_callback(self.obstacle_second_part)
+            else:
+                self.timer = self.create_timer(0, self.fsm_step)
 
     def call_motor_controller(self, angle):
+        self.timer.cancel()
+        self.motor_controller_client.wait_for_server()
+
         msg = MCC.Goal()
         msg.angle = angle
         
@@ -99,12 +121,19 @@ class WanderingNode(Node):
         future.add_done_callback(self.response_callback)
 
     def response_callback(self, future):
-        goal_handle = future.result()
-        future = goal_handle.get_result_async()
-        future.add_done_callback(self.done_callback)
+        self.goal_handle = future.result()
+        if self.goal_handle.accepted:
+            self.controller_state = "working"
+            future = self.goal_handle.get_result_async()
+            future.add_done_callback(self.done_callback)
+        else:
+            pass
 
     def done_callback(self, future):
-        self.timer = self.create_timer(0, self.fsm_step)
+        result = future.result()
+        self.controller_state = "done"
+        if result.status == GoalStatus.STATUS_SUCCEEDED:
+            self.timer = self.create_timer(0, self.fsm_step)
 
     def fsm_step(self):
         #default state, causes robot to stop and after a while transition to DRIVE
@@ -124,7 +153,7 @@ class WanderingNode(Node):
             self.timer.cancel()
             
             msg = Twist()
-            msg.linear.x = 0.4
+            msg.linear.x = 0.5
             self.publisher.publish(msg)
 
             if self.cautious_mode:
@@ -142,7 +171,7 @@ class WanderingNode(Node):
             
             #reverse
             msg = Twist()
-            msg.linear.x = -0.4
+            msg.linear.x = -0.5
             self.publisher.publish(msg)
             time.sleep(0.5)
 

@@ -19,7 +19,7 @@ class ImuNode(Node):
             namespace='',
             parameters=[
                 ('data_topic', rclpy.Parameter.Type.STRING),
-                ('warning_topic', rclpy.Parameter.Type.DOUBLE),
+                ('warning_topic', rclpy.Parameter.Type.STRING),
             ]
         )
         self.data_topic = self.get_parameter('data_topic').get_parameter_value().string_value
@@ -63,7 +63,7 @@ class ImuNode(Node):
         accel_data['z'] = accel_data['z'] / 1.0
 
         #cut low values (so the robot does not drift while stationary)
-        if abs(accel_data['x']) < 0.15:
+        if abs(accel_data['x']) < 0.1:
             accel_data['x'] = 0
 
         if abs(accel_data['y']) < 0.05:
@@ -140,8 +140,8 @@ class ImuNode(Node):
 
         #publish imu data
         msg = Twist()
-        msg.linear.x = self.velocity['x']
-        msg.angular.z = self.orientation['yaw']
+        msg.linear.x = float(self.velocity['x'])
+        msg.angular.z = float(self.orientation['yaw'])
         self.publisher.publish(msg)
 
         #publish not moving warning
