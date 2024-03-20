@@ -5,7 +5,9 @@ from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
 from geometry_msgs.msg import TransformStamped, Quaternion
 import tf2_ros
+
 import math
+import transforms3d
 
 from mpu6050 import mpu6050
 
@@ -16,41 +18,34 @@ class ImuNode(Node):
         self.declare_parameters(
             namespace='',
             parameters=[
-                ('scanning_period', rclpy.Parameter.Type.DOUBLE),
+                ('data_topic', rclpy.Parameter.Type.STRING),
+                ('warning_topic', rclpy.Parameter.Type.DOUBLE),
             ]
         )
-        self.scanning_period = self.get_parameter('scanning_period').get_parameter_value().double_value
+        self.data_topic = self.get_parameter('data_topic').get_parameter_value().string_value
+        self.warning_topic = self.get_parameter('warning_topic').get_parameter_value().string_value
         
         self.subscriber = self.create_subscription(Twist, "/cmd_vel", self.twist_callback, 10)
-        self.publisher = self.create_publisher(Twist, "/imu_node/sensor_reading", 10)
-        self.colision_publisher = self.create_publisher(Bool, "/imu_node/colision_warning", 10)
+        self.publisher = self.create_publisher(Twist, self.data_topic, 10)
+        self.colision_publisher = self.create_publisher(Bool, self.warning_topic, 10)
+        self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
         self.tf_timer = self.create_timer(0.01, self.publish_tf_data)
         
         self.sensor = sensor = mpu6050(0x68)
         sensor.set_filter_range(0x05)
 
         self.linear_command = 0
-        self.angular_command = 0
-        self.history = [0.0] * 5
-
-        self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
-
-        # Initialize state variables
         self.prev_time = self.get_clock().now()
         self.prev_accel_data = {'x': 0.0, 'y': 0.0, 'z': 0.0}
-        self.prev_velocity = {'x': 0.0, 'y': 0.0, 'z': 0.0}
+        self.velocity = {'x': 0.0, 'y': 0.0, 'z': 0.0}
+        self.prev_gyro_data = {'x': 0.0, 'y': 0.0, 'z': 0.0}
         self.orientation = {'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0}
-
         self.absolute_position = {'x': 0.0, 'y': 0.0}
-
-        self.max = 0
 
         self.get_logger().info("InitDone")
 
     def twist_callback(self, msg: Twist):
         self.linear_command = msg.linear.x
-        self.angular_command = msg.angular.z
-
 
     def get_accel_data(self):
         accel_data = {'x': 0.0, 'y': 0.0, 'z': 0.0}
@@ -126,38 +121,35 @@ class ImuNode(Node):
         return gyro_data
 
     def publish_tf_data(self):
-        
-        #get data
+        #get information for calcualtions
         current_time = self.get_clock().now()
         dt = (current_time - self.prev_time).nanoseconds / 1e9
-    
+        
         accel_data = self.get_accel_data()
-
         gyro_data = self.get_gyro_data()
 
-        #calculate velocities, rotations and positions
-        self.prev_velocity['x'] += (accel_data['x'] + self.prev_accel_data['x']) / 2 * dt
+        #calculate velocities, positions and rotations 
+        self.velocity['x'] += (accel_data['x'] + self.prev_accel_data['x']) / 2 * dt
+        self.orientation['yaw'] += (gyro_data['z'] + self.prev_gyro_data['z']) / 2 * dt
 
-        delta_x = self.prev_velocity['x'] * math.cos(self.orientation['yaw']) * dt
-        delta_y = self.prev_velocity['x'] * math.sin(self.orientation['yaw']) * dt
+        delta_x = self.velocity['x'] * math.cos(self.orientation['yaw']) * dt
+        delta_y = self.velocity['x'] * math.sin(self.orientation['yaw']) * dt
 
         self.absolute_position['x'] += delta_x
         self.absolute_position['y'] += delta_y
 
-        self.orientation['yaw'] += gyro_data['z'] * dt
-
         #publish imu data
         msg = Twist()
-        msg.linear.x = self.prev_velocity['x']
+        msg.linear.x = self.velocity['x']
         msg.angular.z = self.orientation['yaw']
         self.publisher.publish(msg)
 
         #publish not moving warning
-        if accel_data['x'] < 0.1 and (self.linear_command - self.prev_velocity['x']) > 0.2:
+        if accel_data['x'] < 0.1 and (self.linear_command - self.velocity['x']) > 0.2:
             if self.strike:
                 msg = Bool()
                 msg.data = True
-                self.publisher.publish(msg)
+                self.colision_publisher.publish(msg)
             else:
                 self.strike = True
         else:
@@ -165,7 +157,7 @@ class ImuNode(Node):
 
             msg = Bool()
             msg.data = False
-            self.publisher.publish(msg)
+            self.colision_publisher.publish(msg)
         
         #publish transform
         transform = TransformStamped()
@@ -175,29 +167,20 @@ class ImuNode(Node):
         transform.transform.translation.x = self.absolute_position['x']
         transform.transform.translation.y = self.absolute_position['y']
         transform.transform.translation.z = 0.0
-        transform.transform.rotation = self.euler_to_quaternion(0, 0, self.orientation['yaw'])
+        quat = transforms3d.euler.euler2quat(0, 0, self.orientation['yaw'])
+        transform.transform.rotation.w = quat[0]
+        transform.transform.rotation.x = quat[1]
+        transform.transform.rotation.y = quat[2]
+        transform.transform.rotation.z = quat[3]
         self.tf_broadcaster.sendTransform(transform)
 
+        #prepare for next iteration
         self.prev_time = current_time
         self.prev_accel_data = accel_data
+        self.prev_gyro_data = gyro_data
 
-        if abs(self.prev_velocity['x']) < 0.01:
-            self.prev_velocity['x'] = 0
-
-    def euler_to_quaternion(self, roll, pitch, yaw):
-        cy = math.cos(yaw * 0.5)
-        sy = math.sin(yaw * 0.5)
-        cp = math.cos(pitch * 0.5)
-        sp = math.sin(pitch * 0.5)
-        cr = math.cos(roll * 0.5)
-        sr = math.sin(roll * 0.5)
-
-        qw = cy * cp * cr + sy * sp * sr
-        qx = cy * cp * sr - sy * sp * cr
-        qy = sy * cp * sr + cy * sp * cr
-        qz = sy * cp * cr - cy * sp * sr
-
-        return Quaternion(x=qx, y=qy, z=qz, w=qw)
+        if abs(self.velocity['x']) < 0.01:
+            self.velocity['x'] = 0
 
 def main():
     rclpy.init()

@@ -42,4 +42,5 @@ line_tracking_node:
 
 imu_node:
   ros__parameters:
-    scanning_period: 0.1
+    data_topic: "/imu_data"
+    warning_topic: "/not_moving_warning"
