@@ -33,15 +33,4 @@ def generate_launch_description():
                 PythonLaunchDescriptionSource([
                     FindPackageShare("adeept_awr_nodes"), '/launch', '/line_tracking_launch.py'])
         ),
-
-        # IncludeLaunchDescription(
-        #         PythonLaunchDescriptionSource([
-        #             FindPackageShare("adeept_awr_nodes"), '/launch', '/web_controller_launch.py'])
-        # ),
-        # IncludeLaunchDescription(
-        #     XMLLaunchDescriptionSource(
-        #         os.path.join(
-        #             get_package_share_directory('rosbridge_server'),
-        #             '/opt/ros/iron/share/rosbridge_server/launch/rosbridge_websocket_launch.xml'))
-        # ),
     ])

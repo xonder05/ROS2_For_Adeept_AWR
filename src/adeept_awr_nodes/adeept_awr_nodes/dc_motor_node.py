@@ -127,8 +127,8 @@ class DCMotorNode(Node):
         right_motor_speed = max(min(right_motor_speed, self.max_motor_rotation_speed), -self.max_motor_rotation_speed)
 
         #map speed to pwm duty cycle value
-        normalized_left_motor_speed = (left_motor_speed / self.max_motor_rotation_speed) * 100
-        normalized_right_motor_speed = (right_motor_speed / self.max_motor_rotation_speed) * 100
+        normalized_left_motor_speed = (left_motor_speed / (self.max_motor_rotation_speed + 1)) * 100
+        normalized_right_motor_speed = (right_motor_speed / (self.max_motor_rotation_speed + 1)) * 100
 
         self.left_side_motor(normalized_left_motor_speed)
         self.right_side_motor(normalized_right_motor_speed)
