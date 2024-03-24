@@ -35,17 +35,20 @@ class ImuNode(Node):
         sensor.set_filter_range(0x05)
 
         self.linear_command = 0
+        self.angular_command = 0
         self.prev_time = self.get_clock().now()
         self.prev_accel_data = {'x': 0.0, 'y': 0.0, 'z': 0.0}
         self.velocity = {'x': 0.0, 'y': 0.0, 'z': 0.0}
         self.prev_gyro_data = {'x': 0.0, 'y': 0.0, 'z': 0.0}
         self.orientation = {'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0}
         self.absolute_position = {'x': 0.0, 'y': 0.0}
+        self.inertia = 10
 
         self.get_logger().info("InitDone")
 
     def twist_callback(self, msg: Twist):
         self.linear_command = msg.linear.x
+        self.angular_command = msg.angular.z
 
     def get_accel_data(self):
         accel_data = {'x': 0.0, 'y': 0.0, 'z': 0.0}
@@ -55,7 +58,7 @@ class ImuNode(Node):
             new_data = self.sensor.get_accel_data()
 
             accel_data['x'] += (new_data['x'] - 0.165931074)
-            accel_data['y'] += (new_data['y'] + 10.001548310205276)
+            accel_data['y'] += (new_data['y'] + 0.201548310205276)
             accel_data['z'] += (new_data['z'] - 0.141471371)
 
         accel_data['x'] = accel_data['x'] / 1.0
@@ -68,7 +71,7 @@ class ImuNode(Node):
 
         if abs(accel_data['y']) < 0.05:
             accel_data['y'] = 0
-        
+
         if abs(accel_data['z']) < 0.5:
             accel_data['z'] = 0
 
@@ -111,6 +114,10 @@ class ImuNode(Node):
         gyro_data_deg['y'] = gyro_data_deg['z']
         gyro_data_deg['z'] = tmp
 
+        gyro_data_deg['z'] *= -1
+
+        self.get_logger().info("hello?")
+
         #convertion from degrees to radians
         gyro_data = {
             'x': math.radians(gyro_data_deg['x']),
@@ -125,12 +132,20 @@ class ImuNode(Node):
         current_time = self.get_clock().now()
         dt = (current_time - self.prev_time).nanoseconds / 1e9
         
-        accel_data = self.get_accel_data()
         gyro_data = self.get_gyro_data()
-
-        #calculate velocities, positions and rotations 
-        self.velocity['x'] += (accel_data['x'] + self.prev_accel_data['x']) / 2 * dt
+        
         self.orientation['yaw'] += (gyro_data['z'] + self.prev_gyro_data['z']) / 2 * dt
+
+        accel_data = self.get_accel_data()
+
+        if self.linear_command == 0:
+            if self.inertia < 10:
+                self.inertia += 1
+            else:
+                self.velocity['x'] = 0
+        else:
+            self.velocity['x'] += (accel_data['x'] + self.prev_accel_data['x']) / 2 * dt
+            self.inertia = 0
 
         delta_x = self.velocity['x'] * math.cos(self.orientation['yaw']) * dt
         delta_y = self.velocity['x'] * math.sin(self.orientation['yaw']) * dt
@@ -178,9 +193,6 @@ class ImuNode(Node):
         self.prev_time = current_time
         self.prev_accel_data = accel_data
         self.prev_gyro_data = gyro_data
-
-        if abs(self.velocity['x']) < 0.01:
-            self.velocity['x'] = 0
 
 def main():
     rclpy.init()
