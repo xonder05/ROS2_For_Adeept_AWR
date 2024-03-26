@@ -2,11 +2,11 @@ import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import String
+from std_msgs.msg import Bool
+from std_msgs.msg import Float32
+from sensor_msgs.msg import CompressedImage
 from interfaces.msg import LineTracking
 from std_srvs.srv import SetBool 
-from std_msgs.msg import String
-from sensor_msgs.msg import CompressedImage
-from std_msgs.msg import Float32
 from interfaces.srv import SetFloat32
 
 import numpy as np
@@ -16,13 +16,13 @@ class UiBridgeNode(Node):
         super().__init__('ui_bridge_node')
 
         self.subscriber = self.create_subscription(CompressedImage, "/camera_stream", self.camera_callback, 10)
-        self.first = True
-
         self.subscriber = self.create_subscription(Float32, "/ultrasonic_distance", self.ultrasonic_callback, 10)
         self.subscriber = self.create_subscription(LineTracking, "/line_visibility", self.line_visibility_callback, 10)
-        
         self.subscriber = self.create_subscription(String, "/wandering_state", self.wandering_state_callback, 10)
         self.subscriber = self.create_subscription(String, "/line_following_state", self.line_following_state_callback, 10)
+
+        self.audio_out_toggle = self.create_publisher(Bool, "/control_transmitter_robot_receiver_toggle", 10)
+        self.audio_in_toggle = self.create_publisher(Bool, "/robot_transmitter_control_receiver_toggle", 10)
 
         self.gamepad_toggle_client = self.create_client(SetBool, "/toggle_gamepad")
         self.line_following_toggle_client = self.create_client(SetBool, "/toggle_line_following")
@@ -99,3 +99,19 @@ class UiBridgeNode(Node):
         request = SetFloat32.Request()
         request.data = value
         self.line_following_multiplier_client.call_async(request)
+
+    def audio_microphone_toggle(self, mic_state):
+        msg = Bool()
+        if mic_state == "muted":
+            msg.data = True
+        else:
+            msg.data = False
+        self.audio_out_toggle.publish(msg)
+
+    def audio_speaker_toggle(self, speaker_state):
+        msg = Bool()
+        if speaker_state == "muted":
+            msg.data = True
+        else:
+            msg.data = False
+        self.audio_in_toggle.publish(msg)

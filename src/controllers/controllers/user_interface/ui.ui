@@ -91,16 +91,16 @@
      </widget>
     </item>
     <item row="2" column="0">
-     <layout class="QGridLayout" name="voice_grid">
+     <layout class="QGridLayout" name="audio_grid">
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="audio_microphone_label_button">
         <property name="text">
          <string>TextLabel</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="audio_speaker_label_button">
         <property name="text">
          <string>TextLabel</string>
         </property>

@@ -53,6 +53,16 @@ class MainWindow(QMainWindow):
         # self.button.clicked.connect(self.showColorDialog)
         # self.button.setGeometry(50, 50, 200, 100)
 
+        self.mic_state = "muted"
+        self.audio_microphone_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/mic_muted.svg").scaled(100, 100))
+        self.audio_microphone_label_button.setCursor(Qt.PointingHandCursor)
+        self.audio_microphone_label_button.mousePressEvent = self.audio_microphone_toggle
+
+        self.speaker_state = "muted"
+        self.audio_speaker_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
+        self.audio_speaker_label_button.setCursor(Qt.PointingHandCursor)
+        self.audio_speaker_label_button.mousePressEvent = self.audio_speaker_toggle
+
         self.show()
 
     def update_image(self, np_image_data_array):
@@ -109,6 +119,26 @@ class MainWindow(QMainWindow):
 
         return pixmap
     
+    def audio_microphone_toggle(self, event):
+        self.node.audio_microphone_toggle(self.mic_state)
+
+        if self.mic_state == "muted":
+            self.audio_microphone_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/mic.svg").scaled(100, 100))
+            self.mic_state = "unmuted"
+        else:
+            self.audio_microphone_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/mic_muted.svg").scaled(100, 100))
+            self.mic_state = "muted"
+
+    def audio_speaker_toggle(self, event):
+        self.node.audio_speaker_toggle(self.speaker_state)
+
+        if self.speaker_state == "muted":
+            self.audio_speaker_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/speaker.svg").scaled(100, 100))
+            self.speaker_state = "unmuted"
+        else:
+            self.audio_speaker_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
+            self.speaker_state = "muted"
+
     # def showColorDialog(self):
     #     color = QColorDialog.getColor()
     #     if color.isValid():
