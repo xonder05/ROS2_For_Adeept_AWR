@@ -1,0 +1,5 @@
+/**:
+  ros__parameters:
+    sample_rate: 16000
+    channels: 2
+    blocksize: 1024
