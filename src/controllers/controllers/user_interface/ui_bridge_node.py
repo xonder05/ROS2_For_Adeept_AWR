@@ -8,6 +8,7 @@ from sensor_msgs.msg import CompressedImage
 from interfaces.msg import LineTracking
 from std_srvs.srv import SetBool 
 from interfaces.srv import SetFloat32
+from interfaces.srv import RGB
 
 import numpy as np
 
@@ -30,6 +31,7 @@ class UiBridgeNode(Node):
         self.keyboard_toggle_client = self.create_client(SetBool, "/toggle_keyboard")
         self.wandering_multiplier_client = self.create_client(SetFloat32, "/set_multiplier")
         self.line_following_multiplier_client = self.create_client(SetFloat32, "/line_following_node/set_multiplier")
+        self.rgb_led_client = self.create_client(RGB, "/change_rgb_color")
 
         self.get_logger().info("InitDone")
 
@@ -115,3 +117,13 @@ class UiBridgeNode(Node):
         else:
             msg.data = False
         self.audio_in_toggle.publish(msg)
+
+    def change_rgb_color(self, color):
+        while not self.rgb_led_client.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info("service not available waiting")
+
+        request = RGB.Request()
+        request.r = color.red()
+        request.g = color.green()
+        request.b = color.blue()
+        self.rgb_led_client.call_async(request)

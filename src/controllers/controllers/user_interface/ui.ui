@@ -20,6 +20,18 @@
    <layout class="QGridLayout" name="gridLayout" columnstretch="3,2">
     <item row="2" column="1">
      <layout class="QGridLayout" name="senzor_status_grid">
+      <property name="leftMargin">
+       <number>10</number>
+      </property>
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="rightMargin">
+       <number>10</number>
+      </property>
+      <property name="bottomMargin">
+       <number>10</number>
+      </property>
       <item row="2" column="1">
        <layout class="QHBoxLayout" name="line_tracking_visualization_grid">
         <item>
@@ -92,17 +104,42 @@
     </item>
     <item row="2" column="0">
      <layout class="QGridLayout" name="audio_grid">
+      <property name="leftMargin">
+       <number>20</number>
+      </property>
+      <property name="rightMargin">
+       <number>20</number>
+      </property>
+      <item row="0" column="1">
+       <widget class="QLabel" name="audio_speaker_label_button">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="audio_microphone_label_button">
         <property name="text">
          <string>TextLabel</string>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="audio_speaker_label_button">
+      <item row="0" column="2">
+       <widget class="QPushButton" name="led_color_picker_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
-         <string>TextLabel</string>
+         <string>Pick Led Color</string>
         </property>
        </widget>
       </item>

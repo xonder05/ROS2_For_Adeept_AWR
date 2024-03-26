@@ -49,10 +49,6 @@ class MainWindow(QMainWindow):
         self.ultrasonic_distance_indicator.setValue(0)
         self.ultrasonic_distance_indicator.setFormat("")
 
-        # self.button = QPushButton('Pick a Color', self)
-        # self.button.clicked.connect(self.showColorDialog)
-        # self.button.setGeometry(50, 50, 200, 100)
-
         self.mic_state = "muted"
         self.audio_microphone_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/mic_muted.svg").scaled(100, 100))
         self.audio_microphone_label_button.setCursor(Qt.PointingHandCursor)
@@ -62,6 +58,8 @@ class MainWindow(QMainWindow):
         self.audio_speaker_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
         self.audio_speaker_label_button.setCursor(Qt.PointingHandCursor)
         self.audio_speaker_label_button.mousePressEvent = self.audio_speaker_toggle
+
+        self.led_color_picker_button.clicked.connect(self.showColorDialog)
 
         self.show()
 
@@ -139,7 +137,7 @@ class MainWindow(QMainWindow):
             self.audio_speaker_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
             self.speaker_state = "muted"
 
-    # def showColorDialog(self):
-    #     color = QColorDialog.getColor()
-    #     if color.isValid():
-    #         self.node.get_logger().info(f"selected color {color.name()}")
+    def showColorDialog(self):
+        color = QColorDialog.getColor()
+        if color.isValid():
+            self.node.change_rgb_color(color)
