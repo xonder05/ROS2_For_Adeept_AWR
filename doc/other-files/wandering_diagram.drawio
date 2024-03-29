@@ -1,0 +1,185 @@
+<mxfile host="app.diagrams.net" modified="2024-03-25T17:11:43.682Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0" etag="kk5bhBBiG0gYjcjiFj2e" version="24.1.0" type="device">
+  <diagram name="Stránka-1" id="CULKfEvMoGleiC0HSqkO">
+    <mxGraphModel dx="3237" dy="1821" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="TzoWM4mobuW4rbGIymL5-48" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-12" target="TzoWM4mobuW4rbGIymL5-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-12" value="PAUSE" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-830" y="-310" width="130" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-13" target="TzoWM4mobuW4rbGIymL5-12">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-560" y="-210" />
+              <mxPoint x="-765" y="-210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-13" value="DRIVE" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-610" y="-310" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-14" target="TzoWM4mobuW4rbGIymL5-15">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-810" y="-490" />
+              <mxPoint x="-810" y="-490" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-14" value="SCAN_START" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-930" y="-530" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-38" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-15" target="TzoWM4mobuW4rbGIymL5-28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-15" value="SCAN_LOG_DISTANCE_AND_TURN&lt;div&gt;/&lt;/div&gt;&lt;div&gt;log measured distance&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-720" y="-530" width="270" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-17" value="SCAN_STOP_AND_WAIT_FOR_DISTANCE_READING" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-752.5" y="-690" width="335" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-18" value="OBSTACLE" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-1140" y="-90" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-19" target="TzoWM4mobuW4rbGIymL5-20">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-670" y="-100" as="sourcePoint" />
+            <mxPoint x="-570" y="-49.999999999999886" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-19" value="CHECK_FIRST_SIDE&lt;div&gt;/&lt;/div&gt;&lt;div&gt;look for obstacle&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-880" y="-90" width="170" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-52" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-20" target="TzoWM4mobuW4rbGIymL5-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-540" y="-200" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-20" value="CHECK_SECOND_SIDE&lt;div&gt;/&lt;/div&gt;&lt;div&gt;look for obstacle&lt;/div&gt;" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-595" y="-90" width="160" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-21" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-18" target="TzoWM4mobuW4rbGIymL5-19">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-1060" y="30" as="sourcePoint" />
+            <mxPoint x="-1010" y="-20" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-23" value="furn 90 degrees in random direction" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-1020" y="-80" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-25" value="turn 180 degrees" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-710" y="-80" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-27" value="turn 90 degrees (back the way you came from)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-510" y="-180" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-41" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-28" target="TzoWM4mobuW4rbGIymL5-13">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-81" y="-270" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-28" target="TzoWM4mobuW4rbGIymL5-13">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="-229" y="-400" />
+              <mxPoint x="-515" y="-400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-28" target="TzoWM4mobuW4rbGIymL5-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-390" y="-340" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="-155" y="-340" />
+              <mxPoint x="-448" y="-340" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-28" value="SCAN_RESOLVE_RESULT" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-260" y="-530" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-32" value="turn 45 degrees to the left" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-810" y="-520" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-33" value="" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-15">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-760" y="-720" as="sourcePoint" />
+            <mxPoint x="-680" y="-617" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-35" value="" style="endArrow=classic;html=1;rounded=0;entryX=1;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="TzoWM4mobuW4rbGIymL5-15">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-490" y="-617" as="sourcePoint" />
+            <mxPoint x="-420" y="-670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-36" value="turn 18 degrees to the right" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;rotation=-90;" vertex="1" parent="1">
+          <mxGeometry x="-740" y="-580" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-37" value="wait for distance merurement" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;rotation=90;" vertex="1" parent="1">
+          <mxGeometry x="-520" y="-580" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-39" value="if you have done 90 degrees of meruremenst" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-420" y="-520" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-42" value="obstacle to the left" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-330" y="-420" width="100" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-45" value="obstacle to the right - turn&lt;span style=&quot;background-color: initial;&quot;&gt;&amp;nbsp;left&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-250" y="-380" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-47" value="obstacle straight ahead or everywhere - continue forward (turn 45 degrees to the left)" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-250" y="-320" width="170" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-49" value="stop moving" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-710" y="-310" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-51" value="drive forward for random duration" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-710" y="-240" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-53" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="TzoWM4mobuW4rbGIymL5-18">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-1080" y="-120" as="sourcePoint" />
+            <mxPoint x="-1180" y="-160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-54" value="obstacle detected event from ultrasonic sensor" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-1150" y="-150" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-55" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" target="TzoWM4mobuW4rbGIymL5-14">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-870" y="-570" as="sourcePoint" />
+            <mxPoint x="-910" y="-590" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-56" value="side obstacle detected event from ultrasonic sensor" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-950" y="-600" width="160" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-57" value="not moving event from imu" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-1070" y="-505" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-58" value="" style="endArrow=classic;html=1;rounded=0;entryX=0.007;entryY=0.47;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" target="TzoWM4mobuW4rbGIymL5-14">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-970" y="-492" as="sourcePoint" />
+            <mxPoint x="-920" y="-450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="TzoWM4mobuW4rbGIymL5-59" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="1" source="TzoWM4mobuW4rbGIymL5-13" target="TzoWM4mobuW4rbGIymL5-14">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-580" y="-390" as="sourcePoint" />
+            <mxPoint x="-755" y="-220" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="-582" y="-390" />
+              <mxPoint x="-870" y="-390" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

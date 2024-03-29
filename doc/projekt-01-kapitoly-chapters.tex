@@ -619,11 +619,238 @@ ROS2 systém se skládá z velkého množství navzájem komunikujících uzlů,
 		
 \end{algorithm}
 
-\subsection*{Knihovny}
-%použité ros2 knihovny
 
+\subsection*{Formáty pro popis Robotů}
+V robotice se často objevuje potřeba definovat strukturu a fyzikální vlastnosti robotů, objektů případně prostředí, ve kterém se nachází. Nejzjevnějším případem jsou simulátory ale existují i jiné použítí kde programy potřebují znát aktuální stav, odometrii robota, a k tomu je nejprve potřeba znát jeho stukturu.
+
+\subsubsection*{Unified Robotics Description Format}
+
+
+\subsubsection*{XML Macro}
+Xacro lze použít na jakékoli XML soubory, ale primárně se používá k generování URDF souborů. Cílem tohoto formátu je zjednodušení URDF souborů, které se při popisu složitějších robotů stávají dlouhé a náchylné na chyby. Xcarco tedy přidává funkce sloužící k eliminaci těchto nedostatků. 
+První z nich je možnost definovat konstanty, v urdf se často opakují stejné hodnoty na několika místech, jednoduchým případem může být definice vizuální a kolizní části <link> elementů které bývají často totožné. 
+\begin{verbatim}
+	<xacro:property name="wheel_radius" value="0.035" />
+\end{verbatim}
+Na konstanty pak navazuje vkládání matematických výrazů, místo statických hodnot.
+\begin{verbatim}
+	<cylinder radius="${wheel_diameter/2}" length="0.1"/>
+\end{verbatim}
+Hlavní funkcionalitou tohoto formátu jsou však makra. Ty umožňují zaobalit blok kódu a přiřadit mu identifikátor pomocí kterého lze takové makro vkládat na další místa v kódu. 
+Makra mohou brát na vstupu také parametry. V těle makra lze pak tyto parametry vkládat a v kombinaci s matematickými výrazy vytvářet komplexní definice.
+\begin{verbatim}
+	<xacro:macro name="identificator" params="name mass:=default_value">
+\end{verbatim}
+Posledním rozšířením které xacro oproti urdf prináší je možnost rozdělení definice robota do více souborů.
+\begin{verbatim}
+	<xacro:include filename="components.xacro"/>
+\end{verbatim}
+
+\subsubsection*{Simulation Description Format}
+
+SDF je formát založený na XML. Jak z názvu vyplývá, slouží k popisu robotů, ale také světů ve kterých se budou následně pohybovat. Jedná se o primární formát využívaný Gazebo simulátorem.
+
+\subsubsection*{Rviz2}
+
+\subsection{Simultaneous Localization And Mapping}
+
+
+
+\subsection{Navigation 2}
+
+\subsection{Geometric Transformation Subsystem}
+Jedná se o subsystém ros2, který realizuje geometrické transformace mezi jednotlivými částmi robota.
+Vztah mezi dvěma objekty lze definovat pomocí posunu (translation) a otočení (rotation). Matematicky jsou tyto složky reprezentovány maticemi, které po spojení vytváří výslednou transformační matici. Vzhledem k tomu, že roboti se skládají z velkého množství částí, které jsou na sebe navzájem zavěšeny a zároveň se jejich relativní pozice neustále mění, není vhodné počítat tyto vztahy manuálně a proto existuje TF.
+
+Základním prvkem se kterým TF pracuje je takzvaný frame, neboli rám. Rám reprezentuje nějakou část robota jako senzor, kolo a podobně. Tyto rámy jsou uspořádány do stromové struktury, kde každý uzel má vždy jednoho předka. Kořenem robota je z pravidla \verb|base_link|, který se nachází v jeho středu. Dalším běžným rámem je \verb|odom|. Ten reprezentuje vztah mezi aktuální pozicí robota a počátkem souřadného systému.
+
+Pro předávání dat mezi uzly jsou využívány dva topicy.
+\begin{itemize}
+	\item {\verb|/tf| - dynamické transformace pro komponenty připojené přes serva, motory}
+	\item {\verb|/tf_static| - statické transformace pro komponenty pevně připevněné na jiné části}
+\end{itemize} 
+ROS2 uzly neinteragují s těmito topicy stejně jako s běžnými topicky ale pomocí speciálních objektů k tomu sloužícím. Pro zasílání nových dat do TF systému slouží \verb|TransformBroadcaster|. Ten se používá vesměs stejně jako klasický publisher.
+Pro získání dat z tf systému pak slouží \verb|TransformListener|. Ten neslouží k jednoduchému čtení zpráv posílaných v topicu, ale umožňuje dotazování se tf systému na konkrétní transformace. Dotaz se skládá z specifikování dvou rámců, mezi kterými je transformace hledána. Tyto dva rámce nemusí být v tf stromu přímí potomci. Cesta od jednoho k druhému může vést přes několik uzlů, ale dokud jsou navzájem dosažitelné, tak tf vrátí výslednou transformaci. Druhou částí dotazu je čas, ten je potřebný protože, pokud je cesta mezi rámy delší může se i během několika milisekund výrazně změnit výsledná transformace a použití aktuálního času tak není vhodné. Specifikování času také umožňuje získávat pozice z minulosti. 
 
 \chapter{Implementace}
+
+
+\section{Uzly pro řízení komponent}
+
+\subsection*{Komponenty součástí adeept kitu}
+
+\subsubsection*{Motory}
+Robot disponuje čtyřmi stejnosměrnými motory. Řizení je tedy realizováno differenciálním způsobem. 
+V ROS systému je ovládání motoru realizováno uzlem \verb|dc_motor_node|. Tento uzel přímo ovládá GPIO piny, pomocí kterých řídí h-bridge obvod. Co se týče interakce s ros2 systémem, tento uzel poslouchá topic jménem \verb|cmd_vel| command velocity. Jedná se o standartní topic pro posílání příkazu na pohyb robota. Zprávy v tomto topicu jsou typu Twist. Pro robota s differenciálním pohonem je tedy důležitá lineární x složka a angulární z. Pomocí nich lze spočítat výsledná rychlost otáčení pro kola na jedné a druhé straně.
+
+$$\omega_L = \frac{V - \omega * b/2}{r}$$
+$$\omega_R = \frac{V + \omega * b/2}{r}$$
+
+\noindent Kde $\omega_L$ a $\omega_R$ jsou výsledné rychlosti motorů v $[rad/s]$. $V$ je zadaná lineární a $\omega$ angulární složka v $[m/s] a [rad/s]$. $b$ je rozpětí mezi koly a $r$ poloměr kola v $[m]$.
+
+%problémy, optimalizace
+
+\subsubsection*{Servo}
+Tento robot využívá pouze jedno servo a to na ovládání náklonu kamery. Toto servo je řízeno pomocí pwm signálu který generuje PCA9685. V softwaru je k jeho řízení využita knihovna \verb|Adafruit_PCA9685|. Vzhledem k tomu, že použité servo má větší rozsah pohybu, než kolik je místa pro kameru, zajišťuje uzel kontrolu minimálního a maximálního natočení aby nedošlo k poškození robota. Z pohledu ROS2 systému tento uzel demonstruje jednoduchý action server. Server příjme požadavek, postupně otáčí servo do cílové pozice a průběžně odesílá informaci o aktuálním úhlu serva.
+
+\subsubsection*{Kamera}
+Zachytávání snímků kamery je realizováno pomocí knihovny OpenCV. Aby bylo možno dosáhnout relativně krátké odezvy při přehrávání obrazu je použito nižší rozlišení a snímkovací frekvence než to co použitá kamera zvládá. V základním configu je použito rozlišení 960 na 540 pixelů a snímkovací frekvence 20hz.
+Pro přenos snímků v ROS2 systému je použita zpráva vestavěného typu \verb|CompressedImage|. Před odesláním jsou ještě data zakódována do jpeg formátu pomocí nástrojů opencv.
+Před použitím CompressedImage formátu bylo experimentováno také s \verb|Image|. Tato zpráva obsahuje více rozšiřujících informací o přenášeném obrázku jako jeho rozměry, použité kódování a podobně. Na první pohled se tedy zdá jako vhodnější formát. Protože se však jedná o snímky kamery přenášené mezi dvěma různými zařízeními pomocí wifi připojení přináší tento objemově větší formát příliš velké zpoždění, které překonává použitelné hranice pro streamování. Na počátku vývoje byl použit ještě třetí možný přístup, který však nevyužívá ROS2 funkcionality a proto byl později změněn. Tím je zakódování přenášených snímků do \verb|base64| formátu a následné přenesení jako jednoduchou string zprávu. Tento přístup se ukázal jako zcela funkční a dosahující podobných výsledků ve zpoždění jako má \verb|CompressedImage|.
+ 
+\subsubsection*{Ultrazvukový senzor}
+Ovládání ultrazvukového senzoru je relativně jednoduché a je tedy realizováno pomocí práce s GPIO piny. Získání aktuální vzdálenosti se skládá z odeslání pulzu na trig pin. Následně se počká dokud senzor nezačne na echo pin odesílat odpověď. V ten moment se uloží časová značka a počká se dokud se echo pin nevrátí zpět na nízkou hladinu. Pak se uloží druhá značka. Interval mezi těmito dvěma momenty lze následně přepočítat na vzdálenost.
+
+Do ROS2 systému tento uzel odesílá kromě pravidelného updatu aktuální vzdálenosti také dvě další informace. Tou první je jednoduché varování o detekci překážky nacházející se přímo před robotem. Druhá zpráva pak doplňuje tu první v ohledu detekování překážek které můžou stále vést ke kolizi ale senzor je již nedetekuje. 
+
+\begin{figure}[h!]
+	\centering
+	\begin{minipage}[c]{0.5\textwidth}
+		\centering
+		\includegraphics[scale=1.0]{obrazky-figures/ultrasonic_blind_spot.pdf}
+	\end{minipage}%
+	\begin{minipage}[c]{0.5\textwidth}
+			$$\cos(82.5^\circ) = \frac{8\text{cm}}{\text{prepona}} \Rightarrow 61.3\text{cm}$$
+			$$\sin(82.5^\circ) = \frac{\text{protilehla}}{61.3\text{cm}} \Rightarrow 60.77\text{cm}$$
+	\end{minipage}
+	\caption{}
+	\label{}
+\end{figure}
+
+V tomto případě se jedná o překážky které zmizí ze skeneru ve vzdálenosti menší než 61cm ale ještě nejsou detekovány klasickým způsobem, který informuje o překážkách ve vzdálenosti menší než např: 20cm. Druhá zpráva tedy informuje o tom, že nějaká překážka zmizela ze radaru v této potenciálně nebezpečné vzdálenosti.
+
+%čtení, detekce překážek
+
+\subsubsection*{Sledování čáry}
+%not much to say
+
+\subsection*{Rozšíření}
+\subsubsection*{Nabíjení}
+V originální konfiguraci je napájení realizováno pomocí dvou sériově zapojených 18650 baterií. V tomto zapojení baterie poskytují napájení až 8V a 4A. Součástí adeept kitu jsou kolébky na baterie, které je přímo připojí k zátěži. Nabíjení baterií je tedy realizováno externě. Protože je tento přístup nepohodlný, prvním rozšířením robota je přidání bms a nabíjecí desky. 
+Nejrozšířenějším způsobem nabíjení 18650 baterií je deska s čipem TP4056. Tyto desky jsou hojně dostupné, v různých konfiguracích s různými vstupy napájení a ochranami. Problémem je, že tyto desky jsou vhodné pro nabíjení jedné 18650 baterie. Potenciálně lze použít více desek na nabíjení baterií v paralelním zapojení. Ale pro sériově zapojené baterie jsou tyto desky nevhodné.
+Lepší přístup je tedy přes využití Battery Management System. Jedná se o desku zajištující ochranu baterií a obsahuje také bod pro připojení mezibodu mezi bateriemi aby mohla správně balancovat nabíjení jednotlivých baterií. V kombinaci s touto deskou se dále využije samotná nabíjecí deska, ta musí dodávat dvojnásobné napětí protože seriové zapojení napětí sčítá.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.75]{obrazky-figures/battery_circuite.pdf}
+	\caption{Zapojení BMS a nabíjecí desky}
+	\label{}
+\end{figure}
+
+\subsubsection*{Inertial Mesurement Unit - IMU}
+Druhým rozšířením oproti originální stavebnici je přidání IMU senzoru. Konkrétně se jedná o model MPU5060. Ten disponuje tří osým akcelerometrem a gyroskopem. Ve výsledném systému pracují s daty z imu dva uzly. Tím prvním je klasický uzel na jeho ovládání, ten využívá knihovnu třetí strany \verb|mpu-5060 dopln|. Nejprve je potřeba vyčistit data. Přímo v hardwaru je implementována dolní propusť, která se nastavuje zápisem do registru \verb|register|. Softwarově lze získaná data zprůměrovat mezi více vzorky a taky je každé čtení upraveno o kalibrační offset, protože senzor i ve statické pozici čte malé hodnoty. Výsledná data pak uzel odesílá kromě klasického Twist topicu také jako odometrii do tf systému.
+
+Druhým uzlem využívajícím tyto data je \verb|motor controller|. Tento uzel zajišťuje přesné ovládání robota. Konkrétně využívá data z gyroskopu aby zajistil otočení robota o konkrétní úhel.
+
+\subsubsection*{Light Detection And Ranging - Lidar}
+Posledním a zároveň nejzajímavějším rozšířením je lidar senzor. Jedná se o senzor ze skupiny senzorů pro určování vzdálenosti. Konkrétním použitým modelem je \verb|dopln|. Jendá se o 360 stupnový senzor. Je tedy skvělý pro mapování prostoru, v němž se robot nachází a případně také navigaci.
+
+\section{Řízení robota na vyšší úrovni}
+Kromě manuálního ovládání robota 
+
+\subsection{Pomocný uzel pro přesné otáčení robota}
+Vzhledem k tomu že použité motory nejsou opatřeny enkodéry, je, bez využití dalších senzorů, jakékoli otáčení velice nepřesné. Motorům lze samozřejmě zadat konkrétní rychlost na určitý časový interval a dostat se tak na přibližně správnou orientaci. Ale opravdu se jedná jen o přibližný úhel z důvodů externích vlivů a nepřesností. Například setrvačnost hraje velkou roli při otáčení o úhly menší než 90° nebo při vyšším využití prostředků mikrokontroleru můžou být reakce na příkazy zpožděné.
+Proto byl vytvořen tento uzel, který využívá gyroskopická data z imu senzoru, aby zajistil, že se robot  může v případě potřeby otáčet o přesně dané úhly. V ROS2 systému se jedná o action server. Přijímá požadavky a následně zasílá příkazy na \verb|cmd\_vel| topic. Podle hodnot získaných z imu pak postupně snižuje rychlost otáčení v závislosti na vzdálenosti od cílového úhlu. Z pohledu demonstrace ROS2 funkcionality tento uzel využívá pokročilejší funkce action serveru mezi které patří možnost předat action serveru vlastní callback funkce pro určité události. Ve většině případů se využívá pouze execute callback ve kterém by měla proběhnout většina funkcionality daného action serveru. Tento konkrétní uzel však potřebuje pro své správné fungování data z imu senzoru. Aby se však vyvolávala callback funkce daného subscriberu musí se uzel točit(spin), což je akce která neprobíhá, když dochází k vykonávání funkce. A proto tento uzel využívá dalších callback funckí. Jednou z nich je \verb|handle\_accepted\_callback|, která se vyvolá po přijmutí cíle. V tomto případě je použita jako začátek vykonávání požadavku. Další funkcí je \verb|goal\_callback|, která má za úkol rozhodnout zda příchozí požadavek bude příjmut, nebo zamítnut. Úpravou tohoto serveru je, že pokud probíhá obsluha nějakého požadavku, budou jakékoli nově příchozí zamítnuty. To z toho důvodu, že po dokončení aktuálně prováděného úkolu bude orientace robota jiná než když byly tyto požadavky zaslány a nebudou s největší pravděpodobností již platné.
+
+\subsection*{Bloudění}
+Náhodné bloudění robota po místnosti je základním autonomním pohybem. Cílem tohoto režimu je náhodný pohyb robota v prostoru, s cílem vyhýbat se překážkám.
+
+Co se týče senzorů využívá tento režim pouze ultrazvukový senzor a imu. Ultrazvukový senzor je umístěný na přední straně robota a zvládá tedy detekovat překážky přímo před robotem. Úhel jeho záběru je přibližne 15 stupnů a nelze tedy počítat s tím že nalezne všechny překážky, typicky se jedná o prekážky u kterých by došlo ke kolizi s koly robota. 
+
+Samotný kód je pak implementován využitím konečného automatu. Ten je modifikován tak, že dokáže přijímat nečekané události jako detekování překážky. 
+
+Tento režim má tři hlavní chování. Tím prvním je klasická jízda v před. 
+Druhý pak řeší překážky nacházející se přímo před robotem. Detekování a přechod do tohoto stavu zajišťuje buď zpráva od ultrazvukového senzoru o překážce nacházející se příliš blízko, nebo zpráva od imu senzoru varující o tom, že \verb|cmd_vel| vyslala příkaz o pohybu vpřed avšak akcelerometr změnu nezaznamenal, což implikuje, že se robot opírá o nějakou překážku. Tyto události zajistí přechod do stavu \verb|OBSTACLE|. Následující stavy pak realizují vyhnutí se překážce. Nejprve se vždy vycouvá zpět a následně se náhodně rozhodne strana na kterou se robot otočí. Pokud je zde volno pokračuje přechází se zpět do jízdy vpřed. Pokud ne, tak se zkontroluje stejným způsobem i druhá strana a případně se robot vrací zpět tím směrem odkud přijel.
+Posledním chováním je skenování překážek v 90 stupňovém úhlu před robotem. Začíná přechodem do stavu \verb|SCAN_START|. Skenovací procedura je vyvolána buď detekováním překážky, která zmizela z ultrazvukového senzoru ale může stále vést ke kolizi, nebo se vyvolává pravidelně v případě použití carefull režimu. Skenování pak provede šest měření v úhlu od 45 do -45 stupnů před robotem a pokud detekuje překážku tak se otočí na +-45° a pokračuje v jízdě vpřed.
+
+
+\subsection*{Sledování čáry}
+
+\subsection*{Navigace a mapování}
+
+\subsubsection*{Model}
+Pro správné fungování mapování je nejprve potřeba převést reálného robota na model, který může využít software k následné interpretaci dat získaných ze senzorů. ROS2 využívá pro tento krok formát .urdf.
+
+Interpretaci této definice zajištuje vestavěný ROS2 uzel jménem \verb|robot_state_publisher|. Tomu se předá definice, a on následně vysílá TF transformace a \verb|robot_description|. Zároveň také poslouchá topic \verb|joint_states| podle kterého upravuje hodnoty transformací.
+
+Oba výstupy robot state publisheru lze vizualizovat v nástroji rviz. %nejakou fotku placni sem
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.5]{obrazky-figures/robot_description.png}
+	\caption{}
+	\label{}
+\end{figure}
+
+\subsubsection*{Odometrie}
+Druhým krokem k mapování a lokalizaci je získání aktuální pozice robota. K tomu slouží odometrie. Odometrická dala lze získat několika způsoby. Jedním z nich je změření jakou vzdálenost urazili jednotlivá kola diferenciálního robota. K tomu je však potřeba aby robot disponoval motory s enkodéry. Druhou možností je využítí imu senzoru a pomocí dat z gyroskopu a akcelerometru vypočítat aktuální pozici a natočení robota vůči počátku. Tento přístup je využit v této práci. Tuto funkcionalitu zajišťuje uzel \verb|doplnit|, který s využitím dat z imu počítá aktuální pozici a následně tyto data odesílá jako odom frame do tf topicu. Výsledná data lze opět vizualizovat v rviz, a nyní když se s robotem začně pohybovat bude tento pohyb viditelný.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.5]{obrazky-figures/odom.png}
+	\caption{}
+	\label{}
+\end{figure}
+
+\subsubsection*{Mapování}
+Posledním krokem k úspěšnému mapování je získání dat o okolním prostředí. To zajíštuje lidar senzor umístěný na robotu. Aby bylo možné data získané z lidaru správně vizualizovat v rviz musí existovat transformace mezi lidarem a base frame robota. Pokud je lidar součástí definice modelu, postará se o tuto transformaci robot state publisher. Samotné mapování zajištuje knihovna \verb|slam-toolbox|. Ta po spuštění uzlu zpracuje data získaná z odom a scan topiců a výslednou mapu publikuje na /map topicu. Pro vizualizaci lze opět využít rviz.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.4]{obrazky-figures/slam.png}
+	\caption{}
+	\label{}
+\end{figure}
+
+\subsubsection*{Navigace}
+Navigaci zajišťuje knihovna NAV2. Jedná se o několik spolupracujících uzlů. Základem nav2 jsou behaviorální stromy. Co se týče použití nav2 na vstupu čte odom scan a map topicy. Na výstupu pak vysílá costmapy. Mapy zobrazující co aktuálně robot vydí a ceny pro pohyb přes pozice. Pro vizualizaci lze takovou cost mapu přeložit přes mapu vytvořenou slamem. Nav2 následně poslouchá na topicu \verb|dopln| příkazy, podle kterých se následně snaží dosáhnout výsledné pozice a orientace robota. 
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.4]{obrazky-figures/nav2.png}
+	\caption{}
+	\label{}
+\end{figure}
+
+
+
+
+
+
+
+\section{Gazebo Simulátor}
+
+
+Před tím, než lze začít využívat výhody simulátoru, je nejprve potřeba vytvořit model robota a světy ve kterých se bude pohybovat. Nativním formátem který gazebo využívá je \verb|.sdf|. V tomto formátu jsou definovány světy.
+
+\subsection*{Definice světa}
+Definice světů se skládá ze dvou základních částí. Nejprve se zpravidla definují obecné vlastnosti jako parametry simulace, fyzikální charakteristiky světa a pluginy. Druhou částí je pak samotná definice objektů, které se budou ve světě nacházet. Ty můžou být složené z jednoduchých tvarů, které lze definovat přímo v souboru. Druhou možností je vložit pomocí \verb|<mesh>| tagu složitější tvary. Poslední možností je využití oficiální fuel knihovny, která obsahuje mnoho uživateli vytvořených modelů, které lze jednoduše vložit do světa.
+
+\subsection*{Definice modelu}
+Pro definici modelu robota lze použít také SDF formát. Takto definovaný model lze vložit do světa buď přímo rámci jeho definice, nebo pomocí \verb|<include>| tagu. Druhým a z důvodu kompatibility s dalšími ROS funkcionalitami častěji používaným formátem je URDF, potažmo Xacro. 
+
+\subsubsection*{Obecná definice}
+Společné pro všechny zmíněné formáty je základní struktura složená z \verb|<link>| a \verb|<joint>| prvků. Linky reprezentují fyzické části robota jako jeho tělo či kola. Joint(kloub) pak tvoří nějaký vztah mezi linky. Jointy můžou být fixní nebo různými způsoby pohyblivé. K tomu aby model něco dělal slouží \verb|<plugin>| tagy. Ty umožnují přiřadit částem robota funkcionalitu definovanou pluginem. V gazebu existuje mnoho vestavěných pluginů jako \verb|DiffDrive| pro řízení diferenciálního pohonu nebo \verb|JointController| pro ovládání kloubů s chováním podobným servu. Naopak pro získávání informací ze simulátoru slouží \verb|<senzor>| tagy. Gazebo podporuje řadu různých senzorů. Typicky se jedná o komplexnější senzory jako lidar a hloubkové kamery. Naopak jednodušší senzory typu ultrazvukový, či sledování čáry nejsou v repertoáru. V implementaci bylo tedy potřeba využít těch podporovaných k simulaci těch nepodporovaných. Ultrazvukový senzor vzdálenosti je tedy ve výsledném modelu nahrazen lidar senzorem s omezeným úhlem a počtem paprsků. Modul pro sledování čáry je pak realizován pomocí kamer s rozlišením jeden pixel který je v kódu převeden na grayscale hodnotu a pomocí treasholdingu rozhodnut výsledek.
+
+\subsubsection*{Xacro Specifika}
+Jak už bylo řečeno, výsledný model je definován ve formátu Xacro. Pro delší definice je tento formát velmi vhodný, protože použití čistého URDF, vede na dlouhý, repetitivní a na chyby náchylný XML kód. Jednou z nejčastěji opakovaných sekcí v URDF kódu je téměř totožná definice fyzikálních vlastností \verb|<link>| elementu. Obsahuje určení váhy, setrvačnosti, a tvaru pro vizuální, kolizní část robota. S použitím XACRO lze tuto část definovat jako makro s několika parametry a následně jedním řádkem vkládat do složitějších definic, kde by tato část jen překážela. Díky matematice se jako součást makra vypočítají i matice setrvačnosti, kterou je jinak potřeba počítat ručně. Podobné makro je pak také definováno pro <joint> elementy. Tyto základní komponenty se následně využívají v rámci definice senzorů. Hlavní soubor se díky této struktuře stává krátkým a přehledným, odkud lze jednoduše a rychle nalézt konkrétní komponenty robota a provádět na nich změny.
+
+Výsledný Xacro soubor je před použitím v simulátoru nejprve potřeba přeložit do URDF formátu. K tomu slouží příkaz \verb|xacro [in.xacro] > [out.urdf]|. Modely definované v URDF se do světa \uv{spawnují} a to až po spuštění simulace. Slouží k tomu gazebo service jménem \verb|/world/name/create| a příkaz \verb|ign service|. 
+
+\subsubsection*{ROS Gazebo Bridge}
+Komunikaci mezi Gazebo simulátorem a zbytkem ROS2 systému zajišťuje oficiální nástroj \verb|ros_gz_bridge|. Tento most na jedné straně interaguje s gazebo reprezentací topiců a servisů. Na druhé straně se pak tváří jako ROS2 uzel. Spouští se pomocí příkazu:
+\begin{verbatim}
+	ros2 run ros_gz_bridge parameter_bridge /topic_name@gazebo_msg_type@ignition_msg_type
+\end{verbatim}
+Pro efektivnější použití lze předat bridge uzlu config soubor s definicí více topiců které budou přemostěny.
+\begin{verbatim}
+- ros_topic_name: "ros_chatter"
+  gz_topic_name: "gz_chatter"
+  ros_type_name: "std_msgs/msg/String"
+  gz_type_name: "gz.msgs.StringMsg"
+  direction: IGN_TO_ROS  # BIDIRECTIONAL or ROS_TO_IGN
+\end{verbatim}
+
 \chapter{Závěr}
 %cca strana
 
