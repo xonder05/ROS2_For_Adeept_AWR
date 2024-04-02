@@ -92,7 +92,7 @@
     <xacro:cylinder_link name="right_rear_wheel" mass="0.05" radius="${wheel_radius}" length="0.02" material="yellow"/>    
     <xacro:continuous_joint name="right_rear_wheel" child="right_rear_wheel" origin_position="-0.05 -0.075 -0.025" origin_orientation="-1.5707 0 0" axis="0 0 1"/>
 
-    <gazebo>
+    <!-- <gazebo>
         <plugin name='ignition::gazebo::systems::DiffDrive' filename='libignition-gazebo-diff-drive-system.so'>
             <left_joint>left_front_wheel_joint</left_joint>
             <right_joint>right_front_wheel_joint</right_joint>
@@ -114,7 +114,52 @@
             <wheel_radius>${wheel_radius}</wheel_radius>
             <odom_publish_frequency>1</odom_publish_frequency>
         </plugin>
-    </gazebo>
+    </gazebo> -->
+
+    <ros2_control name="GazeboSimSystem" type="system">
+        <hardware>
+            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+        </hardware>
+        <joint name="left_front_wheel_joint">
+          <command_interface name="velocity">
+            <param name="min">-100</param>
+            <param name="max">100</param>
+          </command_interface>
+          <state_interface name="position"/>
+          <state_interface name="velocity"/>
+        </joint>
+        <joint name="right_front_wheel_joint">
+          <command_interface name="velocity">
+            <param name="min">-100</param>
+            <param name="max">100</param>
+          </command_interface>
+          <state_interface name="position"/>
+          <state_interface name="velocity"/>
+        </joint>
+        <joint name="left_rear_wheel_joint">
+            <command_interface name="velocity">
+              <param name="min">-100</param>
+              <param name="max">100</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+          </joint>
+        <joint name="right_rear_wheel_joint">
+            <command_interface name="velocity">
+              <param name="min">-100</param>
+              <param name="max">100</param>
+            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
+          </joint>
+      </ros2_control>
+    
+      <gazebo>
+        <!-- Joint state publisher -->
+        <plugin filename="/opt/ros/iron/lib/libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+          <parameters>$(find gazebo_simulator_nodes)/config/controllers.yaml</parameters>
+        </plugin>
+      </gazebo>
 
 </xacro:macro>
 
