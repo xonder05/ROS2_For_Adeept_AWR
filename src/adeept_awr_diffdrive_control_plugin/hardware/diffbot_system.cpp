@@ -151,29 +151,33 @@ hardware_interface::CallbackReturn AdeeptDiffDriveHardware::on_activate(
 {
   RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "Activating ...please wait...");
 
-  // chip = gpiod_chip_open("/dev/gpiochip0");
-  // if (!chip) {
-  //     std::cerr << "Error opening GPIO chip\n";
-  //     return hardware_interface::CallbackReturn::ERROR;
-  // }
+  chip = gpiod_chip_open("/dev/gpiochip0");
+  if (!chip) {
+      std::cerr << "Error opening GPIO chip\n";
+      return hardware_interface::CallbackReturn::ERROR;
+  }
 
-  // enable_line = gpiod_chip_get_line(chip, config.motor_left_enable_pin);
-  // forward_line = gpiod_chip_get_line(chip, config.motor_left_forward_pin);
-  // backward_line = gpiod_chip_get_line(chip, config.motor_left_backward_pin);
+  enable_line = gpiod_chip_get_line(chip, config.motor_left_enable_pin);
+  forward_line = gpiod_chip_get_line(chip, config.motor_left_forward_pin);
+  backward_line = gpiod_chip_get_line(chip, config.motor_left_backward_pin);
   
-  // if (!enable_line || !forward_line || !backward_line) {
-  //     std::cerr << "Error getting GPIO lines\n";
-  //     gpiod_chip_close(chip);
-  //     return hardware_interface::CallbackReturn::ERROR;
-  // }
+  if (!enable_line || !forward_line || !backward_line) {
+      std::cerr << "Error getting GPIO lines\n";
+      gpiod_chip_close(chip);
+      return hardware_interface::CallbackReturn::ERROR;
+  }
 
-  // if (gpiod_line_request_output(enable_line, "example", 0) != 0 ||
-  //     gpiod_line_request_output(forward_line, "example", 1) != 0 ||
-  //     gpiod_line_request_output(backward_line, "example", 0) != 0) {
-  //     std::cerr << "Error setting GPIO lines as output\n";
-  //     gpiod_chip_close(chip);
-  //     return hardware_interface::CallbackReturn::ERROR;
-  // }
+  if (gpiod_line_request_output(enable_line, "example", 0) != 0 ||
+      gpiod_line_request_output(forward_line, "example", 0) != 0 ||
+      gpiod_line_request_output(backward_line, "example", 0) != 0) {
+      std::cerr << "Error setting GPIO lines as output\n";
+      gpiod_chip_close(chip);
+      return hardware_interface::CallbackReturn::ERROR;
+  }
+
+  RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "yes i got here\n");
+  left_side_pwm.initialize(enable_line);
+  left_side_pwm.start();
 
   RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "Successfully activated!");
 
@@ -185,13 +189,15 @@ hardware_interface::CallbackReturn AdeeptDiffDriveHardware::on_deactivate(
 {
   RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "Deactivating ...please wait...");
 
-    // if (gpiod_line_set_value(enable_line, 0) != 0 ||
-    //     gpiod_line_set_value(forward_line, 0) != 0 ||
-    //     gpiod_line_set_value(backward_line, 0) != 0) {
-    //     std::cerr << "Error setting GPIO lines to 0\n";
-    // }
+  left_side_pwm.stop();
 
-    // gpiod_chip_close(chip);
+  if (gpiod_line_set_value(enable_line, 0) != 0 ||
+      gpiod_line_set_value(forward_line, 1) != 0 ||
+      gpiod_line_set_value(backward_line, 0) != 0) {
+      std::cerr << "Error setting GPIO lines to 0\n";
+  }
+
+  gpiod_chip_close(chip);
 
   RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "Successfully deactivated!");
 
@@ -207,10 +213,27 @@ hardware_interface::return_type AdeeptDiffDriveHardware::read(
 hardware_interface::return_type adeept_awr_diffdrive_control_plugin ::AdeeptDiffDriveHardware::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
+  RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "read_call\n");
+
+  if (left_front_wheel_velocity != left_rear_wheel_velocity)
+  {
+    RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "Not same speed\n");
+  }
 
   double left_motor_speed = std::max(std::min(left_front_wheel_velocity, 18.5), -18.5);
-  //double normalized_left_motor_speed = (left_motor_speed / (18.5 + 1)) * 100;
-  printf("resutl speed: %f\n", left_motor_speed);
+  double normalized_left_motor_speed = (left_motor_speed / (18.5 + 1)) * 100;
+  RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "resutl speed: %f\n", normalized_left_motor_speed);
+
+  if (left_motor_speed > 0) {
+    gpiod_line_set_value(forward_line, 1);
+    gpiod_line_set_value(backward_line, 0);
+  }
+  else {
+    gpiod_line_set_value(backward_line, 1);
+    gpiod_line_set_value(forward_line, 0);
+  }
+  //deal with negative values
+  left_side_pwm.set_duty_cycle(normalized_left_motor_speed);
 
   return hardware_interface::return_type::OK;
 }

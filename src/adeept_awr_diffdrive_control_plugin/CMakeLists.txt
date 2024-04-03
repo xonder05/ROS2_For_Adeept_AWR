@@ -43,6 +43,10 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE "ADEEPT_AWR_DIFFDRIVE_CONTROL
 # Export hardware plugins
 pluginlib_export_plugin_description_file(hardware_interface adeept_awr_diffdrive_control_plugin.xml)
 
+target_link_libraries(adeept_awr_diffdrive_control_plugin
+  PRIVATE -lgpiod
+)
+
 # INSTALL
 install(
   DIRECTORY hardware/include/

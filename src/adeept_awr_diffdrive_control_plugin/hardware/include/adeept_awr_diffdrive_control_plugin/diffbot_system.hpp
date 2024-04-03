@@ -21,8 +21,6 @@
 #include <algorithm>
 #include <unistd.h>
 
-#include <gpiod.h>
-
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
 #include "hardware_interface/system_interface.hpp"
@@ -35,6 +33,7 @@
 #include "rclcpp_lifecycle/state.hpp"
 
 #include "adeept_awr_diffdrive_control_plugin/visibility_control.h"
+#include "adeept_awr_diffdrive_control_plugin/pwm_generator.hpp"
 
 namespace adeept_awr_diffdrive_control_plugin
 {
@@ -97,6 +96,8 @@ private:
   struct gpiod_line *enable_line;
   struct gpiod_line *forward_line;
   struct gpiod_line *backward_line;
+
+  PWMGenerator left_side_pwm;
 };
 
 }  // namespace adeept_awr_diffdrive_control_plugin
