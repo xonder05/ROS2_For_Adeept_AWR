@@ -49,10 +49,6 @@ install(
   DESTINATION include/adeept_awr_diffdrive_control_plugin
 )
 install(
-  DIRECTORY description/launch description/ros2_control description/urdf
-  DESTINATION share/adeept_awr_diffdrive_control_plugin
-)
-install(
   DIRECTORY bringup/launch bringup/config
   DESTINATION share/adeept_awr_diffdrive_control_plugin
 )
@@ -62,13 +58,6 @@ install(TARGETS adeept_awr_diffdrive_control_plugin
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
-
-if(BUILD_TESTING)
-  find_package(ament_cmake_pytest REQUIRED)
-
-  ament_add_pytest_test(example_2_urdf_xacro test/test_urdf_xacro.py)
-  ament_add_pytest_test(view_example_2_launch test/test_view_robot_launch.py)
-endif()
 
 ## EXPORTS
 ament_export_targets(export_adeept_awr_diffdrive_control_plugin HAS_LIBRARY_TARGET)
