@@ -40,14 +40,22 @@ namespace adeept_awr_diffdrive_control_plugin
 class AdeeptDiffDriveHardware : public hardware_interface::SystemInterface
 {
 
-struct Config {
-  int motor_left_enable_pin = -1;
-  int motor_left_backward_pin = -1;
-  int motor_left_forward_pin = -1;
-  int motor_right_enable_pin = -1;
-  int motor_right_backward_pin = -1;
-  int motor_right_forward_pin = -1;
+struct Sides {
+  int enable_pin = -1;
+  int forward_pin = -1;
+  int backward_pin = -1;
   float max_motor_rotation_speed = -1.0;
+
+  struct gpiod_line *enable_line;
+  struct gpiod_line *forward_line;
+  struct gpiod_line *backward_line;
+
+  PWMGenerator pwm_gen;
+
+  double front_wheel_velocity = 0.0;
+  double rear_wheel_velocity = 0.0;
+  double front_wheel_position = 0.0;
+  double rear_wheel_position = 0.0;
 };
 
 public:
@@ -81,23 +89,9 @@ public:
 
 private:
 
-  Config config;
-  double left_front_wheel_velocity = 0.0;
-  double left_rear_wheel_velocity = 0.0;
-  double right_front_wheel_velocity = 0.0;
-  double right_rear_wheel_velocity = 0.0;
-
-  double left_front_wheel_position = 0.0;
-  double left_rear_wheel_position = 0.0;
-  double right_front_wheel_position = 0.0;
-  double right_rear_wheel_position = 0.0;
-
   struct gpiod_chip *chip;
-  struct gpiod_line *enable_line;
-  struct gpiod_line *forward_line;
-  struct gpiod_line *backward_line;
-
-  PWMGenerator left_side_pwm;
+  Sides left_side;
+  Sides right_side;
 };
 
 }  // namespace adeept_awr_diffdrive_control_plugin

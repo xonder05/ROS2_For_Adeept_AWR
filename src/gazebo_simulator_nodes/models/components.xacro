@@ -158,11 +158,11 @@
         <hardware>
             <plugin>adeept_awr_diffdrive_control_plugin/AdeeptDiffDriveHardware</plugin>
             <param name="motor_left_enable_pin">4</param>
-            <param name="motor_left_backward_pin">21</param>
-            <param name="motor_left_forward_pin">26</param>
+            <param name="motor_left_forward_pin">21</param>
+            <param name="motor_left_backward_pin">26</param>
             <param name="motor_right_enable_pin">17</param>
-            <param name="motor_right_backward_pin">18</param>
-            <param name="motor_right_forward_pin">27</param>
+            <param name="motor_right_forward_pin">18</param>
+            <param name="motor_right_backward_pin">27</param>
             <param name="max_motor_rotation_speed">18.0</param>
         </hardware>
         <joint name="left_front_wheel_joint">
