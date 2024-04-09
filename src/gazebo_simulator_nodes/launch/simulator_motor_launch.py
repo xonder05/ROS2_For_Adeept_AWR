@@ -1,38 +1,29 @@
-import os
 import launch
 from launch_ros.actions import Node
-from ament_index_python.packages import get_package_share_directory
-import yaml
+from launch.actions import TimerAction
 
 def generate_launch_description():
-    
-    config_file = os.path.join(
-        get_package_share_directory('gazebo_simulator_nodes'),
-        'config',
-        'config.yaml'
+
+    robot_controller_spawner = TimerAction(
+        period=7.5,
+        actions=[
+            Node(
+                package="controller_manager",
+                executable="spawner",
+                arguments=["diffbot_base_controller"],
+            )
+        ]
     )
 
-    with open(config_file, 'r') as f:
-        config_contents = yaml.safe_load(f)
-
-    simulator_motor = Node(
-        package='gazebo_simulator_nodes',
-        executable='simulator_motor',
-        parameters=[config_file]
-    )
-    
-    #ros2 run ros_gz_bridge parameter_bridge /model/adeept_awr/cmd_vel@geometry_msgs/msg/Twist]ignition.msgs.Twist
+    #ros2 run ros_gz_bridge parameter_bridge /clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        arguments=[
-            config_contents["simulator_motor_bridge"]["ros__parameters"]["topic"] + '@' + 
-            config_contents["simulator_motor_bridge"]["ros__parameters"]["ros_message_type"] + ']' + 
-            config_contents["simulator_motor_bridge"]["ros__parameters"]["gazebo_message_type"]
+        arguments=["/clock@rosgraph_msgs/msg/Clock[ignition.msgs.Clock"
         ]
     )
 
     return launch.LaunchDescription([
-        simulator_motor,
+        robot_controller_spawner,
         bridge,
     ])

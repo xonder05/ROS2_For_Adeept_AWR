@@ -1,46 +1,87 @@
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition, UnlessCondition
 
 def generate_launch_description():
-    return LaunchDescription([
-        
-        IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    FindPackageShare("adeept_awr_nodes"), '/launch', '/dc_motor_launch.py'])
-        ),
-        IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    FindPackageShare("adeept_awr_nodes"), '/launch', '/servo_launch.py'])
-        ),
-        IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    FindPackageShare("adeept_awr_nodes"), '/launch', '/pi_camera_launch.py'])
-        ),
-        IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    FindPackageShare("adeept_awr_nodes"), '/launch', '/rgb_led_launch.py'])
-        ),
-        IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    FindPackageShare("adeept_awr_nodes"), '/launch', '/ultrasonic_launch.py'])
-        ),
-        IncludeLaunchDescription(
-                PythonLaunchDescriptionSource([
-                    FindPackageShare("adeept_awr_nodes"), '/launch', '/line_tracking_launch.py'])
-        ),
+    
+    use_ros2_control_arg = DeclareLaunchArgument('use_ros2_control', default_value="true")
 
-        IncludeLaunchDescription(
+    dc_motor = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("adeept_awr_nodes"), '/launch', '/dc_motor_launch.py'
+        ]),
+        condition=UnlessCondition(LaunchConfiguration("use_ros2_control"))
+    )
+
+    robot_state_publisher = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("adeept_awr_diffdrive_control_plugin"), "/launch", "/robot_state_publisher_launch.py"
+        ]),
+        launch_arguments={'use_sim': 'false'}.items(),
+        condition=IfCondition(LaunchConfiguration("use_ros2_control"))
+    )
+
+    control_motor = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("adeept_awr_diffdrive_control_plugin"), '/launch', '/diffdrive_launch.py'
+        ]),
+        condition=IfCondition(LaunchConfiguration("use_ros2_control"))
+    )
+
+    servo = IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
-                FindPackageShare("adeept_awr_nodes"), '/launch', '/sound_receiver_launch.py'
-            ]),
-            launch_arguments={'start_right_away': 'false', 'audio_stream_name':  '/control_transmitter_robot_receiver'}.items()
-        ),
-        IncludeLaunchDescription(
+                FindPackageShare("adeept_awr_nodes"), '/launch', '/servo_launch.py'])
+    )
+
+    camera = IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
-                FindPackageShare("adeept_awr_nodes"), '/launch', '/sound_transmitter_launch.py'
-            ]),
-            launch_arguments={'start_right_away': 'false', 'audio_stream_name':  '/robot_transmitter_control_receiver'}.items()
-        )
+                FindPackageShare("adeept_awr_nodes"), '/launch', '/pi_camera_launch.py'])
+    )
+
+    led = IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                FindPackageShare("adeept_awr_nodes"), '/launch', '/rgb_led_launch.py'])
+    )
+
+    ultrasonic =IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                FindPackageShare("adeept_awr_nodes"), '/launch', '/ultrasonic_launch.py'])
+    )
+
+    line = IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                FindPackageShare("adeept_awr_nodes"), '/launch', '/line_tracking_launch.py'])
+    )
+
+    sound_receiver = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("adeept_awr_nodes"), '/launch', '/sound_receiver_launch.py'
+        ]),
+        launch_arguments={'start_right_away': 'false', 'audio_stream_name':  '/control_transmitter_robot_receiver'}.items()
+    )
+
+    sound_transmitter = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("adeept_awr_nodes"), '/launch', '/sound_transmitter_launch.py'
+        ]),
+        launch_arguments={'start_right_away': 'false', 'audio_stream_name':  '/robot_transmitter_control_receiver'}.items()
+    )
+
+    return LaunchDescription([
+        use_ros2_control_arg,
+
+        dc_motor,
+        robot_state_publisher,
+        control_motor,
+        
+        servo,
+        camera,
+        led,
+        ultrasonic,
+        line,
+        sound_receiver,
+        sound_transmitter,
     ])

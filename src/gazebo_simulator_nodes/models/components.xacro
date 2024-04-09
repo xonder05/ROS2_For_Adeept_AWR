@@ -92,51 +92,12 @@
     <xacro:cylinder_link name="right_rear_wheel" mass="0.05" radius="${wheel_radius}" length="0.02" material="yellow"/>    
     <xacro:continuous_joint name="right_rear_wheel" child="right_rear_wheel" origin_position="-0.05 -0.075 -0.025" origin_orientation="-1.5707 0 0" axis="0 0 1"/>
 
-    <!-- <gazebo>
-        <plugin name='ignition::gazebo::systems::DiffDrive' filename='libignition-gazebo-diff-drive-system.so'>
-            <left_joint>left_front_wheel_joint</left_joint>
-            <right_joint>right_front_wheel_joint</right_joint>
-            <wheel_separation>${wheel_separation}</wheel_separation>
-            <wheel_radius>${wheel_radius}</wheel_radius>
-
-            <odometry_frame>odom</odometry_frame>
-            <robot_base_frame>base_link</robot_base_frame>
-
-            <publish_odom>true</publish_odom>
-            <publish_odom_tf>true</publish_odom_tf>
-            <publish_wheel_tf>true</publish_wheel_tf>
-        </plugin>
-
-        <plugin name='ignition::gazebo::systems::DiffDrive' filename='libignition-gazebo-diff-drive-system.so'>
-            <left_joint>left_rear_wheel_joint</left_joint>
-            <right_joint>right_rear_wheel_joint</right_joint>
-            <wheel_separation>${wheel_separation}</wheel_separation>
-            <wheel_radius>${wheel_radius}</wheel_radius>
-            <odom_publish_frequency>1</odom_publish_frequency>
-        </plugin>
-    </gazebo> -->
-
-    <!-- <ros2_control name="GazeboSimSystem" type="system">
-        <hardware>
-            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
-        </hardware>
-        <joint name="left_front_wheel_joint">
-          <command_interface name="velocity">
-            <param name="min">-100</param>
-            <param name="max">100</param>
-          </command_interface>
-          <state_interface name="position"/>
-          <state_interface name="velocity"/>
-        </joint>
-        <joint name="right_front_wheel_joint">
-          <command_interface name="velocity">
-            <param name="min">-100</param>
-            <param name="max">100</param>
-          </command_interface>
-          <state_interface name="position"/>
-          <state_interface name="velocity"/>
-        </joint>
-        <joint name="left_rear_wheel_joint">
+    <xacro:if value="$(arg use_sim)">
+      <ros2_control name="GazeboSimSystem" type="system">
+          <hardware>
+              <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+          </hardware>
+          <joint name="left_front_wheel_joint">
             <command_interface name="velocity">
               <param name="min">-100</param>
               <param name="max">100</param>
@@ -144,7 +105,7 @@
             <state_interface name="position"/>
             <state_interface name="velocity"/>
           </joint>
-        <joint name="right_rear_wheel_joint">
+          <joint name="right_front_wheel_joint">
             <command_interface name="velocity">
               <param name="min">-100</param>
               <param name="max">100</param>
@@ -152,53 +113,70 @@
             <state_interface name="position"/>
             <state_interface name="velocity"/>
           </joint>
-      </ros2_control> -->
-    
-    <ros2_control name="GazeboRealSystem" type="system">
-        <hardware>
-            <plugin>adeept_awr_diffdrive_control_plugin/AdeeptDiffDriveHardware</plugin>
-            <param name="motor_left_enable_pin">4</param>
-            <param name="motor_left_forward_pin">21</param>
-            <param name="motor_left_backward_pin">26</param>
-            <param name="motor_right_enable_pin">17</param>
-            <param name="motor_right_forward_pin">18</param>
-            <param name="motor_right_backward_pin">27</param>
-            <param name="max_motor_rotation_speed">18.0</param>
-        </hardware>
-        <joint name="left_front_wheel_joint">
-          <command_interface name="velocity">
-            <param name="min">-100</param>
-            <param name="max">100</param>
-          </command_interface>
-        </joint>
-        <joint name="right_front_wheel_joint">
-          <command_interface name="velocity">
-            <param name="min">-100</param>
-            <param name="max">100</param>
-          </command_interface>
-        </joint>
-        <joint name="left_rear_wheel_joint">
+          <joint name="left_rear_wheel_joint">
+              <command_interface name="velocity">
+                <param name="min">-100</param>
+                <param name="max">100</param>
+              </command_interface>
+              <state_interface name="position"/>
+              <state_interface name="velocity"/>
+            </joint>
+          <joint name="right_rear_wheel_joint">
             <command_interface name="velocity">
               <param name="min">-100</param>
               <param name="max">100</param>
             </command_interface>
-          </joint>
-        <joint name="right_rear_wheel_joint">
-            <command_interface name="velocity">
-              <param name="min">-100</param>
-              <param name="max">100</param>
-            </command_interface>
+            <state_interface name="position"/>
+            <state_interface name="velocity"/>
           </joint>
       </ros2_control>
+    </xacro:if>
+    
+    <xacro:unless value="$(arg use_sim)">
+      <ros2_control name="GazeboRealSystem" type="system">
+          <hardware>
+              <plugin>adeept_awr_diffdrive_control_plugin/AdeeptDiffDriveHardware</plugin>
+              <param name="motor_left_enable_pin">4</param>
+              <param name="motor_left_forward_pin">21</param>
+              <param name="motor_left_backward_pin">26</param>
+              <param name="motor_right_enable_pin">17</param>
+              <param name="motor_right_forward_pin">18</param>
+              <param name="motor_right_backward_pin">27</param>
+              <param name="max_motor_rotation_speed">18.0</param>
+          </hardware>
+          <joint name="left_front_wheel_joint">
+            <command_interface name="velocity">
+              <param name="min">-100</param>
+              <param name="max">100</param>
+            </command_interface>
+          </joint>
+          <joint name="right_front_wheel_joint">
+            <command_interface name="velocity">
+              <param name="min">-100</param>
+              <param name="max">100</param>
+            </command_interface>
+          </joint>
+          <joint name="left_rear_wheel_joint">
+              <command_interface name="velocity">
+                <param name="min">-100</param>
+                <param name="max">100</param>
+              </command_interface>
+            </joint>
+          <joint name="right_rear_wheel_joint">
+              <command_interface name="velocity">
+                <param name="min">-100</param>
+                <param name="max">100</param>
+              </command_interface>
+            </joint>
+        </ros2_control>
+    </xacro:unless>
 
-      <gazebo>
-        <!-- Joint state publisher -->
-        <plugin filename="/opt/ros/iron/lib/libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-          <parameters>$(find gazebo_simulator_nodes)/config/controllers.yaml</parameters>
-        </plugin>
-      </gazebo>
-
-
+    <gazebo>
+      <plugin filename="/opt/ros/iron/lib/libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <parameters>$(find adeept_awr_diffdrive_control_plugin)/config/controllers.yaml</parameters>
+        <parameters>$(find adeept_awr_diffdrive_control_plugin)/config/controllers_sim.yaml</parameters>
+      </plugin>
+    </gazebo>
 
 </xacro:macro>
 

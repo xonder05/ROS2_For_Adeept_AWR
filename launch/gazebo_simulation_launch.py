@@ -43,6 +43,13 @@ def generate_launch_description():
         )
     )
 
+    robot_state_publisher = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("adeept_awr_diffdrive_control_plugin"), "/launch", "/robot_state_publisher_launch.py"
+        ]),
+        launch_arguments={'use_sim': 'true'}.items()
+    )
+
     motor = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_motor_launch.py'
@@ -97,13 +104,14 @@ def generate_launch_description():
         wandering_world,
         line_following_world,
         
+        robot_state_publisher,
         motor,        
+
         joint_states,
         servo,
 
         camera,
         line_following,
-
         ultrasonic,
         lidar,
 
