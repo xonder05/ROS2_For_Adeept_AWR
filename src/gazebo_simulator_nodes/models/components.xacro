@@ -175,6 +175,9 @@
       <plugin filename="/opt/ros/iron/lib/libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
         <parameters>$(find adeept_awr_diffdrive_control_plugin)/config/controllers.yaml</parameters>
         <parameters>$(find adeept_awr_diffdrive_control_plugin)/config/controllers_sim.yaml</parameters>
+        <ros>
+          <remapping>/diffbot_base_controller/cmd_vel_unstamped:=/cmd_vel</remapping>
+        </ros>
       </plugin>
     </gazebo>
 

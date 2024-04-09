@@ -15,6 +15,7 @@ def generate_launch_description():
         package="controller_manager",
         executable="ros2_control_node",
         parameters=[controller_config_file],
+        remappings=[('/diffbot_base_controller/cmd_vel_unstamped', '/cmd_vel')]
     )
 
     robot_controller_spawner = Node(
