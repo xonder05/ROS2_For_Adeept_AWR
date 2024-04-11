@@ -24,7 +24,6 @@ def generate_launch_description():
             {'use_sim_time': LaunchConfiguration("use_sim")},
             {'robot_description': robot_description},
         ],
-        remappings=[("/robot_description", "/controller_manager/robot_description")],
     )
 
     return LaunchDescription([

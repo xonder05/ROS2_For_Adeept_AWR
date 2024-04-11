@@ -7,7 +7,7 @@ from launch.conditions import IfCondition
 
 def generate_launch_description():
 
-    world_select_arg = DeclareLaunchArgument('world_select', default_value='')
+    world_select_arg = DeclareLaunchArgument('world_select', default_value='wandering')
     world_select_val = LaunchConfiguration('world_select')
 
     main_world = IncludeLaunchDescription(
@@ -41,13 +41,6 @@ def generate_launch_description():
                 '"', world_select_val, '"', ' == "line_tracking"'
             ])
         )
-    )
-
-    robot_state_publisher = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            FindPackageShare("adeept_awr_diffdrive_control_plugin"), "/launch", "/robot_state_publisher_launch.py"
-        ]),
-        launch_arguments={'use_sim': 'true'}.items()
     )
 
     motor = IncludeLaunchDescription(
@@ -104,16 +97,12 @@ def generate_launch_description():
         wandering_world,
         line_following_world,
         
-        robot_state_publisher,
         motor,        
-
         joint_states,
         servo,
-
         camera,
         line_following,
         ultrasonic,
         lidar,
-
         odometry,
     ])

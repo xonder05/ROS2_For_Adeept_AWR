@@ -7,21 +7,13 @@ from launch.conditions import IfCondition, UnlessCondition
 
 def generate_launch_description():
     
-    use_ros2_control_arg = DeclareLaunchArgument('use_ros2_control', default_value="true")
+    use_ros2_control_arg = DeclareLaunchArgument('use_ros2_control', default_value="True")
 
     dc_motor = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             FindPackageShare("adeept_awr_nodes"), '/launch', '/dc_motor_launch.py'
         ]),
         condition=UnlessCondition(LaunchConfiguration("use_ros2_control"))
-    )
-
-    robot_state_publisher = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            FindPackageShare("adeept_awr_diffdrive_control_plugin"), "/launch", "/robot_state_publisher_launch.py"
-        ]),
-        launch_arguments={'use_sim': 'false'}.items(),
-        condition=IfCondition(LaunchConfiguration("use_ros2_control"))
     )
 
     control_motor = IncludeLaunchDescription(
@@ -74,7 +66,6 @@ def generate_launch_description():
         use_ros2_control_arg,
 
         dc_motor,
-        robot_state_publisher,
         control_motor,
         
         servo,

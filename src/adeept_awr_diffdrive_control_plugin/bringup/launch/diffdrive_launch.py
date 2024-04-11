@@ -8,20 +8,23 @@ def generate_launch_description():
     controller_config_file = os.path.join(
         get_package_share_directory('adeept_awr_diffdrive_control_plugin'),
         'config',
-        'diffbot_controllers.yaml'
+        'controllers.yaml'
     )
 
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
         parameters=[controller_config_file],
-        remappings=[('/diffbot_base_controller/cmd_vel_unstamped', '/cmd_vel')]
+        remappings=[
+            ('/diffbot_base_controller/cmd_vel_unstamped', '/cmd_vel'),
+            ('/controller_manager/robot_description', '/robot_description')
+        ]
     )
 
     robot_controller_spawner = Node(
         package="controller_manager",
         executable="spawner",
-        arguments=["diffbot_base_controller", "--controller-manager", "/controller_manager"],
+        arguments=["diffbot_base_controller"],
     )
 
     return LaunchDescription([

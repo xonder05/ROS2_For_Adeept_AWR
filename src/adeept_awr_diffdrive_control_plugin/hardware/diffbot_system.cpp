@@ -213,9 +213,6 @@ hardware_interface::return_type adeept_awr_diffdrive_control_plugin ::AdeeptDiff
   double right_motor_speed = std::max(std::min(right_side.front_wheel_velocity, 18.5), -18.5);
   double normalized_right_motor_speed = (right_motor_speed / (18.5 + 1)) * 100;
   
-  RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "resutl speed: %f\n", normalized_left_motor_speed);
-  RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "resutl speed: %f\n", normalized_right_motor_speed);
-
   if (normalized_left_motor_speed > 0) {
     gpiod_line_set_value(left_side.forward_line, 1);
     gpiod_line_set_value(left_side.backward_line, 0);
