@@ -63,7 +63,9 @@ class SoundReceiverNode(Node):
 
 def main():
     rclpy.init()
-    node = SoundReceiverNode()
-    rclpy.spin(node)
-    node.stream.close()
-    rclpy.shutdown()
+    try:
+        node = SoundReceiverNode()
+        rclpy.spin(node)
+        node.stream.close()
+    except sd.PortAudioError:
+        rclpy.logging.get_logger("sound_receiver_node").error("No output audio device found, exiting")

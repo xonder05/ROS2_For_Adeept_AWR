@@ -1,6 +1,7 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
+from launch.actions import TimerAction
 import os
 
 def generate_launch_description():
@@ -21,13 +22,18 @@ def generate_launch_description():
         ]
     )
 
-    robot_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["diffbot_base_controller"],
+    delayed_robot_controller_spawner = TimerAction(
+        period=10.0,
+        actions=[
+            Node(
+                package="controller_manager",
+                executable="spawner",
+                arguments=["diffbot_base_controller"],
+            )
+        ]
     )
 
     return LaunchDescription([
         control_node,
-        robot_controller_spawner,
+        delayed_robot_controller_spawner,
     ])
