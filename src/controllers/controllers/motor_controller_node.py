@@ -5,8 +5,6 @@ from rclpy.action import ActionServer, GoalResponse, CancelResponse
 from geometry_msgs.msg import Twist
 from interfaces.action import MCC
 
-import threading
-
 class MotorControllerNode(Node):
 
     def __init__(self):
@@ -34,6 +32,7 @@ class MotorControllerNode(Node):
 
         self.current_angle = 0
         self.goal_handle = None
+        self.canceled_goal_handle = None
         self.waited = False
 
         self.get_logger().info("InitDone")
@@ -42,8 +41,8 @@ class MotorControllerNode(Node):
     def imu_callback(self, msg):
         self.current_angle = msg.angular.z
 
-        if self.goal_handle is not None and self.goal_handle.is_cancel_requested:
-            self.goal_handle.execute()
+        if self.canceled_goal_handle is not None and self.canceled_goal_handle.is_cancel_requested:
+            self.canceled_goal_handle.execute()
             return
 
         if self.goal_handle is not None and self.goal_handle.is_active:
@@ -66,9 +65,9 @@ class MotorControllerNode(Node):
     
             msg = Twist()
             if distance > 0:
-                msg.angular.z = speed
-            else:
                 msg.angular.z = -speed
+            else:
+                msg.angular.z = speed
             self.publisher.publish(msg)
 
     #only one action at a time, two nodes should not control the motor simultaneously
@@ -79,7 +78,9 @@ class MotorControllerNode(Node):
         else:
             return GoalResponse.ACCEPT
 
-    def cancel_callback(self, goal):
+    def cancel_callback(self, goal_handle):
+        self.canceled_goal_handle = goal_handle
+        self.goal_handle = None
         return CancelResponse.ACCEPT
 
     def handle_accepted_callback(self, goal_handle):

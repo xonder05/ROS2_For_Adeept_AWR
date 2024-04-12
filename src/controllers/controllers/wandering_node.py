@@ -42,7 +42,7 @@ class WanderingNode(Node):
         self.ultrasonic_subscriber = self.create_subscription(Float32, "/ultrasonic_distance", self.distance_callback, 10)
         self.obstacle_subscriber = self.create_subscription(Bool, "/ultrasonic_obstacle_warning", self.obstacle_callback, 10)
         self.side_obstacle_subscriber = self.create_subscription(Bool, "/ultrasonic_obstacle_disappearance_warning", self.side_obstacle_callback, 10)
-        # self.not_moving_subscriber = self.create_subscription(Bool, "/not_moving_warning", self.obstacle_callback, 10)
+        self.not_moving_subscriber = self.create_subscription(Bool, "/not_moving_warning", self.obstacle_callback, 10)
         self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         self.state_publisher = self.create_publisher(String, "/wandering_state", 10)
         self.toggle_service = self.create_service(SetBool, "/toggle_wandering", self.toggle_callback)
