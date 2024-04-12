@@ -116,8 +116,6 @@ class ImuNode(Node):
 
         gyro_data_deg['z'] *= -1
 
-        self.get_logger().info("hello?")
-
         #convertion from degrees to radians
         gyro_data = {
             'x': math.radians(gyro_data_deg['x']),

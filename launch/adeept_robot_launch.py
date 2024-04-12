@@ -43,6 +43,11 @@ def generate_launch_description():
                 FindPackageShare("adeept_awr_nodes"), '/launch', '/ultrasonic_launch.py'])
     )
 
+    imu =IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                FindPackageShare("adeept_awr_nodes"), '/launch', '/imu_launch.py'])
+    )
+
     line = IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 FindPackageShare("adeept_awr_nodes"), '/launch', '/line_tracking_launch.py'])
@@ -72,6 +77,7 @@ def generate_launch_description():
         camera,
         led,
         ultrasonic,
+        imu,
         line,
         sound_receiver,
         sound_transmitter,

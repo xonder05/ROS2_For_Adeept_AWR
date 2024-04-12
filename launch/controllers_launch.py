@@ -33,6 +33,12 @@ def generate_launch_description():
         launch_arguments={'start_right_away': 'false'}.items()
     )
 
+    motor_controller = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("controllers"), '/launch', '/motor_controller_node_launch.py'
+        ])
+    )
+
     line_following = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             FindPackageShare("controllers"), '/launch', '/line_following_node_launch.py'
@@ -59,6 +65,7 @@ def generate_launch_description():
         keyboard,
         gamepad,
         wandering,
+        motor_controller,
         line_following,
         controller_sound_receiver,
         controller_sound_transmitter,
