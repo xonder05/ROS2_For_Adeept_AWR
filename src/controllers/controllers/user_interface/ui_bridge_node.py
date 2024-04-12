@@ -1,4 +1,3 @@
-import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import String
@@ -7,7 +6,6 @@ from std_msgs.msg import Float32
 from sensor_msgs.msg import CompressedImage
 from interfaces.msg import LineTracking
 from std_srvs.srv import SetBool 
-from interfaces.srv import SetFloat32
 from interfaces.srv import RGB
 
 import numpy as np
@@ -29,8 +27,6 @@ class UiBridgeNode(Node):
         self.line_following_toggle_client = self.create_client(SetBool, "/toggle_line_following")
         self.wandering_toggle_client = self.create_client(SetBool, "/toggle_wandering")
         self.keyboard_toggle_client = self.create_client(SetBool, "/toggle_keyboard")
-        self.wandering_multiplier_client = self.create_client(SetFloat32, "/set_multiplier")
-        self.line_following_multiplier_client = self.create_client(SetFloat32, "/line_following_node/set_multiplier")
         self.rgb_led_client = self.create_client(RGB, "/change_rgb_color")
 
         self.get_logger().info("InitDone")
@@ -85,22 +81,6 @@ class UiBridgeNode(Node):
     def camera_callback(self, msg: CompressedImage):
         np_array = np.frombuffer(msg.data, np.uint8)
         self.qt.update_image(np_array)
-
-    def wandering_multipler(self, value):
-        while not self.wandering_multiplier_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("service not available waiting")
-
-        request = SetFloat32.Request()
-        request.data = value
-        self.wandering_multiplier_client.call_async(request)
-
-    def line_following_multipler(self, value):
-        while not self.line_following_multiplier_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("service not available waiting")
-
-        request = SetFloat32.Request()
-        request.data = value
-        self.line_following_multiplier_client.call_async(request)
 
     def audio_microphone_toggle(self, mic_state):
         msg = Bool()

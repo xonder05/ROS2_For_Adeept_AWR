@@ -1,7 +1,6 @@
-from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton, QColorDialog
+from PyQt5.QtWidgets import QMainWindow, QColorDialog
 from PyQt5 import uic
-from PyQt5.QtCore import QByteArray
-from PyQt5.QtGui import QPixmap, QImage, QImageReader, QColor
+from PyQt5.QtGui import QPixmap, QImage, QColor
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QPainterPath
 from PyQt5.QtCore import Qt
 
@@ -28,12 +27,6 @@ class MainWindow(QMainWindow):
 
         self.keyboard_start_button.clicked.connect(lambda: self.node.keyboard_toggle(True))
         self.keyboard_stop_button.clicked.connect(lambda: self.node.keyboard_toggle(False))
-
-        self.wandering_adeept_button.clicked.connect(lambda: self.node.wandering_multipler(2.0))
-        self.wandering_gazebo_button.clicked.connect(lambda: self.node.wandering_multipler(0.0))
-
-        self.line_following_adeept_button.clicked.connect(lambda: self.node.line_following_multipler(1.5))
-        self.line_following_gazebo_button.clicked.connect(lambda: self.node.line_following_multipler(1.0))
 
         self.camera_width = int(round((self.size().width() / 5) * 3, 0))
         self.camera_height = int((self.camera_width / 16) * 9)

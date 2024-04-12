@@ -49,6 +49,7 @@ class SoundReceiverNode(Node):
         else:
             self.stream.stop()
 
+    #recieved data are buffered
     def data_recieved_callback(self, msg: SoundBlock):
         new_data = np.vstack((msg.left_channel, msg.right_channel)).T
         self.buffer = np.concatenate((self.buffer, new_data))

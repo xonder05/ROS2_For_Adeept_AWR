@@ -5,7 +5,6 @@ from geometry_msgs.msg import Twist
 from interfaces.msg import LineTracking
 from std_srvs.srv import SetBool
 from std_msgs.msg import String
-from interfaces.srv import SetFloat32
 
 from enum import Enum
 
@@ -36,14 +35,12 @@ class LineFollowingNode(Node):
         self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         self.state_publisher = self.create_publisher(String, "/line_following_state", 10)
         self.toggle_service = self.create_service(SetBool, "/toggle_line_following", self.toggle_callback)
-        self.multiplier_service = self.create_service(SetFloat32, "/line_following_node/set_multiplier", self.multiplier_callback)
 
         self.timer = self.create_timer(0.01, self.fsm_next_state)
         if not self.start_right_away:
             self.timer.cancel()
 
         self.line_status = LineTracking()
-        self.multiplier = 1
         self.state = State.NO_LINE
         self.counter = 0
         self.last_direction = State.FORWARD_ALL
@@ -61,12 +58,6 @@ class LineFollowingNode(Node):
             self.publisher.publish(msg)
             self.timer.cancel()
 
-        response.success = True
-        return response
-
-    #speed multiplier for adeept
-    def multiplier_callback(self, request: SetFloat32, response):
-        self.multiplier = request.data
         response.success = True
         return response
 
@@ -128,39 +119,39 @@ class LineFollowingNode(Node):
             self.state_publisher.publish(String(data = self.state.name))
             
             msg = Twist()
-            msg.linear.x = 0.2 * self.multiplier
+            msg.linear.x = 0.2
             self.publisher.publish(msg)
 
         elif self.state == State.STEER_LIGHT_LEFT:
             self.state_publisher.publish(String(data = State.STEER_LIGHT_LEFT.name))
             
             msg = Twist()
-            msg.linear.x = 0.15 * self.multiplier
-            msg.angular.z = 1.256 * self.multiplier
+            msg.linear.x = 0.15
+            msg.angular.z = 1.256
             self.publisher.publish(msg)
 
         elif self.state == State.STEER_LEFT:
             self.state_publisher.publish(String(data = State.STEER_LEFT.name))
             
             msg = Twist()
-            msg.linear.x = 0.11 * self.multiplier
-            msg.angular.z = 3.14 * self.multiplier
+            msg.linear.x = 0.11
+            msg.angular.z = 3.14
             self.publisher.publish(msg)
 
         elif self.state == State.STEER_LIGHT_RIGHT:
             self.state_publisher.publish(String(data = State.STEER_LIGHT_RIGHT.name))
             
             msg = Twist()
-            msg.linear.x = 0.15 * self.multiplier
-            msg.angular.z = -1.57 * self.multiplier
+            msg.linear.x = 0.15
+            msg.angular.z = -1.57
             self.publisher.publish(msg)
 
         elif self.state == State.STEER_RIGHT:
             self.state_publisher.publish(String(data = State.STEER_RIGHT.name))
             
             msg = Twist()
-            msg.linear.x = 0.11 * self.multiplier
-            msg.angular.z = -3.14 * self.multiplier
+            msg.linear.x = 0.11
+            msg.angular.z = -3.14
             self.publisher.publish(msg)
         
         else:

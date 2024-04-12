@@ -24,7 +24,6 @@ class State(Enum):
     SCAN_LOG_DISTANCE_AND_TURN = 7
     SCAN_WAIT_FOR_DISTANCE_READING = 8
     SCAN_RESOLVE_RESULTS = 9
-    TURN_LEFT = 10
 
 class WanderingNode(Node):
 
@@ -283,21 +282,12 @@ class WanderingNode(Node):
             
             #obstacle right - has to turn left first
             elif right < 0.7 and left > 0.7: 
-                self.state = State.TURN_LEFT
-                self.timer = self.create_timer(0, self.fsm_step)
+                self.call_motor_controller(1.57)
+                self.state = State.DRIVE
 
             else: #obstacle both or false alarm, turn forward and continue
                 self.call_motor_controller(0.785)
-
                 self.state = State.PAUSE
-
-        elif self.state == State.TURN_LEFT:
-            self.state_publisher.publish(String(data = State.TURN_LEFT.name))
-            self.timer.cancel()
-
-            self.call_motor_controller(1.57)
-
-            self.state = State.DRIVE
 
 def main():
     rclpy.init()
