@@ -893,11 +893,6 @@ Mozkem robota je mikropočítač Raspberry pi 4 na kterém běží Ubuntu server
 	\label{}
 \end{figure}
 
-\subsection*{Spouštění}
-Všechny zmíněné uzly využívají spouštěcí launch soubory. Ty jednodušší načtou konfigurační soubor a předají parametry spouštěnému uzlu. Některé pak definují parametry přímo v launch souboru. Takové parametry lze přepisovat při spouštění či volání z jiného launch souboru. 
-
-Protože uzlů je mnoho a spouštět je jeden po druhém by bylo zdlouhavé je v kořenové složce workspace složka launch, která obsahuje vyšší spouštěcí soubory. Ty shlukují nižší launch soubory a hromadně tak spustí všechny potřebné uzly zároveň. Výhodou tady je, že není potřeba řešit parametry a konfigurační soubory pro všechny spouštěné uzly, o to se postarají nižší launch fily.
-
 \section{Řízení robota na vyšší úrovni}
 Po vyřešení všech uzlů sloužících k řízení jednotlivých komponent následuje sekce zabívající se ovládání robota jako celku na vyšší úrovni. Uzly realizující tyto činnosti se nacházejí v balíku \verb|controllers|. 
 
@@ -1005,6 +1000,51 @@ Posledním chováním je skenování překážek v 90 stupňovém úhlu před ro
 Sledování čáry je v robotice známý úkol a na vyšších úrovních se v této disciplíně pořádají závody. Avšak v základním provedení se jedná o jednoduchý úkol. Tato funkcionalita je implementována hlavně z toho důvodu, že robot disponuje senzorem, který je k sledování čáry určený.
 
 Základem kódu je konečný automat. Senzor disponuje třemi senzory a automat tedy bude obsahovat s $2^3$ stavů. Z tohoto počtu jsou dva stavy koncové a to 101, protože se jedná o nevalidní stav a 000 indikující ztrátu čáry. Mezi všemi ostatními lze navzájem přecházet. Následující stav se volí podle aktuálních hodnot senzorů.
+
+\section{Spouštěcí Soubory (Launch files)}
+Každý uzel ve výsledném systému má k sobě vytvořený spouštěcí soubor. Ve většině případů se jedná o jednoduché soubory jejichž úkolem je načtení a předání konfiguračního souboru spouštěnému uzlu. Některé parametry je vhodné změnit také při spouštění uzlu. Spouštěcí soubory které toto umožňují musí tento parametr explicitně definovat.
+\begin{verbatim}
+	ros2 launch lauch.py param_name:=value
+\end{verbatim}
+Ve složce \verb|ros2_ws/launch| se nachází hromadné spouštěcí soubory. Ty mají za úkol využít nižších spouštěcích souborů k nastartování větší části systému zároveň. Díky této hierarchické struktuře už není potřeba řešit předávání všech parametrů a lze se zaměřit jen na to důležité. Pokud jsou volány soubory, které parametry explicitně definují, lze je v tento moment přepsat, stejně jako by to udělal uživatel z příkazové řádky. Příkladem využití této funkcionality je řídící uzel \verb|wandering_node|. Pokud je tento uzel spuštěn manuálně, předpokládá se, že v systému žádný jiný řídící uzel neběží. Může tedy zahájit vykonávání hned po inicializaci, aniž by jeho příkazy kolidovaly s dalšími řídícími uzly. V případě, že je však volán jako součást hromadného spouštění, přepíše se výchozí hodnota parametru \verb|start_right_away| a všechny řídící uzly tak budou po inicializaci čekat na další příkaz.
+\begin{verbatim}
+IncludeLaunchDescription(
+    launch_goal,
+    launch_arguments={'start_right_away': 'false'}.items()
+)
+\end{verbatim}
+
+Jednoduché podmíněné spouštění využívá \verb|adeept_robot_launch.py|. Rozhoduje se zde který uzel bude použit pro řízení motorů. Cíli spouštěcího souboru lze do proměnné \verb|condition| přidat podmínku. Jedná se o speciální třídy (\verb|Ifcondition|, \verb|Unlesscondition|), kterým se v konstruktoru předává true / false výraz, jehož hodnotu lze získat například z parametru. Podmíněné spouštění může být i komplexnější a to kombinací s \verb|PythonExpression|. Tato třída je použita v \verb|gazebo_simulation_launch.py| souboru, kde se porovnáním hodnoty parametru určuje, který svět bude spuštěn.
+\begin{verbatim}
+IncludeLaunchDescription(
+    launch_goal,
+    condition=IfCondition(
+        PythonExpression([
+            '"', world_select_val, '"', ' == "wandering"'
+        ])
+    )
+)
+\end{verbatim}
+
+Komplexnější spouštěcí soubory často potřebují větší kontrolu nad tím, kdy dojde ke provedení jednotlivých cílů. V případě, že je potřeba pouze opozdit provedení některého z cílů lze využít \verb|TimerAction|. Jedná se o třídu, která spustí daný cíl až po předem stanoveném časovém intervalu. Tato funkce je využita při spouštění \verb|ros2_control| v souboru \verb|diffdrive_launch.py|, kde slouží k zpoždění \uv{spawn} ovladače až po dokončení inicializace pluginu.
+\begin{verbatim}
+TimerAction(
+    period=10.0,
+    actions=[
+        Node()
+    ]
+)
+\end{verbatim}
+
+K přesnějšímu řízení pak slouží event handlery. Ty umožňují přesnější kontrolu nad tím, kdy dojde k vykonání jednotlivých cílů. Typickými událostmi jsou spuštění a ukončení procesu, případně, pokud se jedná o lifecycle uzly, také reakce na přechody do konkrétních stavů. Obsluha událostí je využita přímo v balíku gazebo simulace v souboru \verb|gazebo_world_launch.py|. Je zde celý řetěz těchto obsluh, které postupně spustí simulaci, přeloží \verb|xacro| model na \verb|urdf|, \uv{spawnou} jej do simulace a po jejím ukončení ještě uklidí vygenerovaný \verb|urdf|.
+\begin{verbatim}
+RegisterEventHandler(
+    OnProcessStart(
+        target_action=simulator,
+        on_start=convert_xacro
+    )
+)
+\end{verbatim}
 
 \section{Model robota a Gazebo Simulátor}
 Použití simulátoru při vývoji softwaru na řízení robotů je časté a užitečné. Umožňuje vyvíjet a testovat software s bez vlivů reálného světa nebo pracovat i bez fyzického přístupu k robotu. Tato práce využívá novou \verb|ignition| větev Gazebo simulátoru.
@@ -1247,7 +1287,7 @@ Druhým krokem k mapování a lokalizaci je získání aktuálních souřadnic, 
 \subsubsection*{Mapování}
 Posledním krokem k úspěšnému mapování je získání dat o okolním prostředí. To zajišťuje lidar senzor umístěný na robotu. Aby bylo možné data získané z lidaru správně vizualizovat v rviz musí existovat transformace mezi rámem lidaru a base frame robota. Pokud je lidar součástí definice modelu, postará se o tuto transformaci \verb|robot state publisher|.
 
-Mapování jako takové pak zajišťuje perfektní knihovna \verb|slam_toolbox|. Jedná se o komplexní soubor nástrojů souvisejících s SLAM přístupem. Tato práce využívá konkrétně online async mapování. Online znamená, že uzel pracuje nad aktuálními daty (ne nějakou před zaznamenanou historií) a async zajišťuje zpracování vždy nejnovějších dat, což zlepšuje latenci ale může vést k přeskočení některých scanů. Uzlu se ještě předává konfigurační soubor. V příkladech použití je obsažen ukázkový config, který byl s několika menšími změnami použit. Výstupem tohoto uzlu je vytvořená mapa na \verb|/map| topicu.
+Mapování jako takové pak zajišťuje perfektní knihovna \verb|slam_toolbox|. Jedná se o komplexní soubor nástrojů souvisejících se SLAM. Tato práce využívá \verb|async_slam_toolbox_node|. Jedná se o online, async mapování. Online znamená, že uzel pracuje nad aktuálními daty, knihovna totiž umožňuje také tvorbu mapy z před zaznamenané historie. Async pak zajišťuje zpracování vždy nejnovějších dat, což zlepšuje latenci, ale může vést k přeskočení některých scanů. Vzhledem k tomu, že slam je komplexní problém, existuje mnoho nastavitelných parametrů. Ty se předávají při spouštění pomocí konfiguračního souboru. V demo příkladech se nahází ukázkový config soubor, který byl jen s menšími modifikacemi využit i v této práci. Hlavní změnou je zvýšení rozlišení vytvářené mapy. Vývojáři knihovny předpokládají její využití v průmyslu a základní hodnoty tedy pracují s předpokladem, že robot je větší a pohybuje se ve velkých halách. Uzel pak odesílá výslednou mapu ve standardním formátu \verb|nav_msgs/OccupancyGrid| do \verb|/map| topicu.
 
 \begin{figure}[h!]
 	\centering
@@ -1257,7 +1297,11 @@ Mapování jako takové pak zajišťuje perfektní knihovna \verb|slam_toolbox|.
 \end{figure}
 
 \subsubsection*{Navigace}
-Pro navigaci byla využita knihovna Navigation 2. Jedná se o několik spolupracujících uzlů. Základem nav2 jsou behaviorální stromy. Co se týče použití nav2 na vstupu čte odom scan a map topicy. Na výstupu pak vysílá costmapy. Mapy zobrazující co aktuálně robot vydí a ceny pro pohyb přes pozice. Pro vizualizaci lze takovou cost mapu přeložit přes mapu vytvořenou slamem. Nav2 následně poslouchá na topicu \verb|dopln| příkazy, podle kterých se následně snaží dosáhnout výsledné pozice a orientace robota. 
+Pro navigaci byla využita knihovna Navigation 2. Nav2 je v podstatě samostatný ROS2 systém skládající se z několika navzájem spolupracujících uzlů. Principiálně je Nav2 založen na behaviorálních stromech.
+
+Z vnějšího pohledu uzly Nav2 poslouchají topicy \verb|/scan|(lidar data) \verb|map|(slam mapa) a transformace z tf systému, primárně ty související s \verb|odom| rámem. Zobrazitelným výstupem je několik costmap. Jedná se o upravenou mapu z \verb|map| topicu obohacenou o ceny jednotlivých polí. Tyto ceny jsou používány plánovacím serverem (jeden z uzlů Nav2) k určení optimální cesty k cíli. Příkaz pro zahájení navigace je přijímán action serverem se jménem \verb|/navigate_to_pose|. 
+
+Uživatel může ovlivnit chování Nav2 systému pomocí konfiguračního souboru. Ten je poměrně komplexní a umožňuje nastavovat velké množství parametrů a dokonce vyměňovat řídící pluginy. V porovnání s slam konfigurací zde bylo potřeba změnit hodně parametrů. Protože použité motory nedokážou vyvinout menší rychlost než 0.2m/s bylo potřeba upravit minimální rychlosti. Stejně jako u slam konfigurace je robot menší a pohybuje se v menších prostorách, byly proto zmenšeny inflation vzdálenosti. Ty jsou okolo překážek a určují ceny jednotlivých polí při plánování cesty.
 
 \begin{figure}[h!]
 	\centering
@@ -1265,9 +1309,6 @@ Pro navigaci byla využita knihovna Navigation 2. Jedná se o několik spoluprac
 	\caption{}
 	\label{}
 \end{figure}
-
-\subsubsection{Spouštění}
-Ovládací uzly mají také svůj hromadný spouštěcí soubor. Ten se oproti tomu pro spouštění hw ovládajících uzlů vyznačuje využitím přepisování parametrů definovaných v nižších spouštěcích souborech. Při spouštění řídících uzlů manuálně se předpokládá, že jich nepoběží více zároveň a defaultní hodnota parametru \verb|start_right_away| tedy říká, že uzel může zahájit vykonávání hned po jeho spuštění, naopak při spouštění z launch souboru je těchto řídících uzlů spuštěno několik zároveň a tak je jejich vykonávání hned po spuštění pozastaveno.
 
 \section{Uživatelské rozhraní}
 Uživatelské rozhraní na straně stacionárního zařízení využívá knihovnu Qt, konkrétně její python verzi PyQt5. Rozhraní jako takové je odděleno od ostatních řídících funkcionalit a pouze zajišťuje zobrazování informací získatelných z topiců a odesílání příkazů ostatním uzlům. Zbytek ROS2 systému je tedy plně ovladatelný z prostředí příkazové řádky. Co se týče implementace tak ROS2 i qt mají svůj vlastní execution loop, což vytváří problém, protože pokud jeden z nich neběží, tak daná část nefunguje. Jednou možností řešení je použití více procesů. To však vede na problémy se synchronizací. Lepší a také použitý přístup tedy je řídit oba cykly manuálně. 
@@ -1278,72 +1319,6 @@ while controllers.user_interface.global_variables.executeEventLoop:
 \end{verbatim}
 ROS2 část zajišťuje komunikaci se zbytkem systému. Obsahuje subscribery na topicy ze kterých volá qt funkce na zobrazení získaných dat. Kromě těch pak obsahuje také funkce sloužící k zasílání příkazů na servery či odesílání dat do topicků. Ty jsou volané z qt části.
 Qt část se pak stará čistě o zobrazování získaných dat nebo volání ROS části v reakci na uživatelské akce.
-
-\subsubsection*{Spouštění}
-Spouštěcí soubor pro gazebo simulaci využívá další funkci spouštěcích souborů a tou je podmíněné spouštění. Každý cíl může mít přidanou podmínku, ta musí být v základu jednoduchá true / false hodnota, ale lze ji skombinovat s python expression a vytvořit tak výsledek z výrazu. V tomto launch souboru je podmíněné spouštění využito k výběru světa, který bude v gazebo simulátoru spuštěn na základě hodnoty argumentu předaného spouštěcímu souboru.
-
-\begin{algorithm}[h!]
-	\label{}
-	\caption{\textsc{Conditional launch}}
-	
-	\DontPrintSemicolon
-	\SetAlgoNoLine
-	\SetAlgoNlRelativeSize{-1}
-	\SetNlSty{}{}{:}
-	\SetNlSkip{-1.1em}
-	
-	\BlankLine \Indp\Indpp
-	
-	\texttt{wandering\_world = IncludeLaunchDescription(}\;
-	\Indp\Indp
-	\texttt{PythonLaunchDescriptionSource([}\;
-	\Indp\Indp
-	\texttt{path\_to\_launch\_file}\;
-	\Indm\Indm
-	\texttt{]),}\;
-	\texttt{condition=IfCondition(}\;
-	\Indp\Indp
-	\texttt{PythonExpression([}\;
-	\Indp\Indp
-	\texttt{'"', world\_select\_val, '"', ' == "wandering"'}\;
-	\Indm\Indm
-	\texttt{])}\;
-	\Indm\Indm
-	\texttt{)}\;
-	\Indm\Indm
-	\texttt{)}\;
-	
-\end{algorithm}
-
-
-
-
-Přímo v balíku gazebo simulace jsou ještě spouštěcí soubory, které nespouští žádný z uzlů ale zajištují spouštění samotného simulátoru. V těchto souborech jsou využity event handlery. Jedná se o další mocnou funkcionalitu ROS2 launch souborů, která umožnuje vykonání cíle v závislosti na nějaké události. V tomto konkrétním případě se používá k spawnutí modelu robota do již spuštěné simulace. Event handlery tak zajištují, že pokus o spawn proběhne až po spuštění simulace a přeložení xacro souboru na urdf.
-
-\begin{algorithm}[h!]
-	\label{}
-	\caption{\textsc{Launch Event Handler}}
-	
-	\DontPrintSemicolon
-	\SetAlgoNoLine
-	\SetAlgoNlRelativeSize{-1}
-	\SetNlSty{}{}{:}
-	\SetNlSkip{-1.1em}
-	
-	\BlankLine \Indp\Indpp
-	
-	\texttt{simulator\_start\_event = RegisterEventHandler(}\;
-	\Indp\Indp
-	\texttt{OnProcessStart(}\;
-	\Indp\Indp
-	\texttt{target\_action=simulator,}\;
-	\texttt{on\_start=convert\_xacro}\;
-	\Indm\Indm
-	\texttt{)}\;
-	\Indm\Indm
-	\texttt{)}\;
-	
-\end{algorithm}
 
 \section{Instalace}
 Výsledný systém je komplexní a obsahuje mnoho závislostí které vyžaduje pro jeho správnou funkcionalitu.
