@@ -1,48 +1,122 @@
    	@BOOK{ros2_introduction,
-	   	author =       "Rico, Francisco Martín",
-	   	title =        "A concice introduction to robot programming with ROS2",
-	   	publisher =    "CRC Press",
-	   	edition =      "First edition",
-	   	year =         "2023",
-	   	isbn =         "978-1-032-26465-3",
+	   	author =           "Rico, Francisco Martín",
+	   	title =            "A concice introduction to robot programming with ROS2",
+	   	edition =          "First edition",
+ 	   	address = 	       "Boca Raton",
+  	 	publisher =        "CRC Press",
+  	 	month =            "",
+	   	year =             "2023",
+	   	revision =         "",
+	   	series =           "Computer science",
+	   	editionnumber =    "1",
+	   	isbn =             "978-1-032-26465-3",
     }
     
      @BOOK{embeded_robotics,
-    	author =       "Braunl, Thomas",
-    	title =        "Embedded Robotics: From Mobile Robots to Autonomous Vehicles with Raspberry Pi and Arduino",
-    	publisher =    "Springer",
-    	edition =      "Fourth edition",
-    	year =         "2022",
-    	isbn =         "9811608032",
+  		author =           "Braunl, Thomas",
+    	title =            "Embedded Robotics: From Mobile Robots to Autonomous Vehicles with Raspberry Pi and Arduino",
+    	edition =          "Fourth edition",
+    	address = 	       "Singapore",
+    	publisher =        "Springer",
+    	month =            "",
+    	year =             "2022",
+    	revision =         "",
+    	series =           "",
+    	editionnumber =    "",
+    	isbn =             "9811608032",
     }
     
-
+    @InBook{slam,
+    	author =           "Perera, Samunda and Barnes, Nick and Zelinsky, Alexander",
+    	title =            "Exploration: Simultaneous Localization and Mapping (SLAM)",
+    	editor =           "Ikeuchi, Katsushi",
+    	booktitle =        "Computer Vision: A Reference Guide",
+    	edition =          "",
+    	version =          "",
+    	address =          "Cham",
+    	publisher =        "Springer International Publishing",
+    	month =            "",
+    	year =             "2021",
+    	volume =           "",
+    	number =           "",
+    	pages =            "412--420",
+    	revised =          "",
+    	editionnumber =    "",
+    	isbn =             "978-3-030-63416-2",
+    }
+    
     @webpage{dc_motor,
-    	author = 	"{Al-Naib, Ahmed}",
-       	title = 	"DC Motors",
-	   	howpublished = "online",
-	   	publisher =    "researchgate",
-    	year = 		"2019",
-		month =		"05",
- 		url = 		"https://www.researchgate.net/publication/332835517",
-	   	cited =        "2023-31-12"
+    	author = 	       "{Al-Naib, Ahmed}",
+    	secondarytitle =   "DC Motors",
+       	title = 	       "researchgate",
+	   	howpublished =     "online",
+	   	day =              "",
+		month =		       "05",
+    	year = 		       "2019",
+    	revised =          "",
+    	doi =              "",
+    	issn =             "",	
+ 		url = 		       "https://www.researchgate.net/publication/332835517",
+ 		path =             "",
     }
     
     @website{ros2_documentation,
 		author =       "Petr Sojka and others",
 		title =        "ROS 2 Documentation",
 		howpublished = "online",
-		url =          "https://docs.ros.org/en/rolling/index.html",
+		version =      "",
+		address =      "",
+		publisher =    "",
+		year = ;        "",
+		revised =      "",
 		cited =        "2023-11-12"
+		doi =          "",
+		issn =         "",
+		url =          "https://docs.ros.org/en/rolling/index.html",
+	}
+	
+ 	@website{nav2_documentation,
+		author =       "Macenski, Steven and Martin, Francisco and White, Ruffin and Ginés Clavero, Jonatan",
+		title =        "Nav 2 Documentation",
+		howpublished = "online",
+		version =      "",
+		address =      "",
+		publisher =    "",
+		year = ;        "",
+		revised =      "",
+		cited =        "2024-04-19"
+		doi =          "",
+		issn =         "",
+		url =          "https://navigation.ros.org/index.html",
+	}
+	
+	@unpublished{mems,
+		author =        "Matej Andrejašic",
+		title = 		"MEMS ACCELEROMETERS",
+		howpublished = 	"online",
+		edition =       "",
+		address =       "Ljubljana",
+		organization = 	"University of Ljubljana",
+		month =         "03",
+		year =          "2008",
+		revised =       "",
+		cited = 		"2024-04-17",
+		url = 			"https://public.websites.umich.edu/~bkerkez/courses/cee575/Handouts/5_adxl_theory.pdf"
 	}
 
+
 	@manual{um10204,
-		key = 			"NXP", 
-		organization = 	"NXP Semiconductors",
-		title = 		"I2C-bus specification and user manual", 
-		number = 		"um10204",
-		cited = 		"2023-11-12",
+		author =        "",
+		title = 		"I2C-bus specification and user manual",
 		howpublished = 	"online",
+		edition =       "7.0",
+		address =       "",
+		organization = 	"NXP Semiconductors",
+		key = 			"NXP",
+		month =         "",
+		year =          "1982",
+		revised =       "2021-10-01",
+		cited = 		"2023-11-12",
 		url = 			"https://www.nxp.com/docs/en/user-guide/UM10204.pdf"
 	}
 	
@@ -90,7 +164,6 @@
 		cited =        "2023-31-12"
 	}
 	
-
 	@webpage{diff_drive,
 		author = "{Wikipedia contributors}",
 		title = "Differential wheeled robot",
@@ -100,55 +173,3 @@
 		month = "02",
 		url = "https://en.wikipedia.org/w/index.php?title=Differential_wheeled_robot&oldid=1204597545",
 		cited = "2023-13-04"
-	}
-
-    @BOOK{Pravidla,
-      author =       "Zdeněk Hlavsa and others",
-      title =        "Pravidla českého pravopisu",
-      publisher =    "Academia",
-      edition =      "2",
-      year =         "2009",
-      isbn =         "80-200-1327-X",
-    }
-
-    @website{cstugWeb,
-      author =       "Petr Sojka and others",
-      title =        "Československé sdružení uživatelů {\TeX}u",
-      howpublished = "online",
-      url =          "http://www.cstug.cz",
-      cited =        "2019-10-02"
-    }
-
-    @webpage{fitWeb,
-      author =       "Zdena Rábová and Petr Hanáček and Petr Peringer and Petr Přikryl and Bohuslav Křena",
-      title =        "Užitečné rady pro psaní práce",
-      howpublished = "online",
-      publisher =    "FIT VUT v~Brně",
-      year =         "2008",
-      month =        11,
-      url =          "https://www.fit.vut.cz/study/theses/theses-advice/",
-      cited =        "2019-10-02"
-    }
-   
-    @MISC{biblio,
-      author =       "Olga Biernátová and Jan Skůpa",
-      title =        "Bibliografické odkazy a citace dokumentů",
-      howpublished = "online",
-      url =          "http://www.citace.com/download/CSN-ISO-690.pdf",
-      publisher =    "Citace.com",
-      month =        9,
-      address =      "Brno",
-      year =         "2011",
-      cited =        "2019-10-02"
-    }
-  
-    @MASTERSTHESIS{Pysny,
-      author = {Radek Py{\v{s}}n{\'{y}}},
-      type = {Bakal{\'{a}}{\v{r}}sk{\'{a}} pr{\'{a}}ce},
-      title = {BiBTeX styl pro {\v{C}}SN ISO 690 a {\v{C}}SN ISO	690-2},
-      school = {Vysok{\'{e}} u{\v{c}}en{\'{i}} technick{\'{e}} v Brn{\v{e}}, Fakulta informa{\v{c}}n{\'{i}}ch technologi{\'{i}}},
-      year = {2009},
-      location = {Brno, CZ},
-      language = {czech},
-      url = {https://www.fit.vut.cz/study/thesis/7848/}
-    }
