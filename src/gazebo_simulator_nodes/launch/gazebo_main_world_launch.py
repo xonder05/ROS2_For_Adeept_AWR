@@ -41,7 +41,7 @@ def generate_launch_description():
              '--service', '/world/empty/create', 
              '--reqtype', 'ignition.msgs.EntityFactory', 
              '--reptype', 'ignition.msgs.Boolean', 
-             '--timeout', '1000', 
+             '--timeout', '5000', 
              '--req', f'sdf_filename: "{urdf_model_path}", name: "adeept_awr"'],
         output='screen',
     )
