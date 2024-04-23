@@ -4,6 +4,7 @@ from PyQt5.QtGui import QPixmap, QImage, QColor
 from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QPainterPath
 from PyQt5.QtCore import Qt
 
+from ament_index_python.packages import get_package_share_directory
 import controllers.user_interface.global_variables
 
 import math
@@ -11,10 +12,11 @@ import math
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.workspace_path = get_package_share_directory('controllers')
         self.initUI()
 
     def initUI(self):
-        uic.loadUi('/home/daniel/ros2_ws/src/controllers/controllers/user_interface/ui.ui', self)
+        uic.loadUi(self.workspace_path + '/controllers/user_interface/ui.ui', self)
 
         self.gamepad_start_button.clicked.connect(lambda: self.node.gamepad_toggle(True))
         self.gamepad_stop_button.clicked.connect(lambda: self.node.gamepad_toggle(False))
@@ -31,7 +33,7 @@ class MainWindow(QMainWindow):
         self.camera_width = int(round((self.size().width() / 5) * 3, 0))
         self.camera_height = int((self.camera_width / 16) * 9)
 
-        self.video_stream_label.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/camera_placeholder.png").scaled(self.camera_width, self.camera_height))
+        self.video_stream_label.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/camera_placeholder.png").scaled(self.camera_width, self.camera_height))
         self.video_stream_label.setScaledContents(True)
 
         self.line_tracking_left_label.setPixmap(self.create_vector_image())
@@ -43,12 +45,12 @@ class MainWindow(QMainWindow):
         self.ultrasonic_distance_indicator.setFormat("")
 
         self.mic_state = "muted"
-        self.audio_microphone_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/mic_muted.svg").scaled(100, 100))
+        self.audio_microphone_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/mic_muted.svg").scaled(100, 100))
         self.audio_microphone_label_button.setCursor(Qt.PointingHandCursor)
         self.audio_microphone_label_button.mousePressEvent = self.audio_microphone_toggle
 
         self.speaker_state = "muted"
-        self.audio_speaker_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
+        self.audio_speaker_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
         self.audio_speaker_label_button.setCursor(Qt.PointingHandCursor)
         self.audio_speaker_label_button.mousePressEvent = self.audio_speaker_toggle
 
@@ -114,20 +116,20 @@ class MainWindow(QMainWindow):
         self.node.audio_microphone_toggle(self.mic_state)
 
         if self.mic_state == "muted":
-            self.audio_microphone_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/mic.svg").scaled(100, 100))
+            self.audio_microphone_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/mic.svg").scaled(100, 100))
             self.mic_state = "unmuted"
         else:
-            self.audio_microphone_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/mic_muted.svg").scaled(100, 100))
+            self.audio_microphone_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/mic_muted.svg").scaled(100, 100))
             self.mic_state = "muted"
 
     def audio_speaker_toggle(self, event):
         self.node.audio_speaker_toggle(self.speaker_state)
 
         if self.speaker_state == "muted":
-            self.audio_speaker_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/speaker.svg").scaled(100, 100))
+            self.audio_speaker_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/speaker.svg").scaled(100, 100))
             self.speaker_state = "unmuted"
         else:
-            self.audio_speaker_label_button.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
+            self.audio_speaker_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
             self.speaker_state = "muted"
 
     def showColorDialog(self):
