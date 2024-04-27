@@ -144,8 +144,13 @@
   keywords.en={Sem budou zapsána jednotlivá klíčová slova v anglickém jazyce, oddělená čárkami.}, % klíčová slova v anglickém jazyce / keywords in english
   %keywords.en={Here, individual keywords separated by commas will be written in English.},
   % Abstrakt / Abstract
-  abstract.cs={Tato práce se zabývá middlewarem ROS2 a konkrétně je jejím cílem prozkoumat a demonstrovat možnosti tohoto systému. V práci byl vytvořen systém k ovládání rozšířeného robota Adeept AWR. Kromě čistého ROS2 se práce také zabývá souvisejícími technologiemi jako Gazebo Simulátor do kterého byl přenesen fyziký robot a mapováním s navigací pomocí slam\_toolbox a navigation2.}, % abstrakt v českém či slovenském jazyce / abstract in czech or slovak language
-  abstract.en={Do tohoto odstavce bude zapsán výtah (abstrakt) práce v anglickém jazyce.}, % abstrakt v anglickém jazyce / abstract in english
+  abstract.cs={
+  	%Tato práce se zabývá middlewarem Robot Operating System 2. Konkrétně je jejím cílem prozkoumat a demonstrovat možnosti tohoto systému. V práci byl vytvořen systém k ovládání robota Adeept AWR. Kromě čistého ROS2 se práce také zabývá souvisejícími technologiemi. Jednou z nich je Gazebo Simulátor, do kterého byla zduplikována veškerá funkcionalita implementovaná pro fyzického robota. Adeept AWR byl také doplněn o rozšiřující hardware. S jeho pomocí byly použity knihovny slam\_toolbox a navigation2 pro zprovoznění mapování a navigace.
+  	}, % abstrakt v českém či slovenském jazyce / abstract in czech or slovak language
+  abstract.en={%todo do this later The main goal is to explore and demonstrate what this system can do. 
+  
+  %Apart from the main goal, the theesis also touches other related subjects. One of them is integration with Gazebo Simulator. All functionality implemented on real physical robot has been duplicated into simulator enviroment. The original Adeept AWR kit has been expanded with added hardware. This expansion allowed usage of libraries slam\_toolbox and navigation 2 to implement mapping and navigation.
+  }, % abstrakt v anglickém jazyce / abstract in english
   %abstract.en={An abstract of the work in English will be written in this paragraph.},
   % Prohlášení (u anglicky psané práce anglicky, u slovensky psané práce slovensky; u projektové praxe lze zakomentovat) / Declaration (for thesis in english should be in english; for project practice can be commented out)
   declaration={Prohlašuji, že jsem tuto bakalářskou práci vypracoval samostatně pod vedením pana X...

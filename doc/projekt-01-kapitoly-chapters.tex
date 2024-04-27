@@ -7,13 +7,12 @@
 %\begin{document}
 
 \chapter{Úvod}
-Tato práce se zabývá tematikou robotiky. Primárním zaměřením je systém pro řízení robotů jménem Robot Operating System 2. ROS2 jak z názvu vyplývá je již druhá verze těchto nástrojů. V minulosti se originální ROS stal de facto standardem pro vývoj softwaru k řízení robotů. Většina práce tedy řeší převážně softwarovou stranu této problematiky. Obor robotiky jako takový se však pohybuje velice blízko hardwaru a tak se tato práce dotýká také některých hardwarových konceptů a principů potřebných k pochopení fungování použitých komponent.
+Tato práce se zabývá tematikou robotiky. Primárním zaměřením je systém pro řízení robotů jménem Robot Operating System 2. ROS2 jak z názvu vyplývá je již druhá verze těchto nástrojů. V minulosti se originální ROS stal de facto standardem pro vývoj softwaru k řízení robotů. Většina práce řeší softwarovou stranu této problematiky. Obor robotiky jako takový se však pohybuje velice blízko hardwaru a tak se tato práce dotýká také některých hardwarových konceptů a principů potřebných k pochopení použitých komponent.
 
-Jak už bylo zmíněno hlavním zaměřením práce je samotný ROS2. Hlavní část práce se tedy snaží demonstrovat funkcionalitu a možnosti tohoto middleware. Obsahem této části je tvorba systému, který bude využívat nástroje ROS2 k ovládání robota. Jako hardware nad kterým bude celá práce implementována byla zvolena stavebnice Adeept AWR 4WD. Kromě čistého ROS2 se práce zaměřuje také na související nástroje a systémy, které nějakým způsobem využívají nebo rozšiřují funkcionalitu ROS2. Prvním z nich je ros2\_control knihovna pro řízení robotů. Následně je zasaženo využití lidar seznoru pro mapování a navigaci robota v prostoru. Jako poslední se práce také dotýká Gazebo simulátoru, pro vývoj a testování softwaru před použitím přímo na hardwarovém robotu.
+Jak už bylo zmíněno, zaměřením práce je samotný ROS2. Hlavní část práce se tedy snaží demonstrovat funkcionalitu a možnosti tohoto middleware. Obsahem této části je tvorba systému, který bude využívat nástroje ROS2 k ovládání robota. Jako hardware, nad kterým bude celá práce implementována, byla zvolena stavebnice Adeept AWR 4WD. Kromě čistého ROS2 se práce zaměřuje také na související nástroje a systémy, které nějakým způsobem využívají nebo rozšiřují funkcionalitu ROS2. Prvním z nich knihovna ros2\_control, která má slouží k řízení pohybu robotů. Jako druhé práce demonstruje použití Gazebo simulátoru, pro vývoj a testování softwaru bez potřeby disponovat reálným robotem. Posledním rozšířením je využití lidar senzoru pro mapování a navigaci robota v prostoru.
 
-První polovina této dokumentace se zaměřuje na vysvětlení teoretičtějších konceptů souvisejících s danou problematikou. Nejprve se zaměřuje na použitý hardware a principy fungování jednotlivých komponent. Následně přechází na samotný ROS2. Tato část se první podívá na to co ROS2 vlastně je a jak vnitřně funguje. Následně jsou pak vysvětleny koncepty, které používají vývojáři při interakci a vývoje výsledného ROS2 systému. Na konci teoretické části jsou ještě vysvětleny principy související s rozšířeními. 
-Začátek praktické části nejprve ukazuje část výsledného systému která je implementována pouze s využitím ROS2. Zde se projdou uzly pro ovládání hardwarových komponent a vyšší uzly pro řízení celého robota. 
-Dále pak následují jednotlivá rozšíření. Je zde zaměření na řízení motorů pomocí ros2\_control, zprovoznění simulátoru a přemostění aby mohly ros2 uzly řídit model v simulátoru. A jako poslední se řeší nastavení a získání potřebných dat ze zbytku ros2 systému pro úspěšné mapování a navigaci.
+První polovina této dokumentace se zaměřuje na vysvětlení teoretičtějších konceptů souvisejících s danou problematikou. Nejprve se představuje použitý hardware a principy fungování jednotlivých komponent. Následně přechází na samotný ROS2. Tato část se nejprve podívá na to, co ROS2 vlastně je a jak vnitřně funguje. Následně jsou vysvětleny koncepty, které používají vývojáři při interakci a vývoji ROS2 systému. Konec teoretické části se zaměřuje na rozšíření.
+Obsahem druhé poloviny je představení vytvořeného ROS2 systému se zaměřením na praktické ukázky použití jednotlivých ROS2 funkcionalit. Tato polovina je také rozdělena na dvě části. V té první je celé zaměření na čistý ROS2. Probírají se zde jednotlivé uzly pro ovládání hardwaru, ale také řídící uzly pro ovládání robota jako celku. Druhá část se zaměří na obohacení tohoto systému o další související a kompatibilní nástroje. Jejím obsahem je zprovoznění těchto nástrojů a následné propojení s ROS2.
 
 \chapter{Použitý Hardware}
 ROS2 je nástroj sloužící k tvorbě robotických aplikací. Z toho důvodu je k demonstraci jeho možností vyžadováno použití nějakého fyzického robota, nad kterým bude aplikace implementována. V této práci byl jako demonstrační robot použit model Adeept AWR 4WD. Z této stavebnice pochází většina komponentů. V pozdější fázi byl tento základ rozšířen o další rozšiřující hardware. Ten byl následně použit k demonstraci pokročilejších konceptů. Mozkem robota je mikropočítač Raspberry Pi 4.
@@ -24,48 +23,47 @@ V první sekci budou představeny obecné hardwarové technologie. Jedná se o r
 \subsection*{Pulzně šířková modulace} 
 Umožňuje vytvořit pseudo-analogový výstupní signál na číslicových pinech mikrokontroleru. Mikrokontroléry jsou digitální zařízení a chtěly by tedy s okolním světem komunikovat pomocí jedniček a nul. Reálný svět tak ovšem nefunguje a proto je často potřeba převádět výstup z mikrokontroléru na analogový signál. Problém je v tom, že převod digitálního signálu na analogový je relativně dlouhá a neefektivní operace. Proto vznikla pulzně šířková modulace (PWM), která umožňuje relativně jednoduše simulovat analogový výstup.
 
-PWM využívá toho, že člověk nedokáže rozpoznat rychlé změny, například led dioda blikající na frekvenci 5000 Hz se člověku jeví jako by svítila permanentně. Mechanická zařízení také mívají relativně velkou latenci a dc motoru tedy nevadí, že místo konstantního analogového napětí dostává periodický číslicový signál.
-
-\newpage
+PWM využívá toho, že člověk nedokáže rozpoznat rychlé změny, například led dioda blikající na frekvenci 5000 Hz se člověku jeví jako by svítila permanentně. Mechanická zařízení také mívají relativně velkou latenci a stejnosměrnému motoru tedy nevadí, že místo konstantního analogového napětí dostává periodický číslicový signál.
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=1.1]{obrazky-figures/pwm_duty_cycle.pdf}
+	\includegraphics[scale=1.2]{obrazky-figures/pwm_duty_cycle.pdf}
 	\caption{PWM signál pro různé hodnoty střídy}
-	\label{}
+	\label{fig:pwm}
 \end{figure}
 
-Při pohledu na klasický digitální signál který rovnoměrně střídá vysokou a nízkou úroveň by šlo říci, že se jedná o PWM signál se střídou 50\%. Střída(duty cycle) udává poměr času, kdy je signál v logické jedničce, ku času, kdy je v nule. Součet těchto hodnot se musí rovnat délce jedné periody. Úpravou tohoto poměru lze simulovat analogový signál. \cite[str:~116-118]{embeded_robotics}
+Při pohledu na klasický digitální signál \ref{fig:pwm}, který rovnoměrně střídá vysokou a nízkou úroveň by šlo říci, že se jedná o PWM signál se střídou 50\%. Střída(duty cycle) udává poměr času, kdy je signál v logické jedničce, ku času, kdy je v nule. Součet těchto hodnot se musí rovnat délce jedné periody. Úpravou tohoto poměru lze simulovat analogový signál. \cite[str:~116-118]{embeded_robotics}
 
+\newpage
 \subsection*{I2C}
-Je synchronní sběrnice, která se vyznačuje svou jednoduchostí a nízkou cenou. Využívá dva vodiče SDA(serial data) a SCL(serial clock). Oba vodiče jsou připojeny k napájecímu napětí pomocí pull-up rezistoru a bez vlivu jiného hardwaru zůstávají v logické jedničce. Zařízení, která jsou na tuto sběrnici připojeny, využívají open drain k úpravě aktuální napěťové úrovně. I2C pracuje s dvěma druhy zařízení, master a slave. Master zahajuje, řídí a ukončuje komunikaci na vodiči SDA. Po dobu průběhu komunikace také generuje hodinový signál na SCL. Typicky se jedná o mikrokontroler. Slave jsou pak ostatní zařízení s nimiž může master komunikovat, typicky různé periferie. \cite[str:~88]{embeded_robotics}
+Je synchronní sběrnice, která se vyznačuje svou jednoduchostí a nízkou cenou. Využívá dva vodiče SDA(serial data) a SCL(serial clock). Oba vodiče jsou připojeny k napájecímu napětí pomocí pull-up rezistoru. Bez vlivu jiného hardwaru zůstává jejich logická hodnota v jedničce. Zařízení, která jsou na tuto sběrnici připojeny, využívají open drain \ref{fig:open_drain} k úpravě aktuální napěťové úrovně. I2C pracuje s dvěma druhy zařízení, master a slave. Master zahajuje, řídí a ukončuje komunikaci na vodiči SDA. Po dobu průběhu komunikace také generuje hodinový signál na SCL. Typicky se jedná o mikrokontroler. Slave jsou pak ostatní zařízení s nimiž může master komunikovat, typicky různé periferie. \cite[str:~88]{embeded_robotics}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=1]{obrazky-figures/open_drain.pdf}
 	\caption{Open drain}
-	\label{}
+	\label{fig:open_drain}
 \end{figure}
 
-Přenos jednoho datového rámce zahájí master zařízení přivedením datové sběrnice do nuly. Následující komunikace se skládá z odeslání rámce o délce osmi bitů a potvrzení o úspěšném přenosu dat od přijímajícího zařízení. Toto potvrzení se nazývá ACK a je provedeno podržením datové sběrnice v hodnotě nula po dobu jednoho taktu. Opačný stav se nazývá NACK a indikuje že nastala chyba. Ukončení přenosu je provedeno navrácením datové sběrnice na hodnotu jedna. \cite{um10204}
+Přenos jednoho datového rámce zahájí master zařízení přivedením datové sběrnice do nuly. Následující komunikace se skládá z odeslání rámce o délce osmi bitů a potvrzení o úspěšném přenosu dat od přijímajícího zařízení. Toto potvrzení se nazývá ACK a je provedeno podržením datové sběrnice v hodnotě nula po dobu jednoho taktu. Opačný stav se nazývá NACK a indikuje že nastala chyba. Ukončení přenosu je provedeno navrácením datové sběrnice na hodnotu jedna. \cite[str:~8-10]{um10204}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/i2c_data_word.pdf}
 	\caption{Datové slovo sběrnice I2C}
-	\label{}
+	\label{fig:i2c_word}
 \end{figure}
 
-Na obrázku lze vidět, jak může vypadat přenos jednoho datového slova. V prvním rámci je přenesena sedmi bitová adresa, identifikující slave zařízení se kterým chce máster navázat komunikaci. Osmý bit datového rámce indikuje směr, kterým budou posílány data. V druhém rámci dojde k adresaci konkrétního registru na slave zařízení. A ve třetím, případně dalších, již probíhá samotné posílání dat mezi zařízeními. \cite{an4481}
+Na obrázku \ref{fig:i2c_word} lze vidět, jak může vypadat přenos jednoho datového slova. V prvním rámci je přenesena sedmi bitová adresa, identifikující slave zařízení se kterým chce máster navázat komunikaci. Osmý bit datového rámce indikuje směr, kterým budou posílány data. V druhém rámci dojde k adresaci konkrétního registru na slave zařízení. A ve třetím, případně dalších, již probíhá samotné posílání dat mezi zařízeními. \cite[str:~3, 5]{an4481}
 
 \section{Adeept AWR 4WD}
 Tato sekce se již zaměří na použitého robota a konkrétně na komponenty, které jej tvoří. U každé součástky je cílem vysvětlit princip jejího fungování z teoretičtějšího pohledu. A také poukázat její účel na tomto konkrétním robotu.
 
 \subsection*{Robot HAT}
-HAT(hardware attached on top) je hardwarová deska, která slouží k rozšíření funkcionality mikrokontroléru. Tato konkrétní se k Raspberyy Pi připojuje pomocí GPIO(general purpuse input outpu) pinů. Deska jako taková obsahuje rozšiřující čipy a rozhraní sloužící k ovládání připojených periferií.
+HAT(hardware attached on top) je hardwarová deska, která slouží k rozšíření funkcionality mikrokontroléru. Tato konkrétní, se k Raspberyy Pi připojuje pomocí GPIO(general purpuse input outpu) pinů. Deska jako taková obsahuje rozšiřující čipy a rozhraní sloužící k ovládání připojených periferií.
 
 \begin{itemize}
-	\item{PCA9685 \cite{pca9685}}
+	\item{PCA9685 \cite[str:~2]{pca9685}}
 	\begin{itemize}
 		\item{generátor PWM signálu}
 		\item{16 kanálů}
@@ -75,7 +73,7 @@ HAT(hardware attached on top) je hardwarová deska, která slouží k rozšíře
 	\item{L298P \cite{l298}}
 	\begin{itemize}
 		\item{ovladač pro řízení dc motoru}
-		\item{základem je full bridge obvod}
+		\item{základem je full bridge obvod, obr: \ref{fig:full_bridge}}
 		\item{umožňuje roztočit motor oběma směry}
 		\item{pomocí PWM lze ovládat rychlost motorů}
 		\item{připojuje motor na externí napájení}
@@ -86,152 +84,146 @@ HAT(hardware attached on top) je hardwarová deska, která slouží k rozšíře
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/motor_full_bridge.pdf}
-	\caption[Full bridge ovladač motoru.]{Full bridge konfigurace pro ovládání motoru. In1 a In2 určují směr otáčení. EnA je PWM signál určující rychlost otáčení. \cite{l298}}
-	\label{}
+	\caption[Full bridge ovladač motoru.]{Full bridge konfigurace pro ovládání motoru. In1 a In2 určují směr otáčení. EnA je PWM signál určující rychlost otáčení. \cite[str:~1]{l298}}
+	\label{fig:full_bridge}
 \end{figure}
 
-\subsection*{DC Motor}
+\newpage
+\subsection*{Stejnosměrný motor}
 Pohyb celého autíčka zajišťují čtyři stejnosměrným proudem(direct current) napájené motory. Ovladač motorů L298P je umístěný na Robot HAT.
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.50]{obrazky-figures/dc_motor.pdf}
+	\includegraphics[scale=0.5]{obrazky-figures/dc_motor.pdf}
 	\caption{Schéma DC motoru}
-	\label{}
+	\label{fig:dc_motor}
 \end{figure}
 
-Elektrický DC motor se skládá ze dvou hlavních částí, stator a rotor. Stator je statická, vnější část, a typicky se jedná o permanentní magnet. Uvnitř statoru se pak nachází rotor, ten se skládá z elektromagnetů, které při zapnutí reagují se statorem(opačné póly se přitahují a stejné odpuzují) a dojde tak k částečnému pootočení. Při správném spínání a vypínání těchto elektromagnetů lze motor rozběhnout. 
-Toto střídání zajišťuje prstenec zvaný komutátor. Komutátor je rozdělen na několik od sebe odizolovaných částí, ke kterým jsou připojeny vývody elektromagnetů. S povrchem prstence jsou pomocí pružin v kontaktu dva kartáče. Tyto kartáče se již neotáčí a mohou tak být připojeny na zdroj napájení a zem. Komutátor se otáčí společně s rotorem a při tomto pohybu se kartáče postupně dotýkají různých částí komutátoru a spínají tak jednotlivé elektromagnety, ty zajistí pootočení rotoru a sepnutí následujícího magnetu. \cite{dc_motor}
+Elektrický DC motor \ref{fig:dc_motor} se skládá ze dvou hlavních částí, stator a rotor. Stator je statická, vnější část, a typicky se jedná o permanentní magnet. Uvnitř statoru se pak nachází rotor, ten se skládá z elektromagnetů, které při zapnutí reagují se statorem(opačné póly se přitahují a stejné odpuzují) a dojde tak k částečnému pootočení. Při správném spínání a vypínání těchto elektromagnetů lze motor rozběhnout. 
+Toto střídání zajišťuje prstenec zvaný komutátor. Komutátor je rozdělen na několik od sebe odizolovaných částí, ke kterým jsou připojeny vývody elektromagnetů. S povrchem prstence jsou pomocí pružin v kontaktu dva kartáče. Tyto kartáče se již neotáčí a mohou tak být připojeny na zdroj napájení a zem. Komutátor se otáčí společně s rotorem a při tomto pohybu se kartáče postupně dotýkají různých částí komutátoru a spínají tak jednotlivé elektromagnety, ty zajistí pootočení rotoru a sepnutí následujícího magnetu. \cite[std:~28-36]{mobilní_roboty}
 
 \subsubsection{Robot s diferenciálním podvozkem}
 Tento konkrétní robot disponuje čtyřmi těmito motory. Ty jsou pevně připevněny k tělu robota. Z toho důvodu je zatáčení realizováno diferenciálním způsobem. Tento přístup využívá toho, že motory nejsou na sobě navzájem závislé a můžou se tedy otáčet různými rychlostmi. Pokud se kola na jedné straně robota otáčejí rychleji, urazí větší vzdálenost. Z toho pak vyplývá, že výsledné trajektorie již nejsou dvě rovnoběžky, ale soustředné kružnice. V porovnání s ostatními přístupy pro realizaci pohybu robota se jedná o konstrukčně jednodušší řešení, protože nevyžaduje natáčení kol do stran. Další výhodou je možnost otáčení robota na místě.
 
 \subsection*{Servo}
-Servo je komponenta na první pohled velmi podobná DC Motoru. Na rozdíl od něj se však neotáčí donekonečna, ale bývá omezena nějakým úhlem, například 180 stupňů. Hlavní výhodou a důvodem pro použití serva je plná kontrola nad úhlem natočení jeho hřídele.\cite[str:~119-121]{embeded_robotics}
+Servo je komponenta na první pohled velmi podobná stejnosměrnému motoru. Na rozdíl od něj se však neotáčí donekonečna, ale bývá omezena nějakým úhlem, například 180 stupňů. Hlavní výhodou a důvodem pro použití serva je plná kontrola nad úhlem natočení jeho hřídele.\cite[str:~119-121]{embeded_robotics}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.9]{obrazky-figures/servo.pdf}
 	\caption{Vnitřní zapojení serva}
-	\label{}
+	\label{fig:servo}
 \end{figure}
 
-Při pohledu na vnitřní zapojení serva lze zjistit, že se prakticky jedná o klasický dc motor připojený na převodovku a rozšířený o elektroniku na jeho řízení. K nastavení úhlu serva se využívá PWM signál. Ten je první přeložen na napěťovou úroveň, která je porovnána s aktuálním natočením serva a výsledek udává směr, kterým se bude otáčet motor. Aktuální natočení serva je získáno využitím potenciometru zapojeného na výstupní hřídel serva.%todo find better citation
+Při pohledu na vnitřní zapojení serva \ref{fig:servo} lze zjistit, že se prakticky jedná o klasický stejnosměrný motor připojený na převodovku a rozšířený o elektroniku na jeho řízení. K nastavení úhlu serva se využívá PWM signál. Ten je první přeložen na napěťovou úroveň, která je porovnána s aktuálním natočením serva a výsledek udává směr, kterým se bude otáčet motor. Aktuální natočení serva je získáno využitím potenciometru zapojeného na výstupní hřídel serva. \cite[str:~89-90]{mobilní_roboty}
 
 \subsection*{Ultrazvukový senzor hloubky} \label{theory:ultrasonic}
-V podstatě se jedná o sonar. Slouží k určení vzdálenosti. Senzor zahajuje měření po přijetí pulzu na trig pinu. Následně je odesláno 8 pulzů na frekvenci 40Hz. Výsledkem měření je časový interval mezi odesláním pulzu a přijetím ozvěny. Tato informace se předává zpět nastavením echo pinu do hodnoty jedna na dobu rovnou výsledku měření. \cite[str:~93]{embeded_robotics}
+V podstatě se jedná o sonar \ref{fig:ultrasonic}. Slouží k určení vzdálenosti. Senzor zahajuje měření po přijetí pulzu na trig pinu. Následně je odesláno 8 pulzů na frekvenci 40Hz. Výsledkem měření je časový interval mezi odesláním pulzu a přijetím ozvěny. Tato informace se předává zpět nastavením echo pinu do hodnoty jedna na dobu rovnou výsledku měření. \cite[str:~93]{embeded_robotics}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/ultrasonic.pdf}
 	\caption{Ultrazvukový senzor}
-	\label{}
+	\label{fig:ultrasonic}
 \end{figure}
 
 Pro výpočet vzdálenosti lze využít následující vzorec:
 
-$$S = \frac{(T_2 - T_1) * V_S}{2}$$
+\begin{equation}
+	S = \frac{(T_2 - T_1) * V_S}{2}
+\end{equation}
 
 Kde $T_1$ je moment vyslání pulzu, $T_2$ moment zachycení ozvěny a $V_S$ rychlost šíření zvuku ve vzduchu (cca 340m/s). Výsledek se pak dělí dvěma, protože doba $T_2 - T_1$ je rovna času k překážce a zpět.
 
 \subsection*{Třícestný senzor pro sledování čáry}
-Modul využívá fakt, zě intenzita světla odraženého od povrchu je závislá na barvě dané plochy. Například černá barva pohltí téměř veškeré světlo, naopak bílá téměř vše odrazí. Používáno je infračervené záření, protože není ovlivněno okolními zdroji světla, odráží se od velkého množství materiálů a je přesné. Jedná se o třícestný modul a skládá se tedy ze setu tří vysílačů a senzorů. Pokud vysílač svítí a senzor nezaznamenává dostatečnou intenzitu odraženého světla, znamená to, že byla nalezena černá čára. \cite{embeded_robotics}
+Modul využívá fakt, zě intenzita světla odraženého od povrchu je závislá na barvě dané plochy. Například černá barva pohltí téměř veškeré světlo, naopak bílá téměř vše odrazí. Používáno je infračervené záření, protože není ovlivněno okolními zdroji světla, odráží se od velkého množství materiálů a je přesné. Jedná se o třícestný modul a skládá se tedy ze setu tří vysílačů a senzorů. Pokud vysílač svítí a senzor nezaznamenává dostatečnou intenzitu odraženého světla, znamená to, že byla nalezena černá čára. \cite[str:~115, 148]{mobilní_roboty}
 
 \subsection*{WS2812 RGB LED}
-V nejjednodušším případě jsou diody k mikrokontroleru připojeny napřímo pomocí GPIO pinů. Při použití většího počtu ledek se tento přístup stává nepoužitelným. Jedním z řešení je použití WS2812. Jedná se o druh adresovatelných led diod. Tento přistup umožňuje připojit několik set diod pomocí pouze tří vodičů. Konkrétně je použit jeden datový vodič, napájení a země.\cite{ws2812}
+V nejjednodušším případě jsou diody k mikrokontroleru připojeny napřímo pomocí GPIO pinů. Při použití většího počtu ledek se tento přístup stává nepoužitelným. Jedním z řešení je použití WS2812. Jedná se o druh adresovatelných led diod. Tento přistup umožňuje připojit několik set diod pomocí pouze tří vodičů. Konkrétně je použit jeden datový vodič, napájení a země.\cite[str:~2]{ws2812}
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[scale=0.55]{obrazky-figures/ws2812_led.pdf}
+	\includegraphics[scale=0.6]{obrazky-figures/ws2812_led.pdf}
 	\caption{Komunikační protokol pro WS2812 led}
-	\label{}
+	\label{fig:ws2812_protocol}
 \end{figure}
 
-Diody jsou na pásku zapojeny sériově. Každá dioda má DIN a DO port. Pokud dioda přijme data, která jí nejsou určená, přeposílá je dále. Komunikace vždy začíná klidovým stavem, datový vodič je v nule. Datové slovo se skládá z 24 bitových bloků. Jeden pro každou diodu. Blok obsahuje tři osmi bitové hodnoty. Jednu pro každou barevnou složku (MSB je posíláno první). Diody pak fungují tak, že přijmou prvních 24 bitů, podle kterých nastaví svou barvu. Tuto část odeberou z datového slova a zbytek přeposílají na výstup. \cite{ws2812}
+Diody jsou na pásku zapojeny sériově. Každá dioda má DIN a DO port. Komunikace \ref{fig:ws2812_protocol} vždy začíná klidovým stavem, datový vodič je v nule. Datové slovo se skládá z 24 bitových bloků. Jeden pro každou diodu. Blok obsahuje tři osmi bitové hodnoty. Jednu pro každou barevnou složku (MSB je posíláno první). Diody pak fungují tak, že přijmou prvních 24 bitů, podle kterých nastaví svou barvu. Tuto část odeberou z datového slova a zbytek přeposílají na výstup. \cite[str:~4]{ws2812}
 
-\section{Rozšíření Hardware komponent}
+\section{Rozšiřující hardware komponenty}
 V minulé sekci byly představeny ty komponenty, které jsou součástí Adeept Kitu. V průběhu vývoje ROS2 systému se objevovaly požadavky na další rozšíření, které by dokázaly vylepšit výsledný produkt. Proto bylo originální hardwarové vybavení doplněno o následující komponenty.
 
 \subsection*{Inertial measurement unit}
 Jedná se o druh senzoru, jehož úkolem je určování orientace a pozice v prostoru. Použitý IMU disponuje třemi senzory. Pro měření rotace je obsazen tříosý gyroskopem. Pro určení zrychlení, případně rychlosti, disponuje také tříosým akcelerometrem. Poslední funkcí tohoto senzoru je ještě zabudovaný teploměr. Ten však není v této práci použitý.
 
 \subsubsection*{MEMS}
-
-Pod pojmem gyroskop si snad každý představí mechanickou rotující součástku držící si svou orientaci. Tento přístup však nelze použít na miniaturních čipech IMU senzorů. MEMS je zkratka pro micro-electromechanical systems. Jak z názvu vyplývá jedná se o systémy využívající mechanické elementy ve velikostech typických pro elektronické součástky. Běžně se jedná o velikosti pod 100$\mu m$.
+Pod pojmem gyroskop si snad každý představí mechanickou rotující součástku, která udržuje svou orientaci. Tento přístup však nelze použít na miniaturních čipech IMU senzorů. MEMS je zkratka pro micro-electromechanical systems. Jak z názvu vyplývá jedná se o systémy využívající mechanické elementy ve velikostech typických pro elektronické součástky. Běžně se jedná o velikosti pod 100$\mu m$. \cite[str:~2-3]{mems_acc}
 
 \subsubsection*{Princip Akcelerometru}
-Následující obrázek zobrazuje vnitřní strukturu akcelerometru. Senzor se skládá ze dvou hlavních částí. Tou první je pohyblivé oranžové závaží. Protože má nezanedbatelnou hmotnost, je ovlivněno vnějšími vlivy. V případě, že se změní akcelerace působící na senzor, dojde také ke změně relativní pozice mezi tímto závažím a zbytkem senzoru. Tento pohyb je měřen a určuje výslednou akceleraci. Obě části, pohyblivá i statická obsahují desky, které tvoří části kondenzátorů. Při pohybu vnitřní části, dojde také k změně vzdálenosti mezi těmito deskami a tedy i změně kapacity kondenzátorů. \cite{mems}
+Následující obrázek \ref{fig:mems_acc} zobrazuje vnitřní strukturu akcelerometru. Senzor se skládá ze dvou hlavních částí. Tou první je pohyblivé oranžové závaží. Protože má nezanedbatelnou hmotnost, je ovlivněno vnějšími vlivy. V případě, že se změní akcelerace působící na senzor, dojde také ke změně relativní pozice mezi tímto závažím a zbytkem senzoru. Tento pohyb je měřen a určuje výslednou akceleraci. Obě části, pohyblivá i statická, obsahují desky, které tvoří části kondenzátorů. Při pohybu vnitřní části, dojde ke změně vzdálenosti mezi deskami a tedy i změně kapacity kondenzátorů. \cite[str:~4-5]{mems_acc}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.8]{obrazky-figures/accelerometer.pdf}
 	\caption{Vnitřní struktura MEMS akcelerometru}
-	\label{}
+	\label{fig:mems_acc}
 \end{figure}
 
-Základní rovnice pro výpočet kapacity je následující:
-$$C = \epsilon \frac{A}{d}$$
-Kde $C$ je výsledná kapacita, $A$ plocha desek $\epsilon$ permitivita prostředí mezi nimi a $d$ jejich vzdálenost.
-
-Statické desky jsou zapojeny střídavě a rozdíl mezi jejich kapacitami pak odpovídá posunutí vnitřní části.
-$$x \approx d \frac{\Delta C}{C_0}$$
-
 \subsubsection{Princip Gyroskopu}
-MEMS gyroskop využívá podobné principy jako akcelerometr. Skládá se ze dvou částí, vnitřní a vnější(senzorický) rám. Ve vnitřním rámu je umístěno pohyblivé závaží. Na rozdíl od akcelerometru není tato část v klidovém stavu statická ale je rozvibrována do harmonické oscilace podél osy x.
-Vnitřní rám je celý umístěn pohyblivě, uvnitř senzorického rámu. V momentě kdy dojde k rotaci gyroskopu, bude si vnitřní oscilující část snažit držet svou orientaci. To způsobí pohyb celého vnitřního rámu podél osy y. Vnější a vnitřní rámy jsou stejně jako u akcelerometru obsazeny deskami kondenzátorů. Změna v jejich kapacitě je opět hlídána a přepočítána na rotaci.
+MEMS gyroskop \ref{fig:mems_gyro} využívá podobné principy jako akcelerometr. Skládá se ze dvou částí, vnitřní a senzorický rám. Ve vnitřním rámu je umístěno pohyblivé závaží. Na rozdíl od akcelerometru není tato část v klidovém stavu statická, ale je rozvibrována do harmonické oscilace podél osy x.
+Vnitřní rám je celý umístěn pohyblivě, uvnitř senzorického rámu. Když potom dojde k rotaci senzoru, bude vnitřní oscilující část držet svůj původní směr. To způsobí pohyb vnitřního rámu podél osy y. Vnější a vnitřní rámy jsou stejně jako u akcelerometru obsazeny deskami kondenzátorů. Změna v jejich kapacitě je opět hlídána a přepočítána na rotaci. \cite{mems_gyro}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.8]{obrazky-figures/gyroscope.pdf}
 	\caption{Vnitřní struktura MEMS gyroskopu}
-	\label{}
+	\label{fig:mems_gyro}
 \end{figure}
 
 \subsection*{Lidar}
-Principiálně se jedná o senzor podobný ultrazvukovému. Hlavním rozdílem je, že lidar používá pro měření laser. Data získaná lidarem tak bývají z pravidla přesnější oproti sonaru. Hlavní důvod přidání lidaru však není jeho vyšší přesnost. Tento konkrétní model totiž umožňuje měření v celých 360° okolo robota. Díky tomu lze data získaná z tohoto senzoru použít ka mapování a lokalizaci robota v prostoru.
+Principiálně se jedná o senzor podobný ultrazvukovému. Hlavním rozdílem je, že lidar používá pro měření laser. Data získaná lidarem tak bývají z pravidla přesnější oproti sonaru. Hlavní důvod přidání lidaru však není jeho vyšší přesnost. Tento konkrétní model totiž umožňuje měření v celých 360° okolo robota. Díky tomu lze data získaná z tohoto senzoru použít k mapování a lokalizaci robota v prostoru. \cite[str:~96-98]{embeded_robotics}
 
 \section{Raspberry Pi 4b}
-Jako mozek celého systému je použit mikropočítač Raspberry Pi. Konkrétně se jedná o verzi 4 model B s operační pamětí o velikosti čtyř gigabajtů. Tato verze disponuje 64bitovým procesorem, který je potřeba pro spuštění 64bitového Ubuntu serveru. Jedná se o doporučený operační systém pro běh ROS2 na platformě Raspberry Pi.
-Komunikace s většinou použitých periferií je uskutečněna pomocí General Purpuse Input Output(GPIO) pinů. Jedná se o číslicové vývody, které podle potřeby můžou fungovat jako vstup i výstup ze zařízení. Některé z nich pak mají ještě speciální funkce, například GPIO 2 a 3 můžou pracovat jako SDA a SCL připojení pro I2C komunikaci.
+Jako mozek celého systému je použit mikropočítač Raspberry Pi. Konkrétně verzi~4 model~B s~operační pamětí o velikosti čtyř gigabajtů. Tato verze disponuje 64bitovým procesorem, který je potřeba pro spuštění 64bitového Ubuntu serveru. Jedná se o doporučený operační systém pro běh ROS2 na platformě Raspberry Pi.
+Komunikace s většinou použitých periferií je uskutečněna pomocí General Purpuse Input Output(GPIO) pinů \ref{fig:rpi_gpio_pinout}. GPIO jsou číslicové vývody, které podle potřeby můžou fungovat jako vstup i výstup ze zařízení. Některé z nich pak mají ještě speciální funkce, například GPIO 2 a 3 můžou pracovat jako SDA a SCL připojení pro I2C komunikaci. \cite{rpi_documentation}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.15]{obrazky-figures/gpio_pinout.png}
-	\caption{GPIO pinout pro Raspberry Pi}
-	\label{}
+	\caption[GPIO pinout pro Raspberry Pi]{GPIO pinout pro Raspberry Pi, převzato z \cite{rpi_documentation}}
+	\label{fig:rpi_gpio_pinout}
 \end{figure}
 
 \subsection*{Kamera}
-Přímo k Rapsberry Pi je připojena oficiální camera module 3. Tento modul dokáže nahrávat video až v rozlišení 2304 × 1296 pixelů a 56 snímcích za vteřinu. \cite{rpi_camera}
+Přímo k Rapsberry Pi je připojena oficiální camera module 3. Tento modul dokáže nahrávat video až v rozlišení 2304 × 1296 pixelů a 56 snímcích za vteřinu. \cite{rpi_documentation}
 
 \chapter{Robot Operating System 2}
-Tato kapitola slouží k představení ROS2. Začátek se zaměří na vnitřní fungování systému. Následně budou představeny koncepty, na kterých je ROS2 postavený a které jsou potřebné pro vývoj aplikací nad tímto middlewarem. Závěr této kapitoly pak projde další části ROS2 jako nástroje příkazové řádky, spouštění uzlů a transformační subsystém.
-
-%todo Jako primární programovací jazyk byl zvolen python, protože je jedním z oficiálních jazyků podporovaných ROS2 a také jsou v něm implementovány potřebné knihovny pro ovládání periferií.
+Tato kapitola slouží k představení ROS2. Začátek se zaměří na vnitřní fungování systému. Následně budou představeny koncepty, na kterých je ROS2 postavený a které jsou potřebné pro vývoj aplikací používajících tento middleware. Závěr této kapitoly pak projde další části ROS2 jako nástroje příkazové řádky, spouštění uzlů a transformační subsystém.
 
 \section{Aktuální software}
 Robot Adeept AWR 4WD je dodáván s ukázkovým softwarem. Ten je implementován v jazyce Python a využívá knihovny třetích stran sloužící k nízkoúrovňovému ovládání hardwarových komponent. Aby byl robot responzivní je celá implementace řešena s použitím python modulů pro multithreading.
 
 \section{Seznámení s ROS2}
 ROS2 je middleware sloužící k vývoji a řízení robotů. Middleware je softwarová vrstva běžící nad operačním systémem. Jejím úkolem je rozšíření operačního systému o další funkcionalitu. Typickou součástí middlewaru bývají knihovny, ovladače, vývojové a monitorovací nástroje. Může také specifikovat doporučené metodologie pro vývoj. ROS2 je již druhá verze tohoto softwaru, která rozšiřuje a opravuje neduhy první verze. Původní ROS1 je považován za de-facto standart pro vývoj robotických aplikací.
-Tato práce využívá ROS2 distribuci jménem iron. Distribuce v ROS2 lze popsat jako set operačního systému, knihoven a dalších aplikací, které jsou otestovány a je zaručeno, že jsou navzájem kompatibilní. Velkou výhodou ROS je fakt, že se jedná o open source projekt. Díky tomu kolem něj vznikla velká komunita vývojářů, ale i firem a dalších institucí, které tvoří mnoho souvisejícího obsahu. Existuje tedy velké množství knihoven, dokumentací a návodů které usnadňují vývojářům práci. \cite{ros2_introduction}
+Tato práce využívá ROS2 distribuci jménem iron. Distribuce v ROS2 lze popsat jako set operačního systému, knihoven a dalších aplikací, které jsou otestovány a je zaručeno, že jsou navzájem kompatibilní. Velkou výhodou ROS je fakt, že se jedná o open source projekt. Díky tomu kolem něj vznikla velká komunita vývojářů, ale i firem a dalších institucí, které tvoří mnoho souvisejícího obsahu. Existuje tedy velké množství knihoven, dokumentací a návodů které usnadňují vývojářům práci. \cite[str:~1-5]{ros2_introduction}
 
 \subsection*{Vrstvy ROS2}
-Na nejvyšší úrovni, se nachází programátor, který interaguje s klientskými knihovnami pro vývoj ROS2 aplikací. Tyto knihovny jsou oficiálně dvě a to rclpy pro Python a rclcpp pro C++. Existují také implementace pro další programovací jazyky (rclc, java, C\#), které jsou udržovány komunitně. Všechny klientské knihovny pak využívají RCL. To je jádrem celého ROS a obsahuje implementaci všech ROS2 funkcionalit. Je napsáno v jazyce C a jeho součástí je rozhraní, pomocí kterého poskytuje svou funkcionalitu ostatním klientským knihovnám. Díky tomuto přístupu se uzly implementované v Pythonu budou chovat stejně jako ty implementované v C++. Z toho pak také vyplývá, že uzly implementované na různých klientských knihovnách spolu mohou bez problémů komunikovat.
-Poslední vrstvou je data distribution service. DDS je komunikační vrstva implementována na UDP protokolu sloužící k předávání informací mezi procesy. Má charakteristiky systémů reálného času, zajišťuje kvalitu a zabezpečení komunikace. Také umožňuje vyhledávání uzlů bez potřeby centralizovaného serveru (vyhledávání je realizováno s využitím multicastové komunikace, zprávy zasílané mezi jednotlivými uzly pak využívají klasický unicast). \cite{ros2_introduction}
+Na nejvyšší úrovni \ref{fig:ros_layers}, se nachází programátor, který interaguje s klientskými knihovnami pro vývoj ROS2 aplikací. Tyto knihovny jsou oficiálně dvě a to rclpy pro Python a rclcpp pro C++. Existují také implementace pro další programovací jazyky (rclc, java, C\#), které jsou udržovány komunitně. Všechny klientské knihovny pak využívají RCL. To je jádrem celého ROS a obsahuje implementaci všech ROS2 funkcionalit. Je napsáno v jazyce C a jeho součástí je rozhraní, pomocí kterého poskytuje svou funkcionalitu ostatním klientským knihovnám. Díky tomuto přístupu se uzly implementované v Pythonu budou chovat stejně jako ty implementované v C++. Z toho pak také vyplývá, že uzly implementované na různých klientských knihovnách spolu mohou bez problémů komunikovat.
+Poslední vrstvou je data distribution service. DDS je komunikační vrstva implementována na UDP protokolu sloužící k předávání informací mezi procesy. Má charakteristiky systémů reálného času, zajišťuje kvalitu a zabezpečení komunikace. Také umožňuje vyhledávání uzlů bez potřeby centralizovaného serveru (vyhledávání je realizováno s využitím multicastové komunikace, zprávy zasílané mezi jednotlivými uzly pak využívají klasický unicast). \cite[str:~13-15]{ros2_introduction}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/ros_layers.pdf}
 	\caption{Vrstvy ROS2 systému}
-	\label{}
+	\label{fig:ros_layers}
 \end{figure}
 
 \subsection*{Vývoj v ROS2}
-Nejvyšší organizační jednotkou v ROS2 je workspace. Jedná se o složku, která slouží k organizaci zdrojových souborů, jejich instalaci a následné spouštění. ROS2 jako takový se také kvalifikuje jako workspace a před použitím musí být nejprve aktivován. K tomu v linuxu slouží příkaz \verb|source|. Aktivace workspace je akumulativní, to znamená, že v jeden moment může být aktivních několik workspace najednou. Typicky se první aktivuje základní ROS2 instalace, která tvoří takzvanou underlay vrstvu. Vývojový workspace aktivovaný jako druhý, se pak nazývá overlay. Pokud má overlay nějaké závislosti, měly by být uspokojeny v underlay.
-Zdrojové soubory v rámci workspace jsou pak organizovány do balíků(packages). Balík může obsahovat zdrojové soubory, knihovny a definice zpráv. Balíky na sobě můžou navzájem záviset (například balík, který využívá konkrétní rozhraní, závisí na jiném který toto rozhraní definuje). \cite{ros2_introduction}
+Nejvyšší organizační jednotkou v ROS2 je pracovní plocha(workspace). Jedná se o složku, která slouží k organizaci zdrojových souborů, jejich instalaci a následné spouštění. ROS2 jako takový se také kvalifikuje jako pracovní plocha a před použitím musí být nejprve aktivován. K tomu v linuxu slouží příkaz \verb|source|. Aktivace pracovních ploch je akumulativní. To znamená, že v jeden moment jich může být aktivních hned několik najednou. Typicky se první aktivuje základní ROS2 instalace, která tvoří takzvanou underlay vrstvu. Vývojová pracovní plocha aktivována jako druhá, se pak nazývá overlay. Pokud má overlay nějaké závislosti, měly by být uspokojeny v underlay.
+Zdrojové soubory v rámci pracovní plochy jsou organizovány do balíků(packages). Balík může obsahovat zdrojové soubory, knihovny a definice zpráv. Balíky na sobě můžou navzájem záviset (například balík, který využívá konkrétní rozhraní, závisí na jiném který toto rozhraní definuje). \cite[str:~10-11]{ros2_introduction} 
 
-\begin{figure}[h]
+Následující strom zobrazuje typickou strukturu pracovní plochy a balíku:
+\begin{center}
 	\begin{forest}
 		for tree={
 			font=\ttfamily,
@@ -253,37 +245,35 @@ Zdrojové soubory v rámci workspace jsou pak organizovány do balíků(packages
 			before computing xy={l=15pt},
 		}
 		[Workspace
-			[build / install /log {\hspace{3em}\# složky generované při kompilaci}
-			]
-			[launch {\hspace{2.5em}\# globální spouštěcí soubory}
-			]
-			[src {\hspace{4em}\# balíky}
-				[package\_name {\hspace{2em}\#příklad jak vypadá python package}
-					[package\_name {\hspace{2em}\#zdrojové python soubory}
-					]
-					[config {\hspace{2.5em}\# konfigurační soubory}
-					]
-					[launch {\hspace{2.5em}\# spouštěcí soubory pro uzly balíku}
-					]
-					[resource
-					]
-					[test
-					]
-					[package.xml {\hspace{1em}\#metadata infromace o package}]
-					[setup.cfg {\hspace{2em}\#konfigurace pro manuální spouštění uzlu}]
-					[setup.py {\hspace{2.5em}\#instrukce pro kompilátor jak nainstalovat package}]
-				]
-			]
+		[build / install /log {\hspace{3em}\# složky generované při kompilaci}
+		]
+		[launch {\hspace{2.5em}\# globální spouštěcí soubory}
+		]
+		[src {\hspace{4em}\# balíky}
+		[package\_name {\hspace{2em}\#příklad jak vypadá python package}
+		[package\_name {\hspace{2em}\#zdrojové python soubory}
+		]
+		[config {\hspace{2.5em}\# konfigurační soubory}
+		]
+		[launch {\hspace{2.5em}\# spouštěcí soubory pro uzly balíku}
+		]
+		[resource
+		]
+		[test
+		]
+		[package.xml {\hspace{1em}\#metadata infromace o package}]
+		[setup.cfg {\hspace{2em}\#konfigurace pro manuální spouštění uzlu}]
+		[setup.py {\hspace{2.5em}\#instrukce pro kompilátor jak nainstalovat package}]
+		]
+		]
 		]
 	\end{forest}
-  	\caption{Struktura ROS2 Workspace}
-	\label{}
-\end{figure}
+\end{center}
 
 \subsubsection*{Node}
-Celý ROS2 systém je složený z uzlů (node), které mezi sebou navzájem komunikují. Každý uzel je vlastní výpočetní jednotka, která by měla plnit jeden specifický úkol. Tento přístup je podobný objektově orientovanému návrhu. Implementačně je uzel objekt, který dědí ze třídy \verb|Node|.
+Celý ROS2 systém je složený z uzlů (node), které mezi sebou navzájem komunikují. Každý uzel je vlastní výpočetní jednotka, která by měla plnit jeden specifický úkol. Tento přístup je podobný objektově orientovanému návrhu. Implementačně je uzel objekt, který dědí ze třídy \verb|Node|. \cite{ros2_documentation}
 Uzly v ROS2 většinou nepotřebují běžet permanentně, ale pouze v monentě, kdy nastane nějaká událost, kterou je potřeba obsloužit. Z toho důvodu existuje v ROS2 metoda \verb|spin()|, která uspí vykonávání uzlu, dokud jej není potřeba opět využít. Aby ROS2 šetřil výpočetní prostředky, využívá dva přístupy k určení, kdy bude potřeba uzel vzbudit. Prvním je iterative execution. Ten se používá u uzlů, které vykonávají svou činnost pravidelně, na nějaké předem dané frekvenci. Příkladem může být uzel pro obsluhu senzoru. Ten se v pravidelných intervalech zaktivuje, získá nová data, nějakým způsobem je zpracuje a následně odešle dalším uzlům, které je potřebují pro jejich činnost.
-Druhým přístupem je event oriented execution. Zde je vyvolání řídícího cyklu důsledkem nějaké události. Typickou událostí je příchod zprávy od ostatních uzlů. Frekvenci spouštění těchto uzlů pak lze odvodit od frekvence příchozích zpráv. Příkladem může být uzel přijímající snímky z kamery na kterých provede výpočet a vrátí odpověď. Frekvence spuštění je dána příchozími snímky, pokud přestanou přicházet, uzel bude neaktivní. \cite{ros2_introduction} \cite{ros2_documentation}
+Druhým přístupem je event oriented execution. Zde je vyvolání řídícího cyklu důsledkem nějaké události. Typickou událostí je příchod zprávy od ostatních uzlů. Frekvenci spouštění těchto uzlů pak lze odvodit od frekvence příchozích zpráv. Příkladem může být uzel přijímající snímky z kamery na kterých provede výpočet a vrátí odpověď. Frekvence spuštění je dána příchozími snímky, pokud přestanou přicházet, uzel bude neaktivní. \cite[str:~6]{ros2_introduction}
 
 \begin{algorithm}[h!]
 	\label{}
@@ -315,15 +305,16 @@ Druhým přístupem je event oriented execution. Zde je vyvolání řídícího 
 	\texttt{rclpy.shutdown()}\;
 \end{algorithm}
 
+\newpage
 \subsubsection*{Interface}
 Jak už bylo řečeno tak uzly ROS2 systému spolu komunikují posíláním zpráv. Aby si uzly navzájem rozuměly, musí mít tyto zprávy stejnou strukturu. K tomuto účelu slouží rozhraní(interface). 
 
-ROS2 obsahuje mnoho již vytvořených a vývojáři po celém světě používaných formátů. Tento přístup podporuje znovupoužitelnost vytvořeného kódu a šetří práci. Díky tomu může být software pro ovládání konkrétního kusu hardware implementován pouze jednou s využitím standardního rozhraní a všichni ostatní jej pak mohou využít ve svých systémech. Pokud však standardní interface nevyhovuje potřebám, lze si implementovat vlastní. Více o definici vlastních rozhraní v %todo reference
+ROS2 obsahuje mnoho již vytvořených a vývojáři po celém světě používaných formátů. Tento přístup podporuje znovupoužitelnost vytvořeného kódu a šetří práci. Díky tomu může být software pro ovládání konkrétního kusu hardware implementován pouze jednou s využitím standardního rozhraní a všichni ostatní jej pak mohou využít ve svých systémech. Pokud však standardní interface nevyhovuje potřebám, lze si implementovat vlastní.\cite{ros2_documentation} Více o definici vlastních rozhraní na straně \pageref{theory:custom_interfaces}.
 
-V kódu má každé rozhraní vygenerovanou vlastní třídu sloužící k jeho reprezentaci. Instance této třídy jsou používány jako zprávy posílané mezi uzly. Data přenášená těmito zprávami se ukládají do atributů. Atributy těchto objektů mají strukturu danou originálním rozhraním.
+V kódu má každé rozhraní vygenerovanou vlastní třídu, která slouží k jeho reprezentaci. Instance této třídy jsou používány jako zprávy posílané mezi uzly. Data přenášená těmito zprávami se ukládají do atributů. Atributy těchto objektů mají strukturu danou originálním rozhraním.
 
 \subsubsection*{Topic}
-Je základním a také nejčastěji používaným způsobem pomocí kterého spolu ROS2 uzly komunikují. Topic si lze představit jako analogii hardwarové sběrnice. Prakticky se jedná o přesně pojmenované místo, do kterého může n uzlů posílat data (Publish) a m poslouchat co bylo posláno (Subscribe). Zprávy posílané do topicu mají přesný formát a jsou posílány asynchronně. Příkladem použití může být topic, do nějž posílá data uzel ovládající kameru a několik dalších uzlů které tyto data potřebují jej mohou číst. \cite{ros2_introduction}
+Je základním a také nejčastěji používaným způsobem pomocí kterého spolu ROS2 uzly komunikují. Topic si lze představit jako analogii hardwarové sběrnice. Prakticky se jedná o přesně pojmenované místo, do kterého může n uzlů posílat data (Publish) a m poslouchat co bylo posláno (Subscribe). Zprávy posílané do topicu mají přesný formát a jsou posílány asynchronně. Příkladem použití může být topic, do nějž posílá data uzel ovládající kameru a několik dalších uzlů které tyto data potřebují jej mohou číst. \cite[str:~6]{ros2_introduction}
 
 \begin{algorithm}[h!]
 	\label{}
@@ -343,7 +334,7 @@ Je základním a také nejčastěji používaným způsobem pomocí kterého spo
 	\Indp\Indp
 	\texttt{value = msg.item}\;
 \end{algorithm}
-Tento kód ukazuje, jak se může uzel přihlásit k odebírání zpráv z topicku. Nejprve je potřeba (typicky v konstruktoru třídy) zavolat zděděnou metodu sloužící k inicializaci nějaké ROS2 funkcionality. V tomto případě se jedná o \verb|create_subscription|. Jako parametry potřebuje jméno, interface, callback funkci a QoS profil. Callback funkce je volána když uzel příjme zprávu a jako parametr je jí předán objekt reprezentující přijatou zprávu. \cite{ros2_documentation}
+Tento kód ukazuje, jak se může uzel přihlásit k odebírání zpráv z topicku. Nejprve je potřeba (typicky v konstruktoru třídy) zavolat zděděnou metodu. V tomto případě se jedná o \verb|create_subscription|, která vytvoří subscription objekt. Jako parametry potřebuje jméno, interface, callback funkci a QoS profil. Callback funkce je volána když uzel příjme zprávu a jako parametr je jí předán objekt reprezentující přijatou zprávu. \cite{ros2_documentation}
 
 \begin{algorithm}[h!]
 	\label{}
@@ -366,7 +357,7 @@ Tento kód ukazuje, jak se může uzel přihlásit k odebírání zpráv z topic
 Odesílání zpráv do topicu je velmi podobné poslouchání. Jak bylo řečeno, zprávy jsou instance tříd reprezentující rozhraní. Proto je potřeba tuto instanci vytvořit, naplnit daty a následně předat metodě \verb|publish()| předem vytvořeného publisheru. \cite{ros2_documentation}
 
 \subsubsection*{Service}
-ROS2 služby(service) fungují na stejném principu jako klient--server komunikace známá z počítačových sítí. Jedná se tedy o synchronní komunikaci, kde jeden uzel poskytuje nějakou službu a ostatní si na ni mohou poslat požadavek. Od serverového uzlu se předpokládá okamžitá odpověď, aby nedošlo k narušení řídícího cyklu volajícího uzlu. \cite{ros2_introduction}
+ROS2 služby(service) fungují na stejném principu jako klient--server komunikace známá z počítačových sítí. Jedná se tedy o synchronní komunikaci, kde jeden uzel poskytuje nějakou službu a ostatní si na ni mohou poslat požadavek. Od serverového uzlu se předpokládá okamžitá odpověď, aby nedošlo k narušení řídícího cyklu volajícího uzlu. \cite[str:~6]{ros2_introduction}
 
 \begin{algorithm}[h!]
 	\label{}
@@ -425,8 +416,8 @@ Tento kód demonstruje vytvoření služby. Hlavní změnou oproti předchozím 
 Klient potřebuje pro své fungování již existující službu. Tato podmínka vyplývá z faktu, že služby jsou určeny k úkolům, které lze vykonat relativně rychle a odpovědět na požadavek v krátkém čase. Klientská strana proto čeká synchronně. V případě že by servis neexistoval, klient by se zasekl v nekonečném čekání. Proto je hned v konstruktoru implementována kontrola, které nedovolí vytvoření uzlu dokud není přítomen server. Čekání na odpověď od serveru, je pak implementována pomocí funkce \verb|spin_until_future_complete()| \cite{ros2_documentation}
 
 \newpage
-\subsubsection*{Action}
-Jedná se o rozšířenou verzi služeb. Akce z pravidla vykonává déle trvající požadavek. Například provedení řídícího manévru robota, který je prováděn v reálném světě a z pohledu uzlu se nejedná o krátkodobou záležitost. Akce, na rozdíl od služby, dokáže v průběhu vykonávání své činnosti odesílat průběžné aktualizace o aktuálním stavu zpět volajícímu uzlu. Implementačně akce funguje jako dvě služby a jeden topic. Cílová(goal) služba slouží k zaslání požadavku na server a jeho potvrzení. Výsledková(result) pak vrací výsledek operace. V průběhu akce pak server posílá aktualizace do topicu. \cite{ros2_introduction}
+\subsubsection*{Action} \label{theory:action}
+Jedná se o rozšířenou verzi služeb. Akce z pravidla vykonává déle trvající požadavek. Například provedení řídícího manévru robota, který je prováděn v reálném světě a z pohledu uzlu se nejedná o krátkodobou záležitost. Akce, na rozdíl od služby, dokáže v průběhu vykonávání své činnosti odesílat průběžné aktualizace o aktuálním stavu zpět volajícímu uzlu. \cite[str:~6]{ros2_introduction} Implementačně akce funguje jako dvě služby a jeden topic. Cílová(goal) služba slouží k zaslání požadavku na server a jeho potvrzení. Výsledková(result) pak vrací výsledek operace. V průběhu akce pak server posílá aktualizace do topicu. \cite{ros2_documentation}
 
 \begin{algorithm}[h!]
 	\label{}
@@ -487,6 +478,8 @@ Implementace akčního serveru kombinuje postupy představené u služeb a topic
 	\Indm\Indm
     
 \end{algorithm}
+
+\newpage
 V porovnání s klientem služeb je ten akční výrazně složitější. Tento klient interaguje se serverem, který z pohledu uzlů vykonává velmi dlouhé úkoly. Komunikace je proto asynchronní a skládá se z několika callback funkcí. \cite{ros2_documentation}
 
 Prvním krokem je odeslání požadavku, to je podobné jako u služeb. Hlavním rozdílem je předání callback funkce pro zpětnou vazbu a pro odpověď na požadavek.
@@ -547,7 +540,7 @@ Zpracování odpovědi bývá vždy téměř totožné. Cílem je zjistit zda by
 \end{algorithm}
 Tyto bloky už pouze ukazují jak vypadají jednoduché funkce pro zpracování zpětné vazby a získání výsledku operace.
 
-\subsubsection*{Definice vlastních rozhraní} \label{todo}
+\subsubsection*{Definice vlastních rozhraní} \label{theory:custom_interfaces}
 Jak už bylo řečeno, ROS2 disponuje standardními rozhraními. Existují ale případy, kdy tyto rozhraní nevyhovují a je potřeba si vytvořit vlastní. Každý druh komunikace mezi uzly má svou vlastní příponu pro definování rozhraní. \cite{ros2_introduction}
 
 Prvním jsou \verb|.msg| zprávy. Tento formát je využívám topicy. Jedná se o seznam, kde je každá položka definována jako dvojice datový typ a název (případně komentář).
@@ -574,7 +567,7 @@ Poslední je \verb|.action| soubor. Slouží pro komunikaci mezi akčním server
 \end{verbatim}
 
 \subsubsection*{Parametry}
-ROS2 uzly mohou definovat parametry. V základu fungují jako argumenty funkcí. Umožňují předat dynamické hodnoty při spuštění uzlu. Příkladem může být uzel, sloužící k obsluze periferního zařízení. Parametrem mu jsou předány čísla GPIO pinů, na které je dané zařízení připojeno. Tyto parametry jsou však pokročilejší. Každý uzel zdědí z \verb|Node| třídy set služeb. Ty lze volat za běhu uzlu a umožňují jednak získání aktuální hodnoty parametrů ale také je změnit. Následující kód demonstruje deklaraci a použití parametrů uvnitř uzlu. \cite{ros2_introduction}
+ROS2 uzly mohou definovat parametry. V základu fungují jako argumenty funkcí. Umožňují předat dynamické hodnoty při spuštění uzlu. Příkladem může být uzel, sloužící k obsluze periferního zařízení. Parametrem mu jsou předány čísla GPIO pinů, na které je dané zařízení připojeno. Parametry ROS2 uzlů jsou však pokročilejší. Každý uzel dědí z \verb|Node| třídy set služeb. Ty lze volat za běhu uzlu a umožňují jednak získat aktuální hodnoty parametrů ale také je změnit. Následující kód demonstruje deklaraci a použití parametrů uvnitř uzlu. \cite[str:~37-39]{ros2_introduction}
 
 \begin{algorithm}[h!]
 	\label{}
@@ -597,9 +590,8 @@ ROS2 uzly mohou definovat parametry. V základu fungují jako argumenty funkcí.
 	
 	\BlankLine
 	\tcp{nastavení hodnoty parametru}
-	\texttt{new\_param = rclpy.parameter.Parameter(}\;
+	\texttt{new\_param = rclpy.parameter.Parameter('parameter\_name',}\;
 	\Indp\Indp
-	\texttt{'parameter\_name',}\;
 	\texttt{rclpy.Parameter.Type.STRING,}\;
 	\texttt{'default\_parameter\_value'}\;
 	\Indm\Indm
@@ -610,11 +602,7 @@ ROS2 uzly mohou definovat parametry. V základu fungují jako argumenty funkcí.
 \end{algorithm}
 
 \subsubsection*{Konfigurační soubory}
-Cílem konfiguračních souborů je usnadnit předávání parametrů spouštěným uzlům. Jejich hlavní výhodou je schopnost nastavit velké množství parametrů  %todo do this shit later 
-
-Konfigurační soubory se typicky umisťují do složky \verb|config| v kořenovém adresáři balíku a používají formát \verb|.yaml|. 
-
-Následující kód demonstruje strukturu konfiguračních souborů.
+Konfigurační soubory v ROS2 slouží k usnadnění práce s parametry. Umožňují jednoduše předat větší množství parametrů najednou. Jeden konfigurační soubor může být předán více uzlům. Jeho obsahem jsou specifické parametry pro jednotlivé uzly, ale také univerzální použitelné pro všechny. Konfigurační soubory se typicky umisťují do složky \verb|config| v kořenovém adresáři balíku a používají formát \verb|.yaml|. Následující kód demonstruje strukturu konfiguračních souborů. \cite{ros2_documentation}
 
 \begin{algorithm}[h!]
 	\label{}
@@ -645,7 +633,7 @@ Následující kód demonstruje strukturu konfiguračních souborů.
 \end{algorithm}
 
 \subsubsection*{Launch File}
-ROS2 systém se skládá z velkého množství navzájem komunikujících uzlů. Spouštění každého uzlu zvlášť by bylo pracné a zdlouhavé. Proto existují spouštěcí(launch) soubory, které mají za úkol nastartovat ROS2 systém. Možnými formáty pro psaní těchto souborů jsou \verb|Python|, \verb|yaml| a \verb|xml|. V této práci jsou použité \verb|Python| spouštěcí soubory. Základní struktura těchto souborů je vždy stejná. Funkce, kterou musí každý definovat se jmenuje \verb|generate_launch_description|. Návratovou hodnotou je objekt \verb|LaunchDescription| jehož obsahem jsou jednotlivé cíle, které mají být vykonány. Následující kód obsahuje příklad jednoduchého spouštěcího souboru s dvěma cíli. Jedním z nich je klasické spuštění uzlu. Je mu předán parametr a jeden z jeho topiců je přemapován na jiné jméno. Přemapování je užitečná funkcionalita, která pomáhá s kompatibilitou uzlů. Druhý cíl pak volá jiný spouštěcí soubor. Běžně se spouštěcí soubory používají minimálně na dvou úrovních. Vyšší se nacházejí na úrovni workspace. Jejich cílem je spuštění větší části ROS2 systému. Používají k tomu volání nižších spouštěcích souborů. Ty se nacházejí na úrovni balíků. Mají za úkol spustit a nakonfigurovat konkrétní uzel. \cite{ros2_introduction}
+ROS2 systém se skládá z velkého množství navzájem komunikujících uzlů. Spouštění každého uzlu zvlášť by bylo pracné a zdlouhavé. Proto existují spouštěcí(launch) soubory, které mají za úkol nastartovat ROS2 systém. Možnými formáty pro psaní těchto souborů jsou \verb|Python|, \verb|yaml| a \verb|xml|. V této práci jsou použité \verb|Python| spouštěcí soubory. Základní struktura těchto souborů je vždy stejná. Funkce, kterou musí každý definovat se jmenuje \verb|generate_launch_description|. Návratovou hodnotou je objekt \verb|LaunchDescription| jehož obsahem jsou jednotlivé cíle, které mají být vykonány. Následující kód obsahuje příklad jednoduchého spouštěcího souboru se dvěma cíli. Jedním z nich je klasické spuštění uzlu. Je mu předán parametr a jeden z jeho topiců je přemapován na jiné jméno. Přemapování je užitečná funkcionalita, která pomáhá s kompatibilitou uzlů. Druhý cíl pak volá jiný spouštěcí soubor. Běžně se spouštěcí soubory používají minimálně na dvou úrovních. Vyšší se nacházejí na úrovni pracovní plochy. Jejich cílem je spuštění větší části ROS2 systému. Používají k tomu volání nižších spouštěcích souborů. Ty se nacházejí na úrovni balíků. Mají za úkol spustit a nakonfigurovat konkrétní uzel. \cite[str:~35-37]{ros2_introduction}
 
 \begin{algorithm}[h!]
 	\label{}
@@ -705,13 +693,14 @@ ROS2 systém se skládá z velkého množství navzájem komunikujících uzlů.
 		
 \end{algorithm}
 
+\newpage
 \subsection*{Nástroje příkazové řádky}
 Jak už bylo řečeno tak ROS2 systémy se skládají z velkého množství navzájem komunikujících uzlů. Taková struktura je vhodná na organizaci a modularitu. Naopak pro ladění chyb v rozsáhlejším systému by mohla být problematická. ROS2 proto disponuje sadou nástrojů, které mají za úkol pomoci vývojářům zjišťovat informace o právě běžících uzlech. Obecný formát volání je:
 \begin{verbatim}
 	ros2 [command] [sub_command]
 \end{verbatim}
 
-Názvy příkazů jsou odvozené od jednotlivých ROS2 konceptů. Například \verb|node|, \verb|topic|, \verb|service| a \verb|param|. Podpříkazy pak reprezentují akce, které budou nad daným konceptem provedeny. Typicky se jedná o \verb|list| a \verb|info|, případně další, specifické pro konkrétní příkaz. Díky této struktuře a dobrému pojmenování jsou velice intuitivní a příjemné na používání. Zde je několik ukázkových a často používaných příkazů.
+Názvy příkazů jsou odvozené od jednotlivých ROS2 konceptů. Například \verb|node|, \verb|topic|, \verb|service| a \verb|param|. Podpříkazy pak reprezentují akce, které budou nad daným konceptem provedeny. Typicky se jedná o \verb|list| a \verb|info|, případně další, specifické pro konkrétní příkaz. Díky této struktuře a dobrému pojmenování jsou velice intuitivní a příjemné na používání. Zde je několik ukázkových a často používaných příkazů. \cite{ros2_documentation}
 
 \begin{verbatim}
 	#prints all active topics
@@ -727,46 +716,46 @@ Názvy příkazů jsou odvozené od jednotlivých ROS2 konceptů. Například \v
 	ros2 node info /node_name
 \end{verbatim}
 
-\subsection*{Geometric Transformation Subsystem}
+\subsection*{Geometric Transformation Subsystem} \label{theory:tf}
 Jedná se o subsystém ROS2, který realizuje geometrické transformace mezi jednotlivými částmi robota.
-Vztah mezi dvěma objekty lze definovat pomocí posunu (translation) a otočení (rotation). Matematicky jsou tyto složky reprezentovány maticemi, které po spojení vytváří výslednou transformační matici. Roboti se většinou skládají z velkého množství částí. Ty na sebe bývají navzájem zavěšeny a zároveň se jejich relativní pozice neustále mění. Není proto vhodné počítat tyto vztahy manuálně. A přesně z toho důvodu existuje TF.
+Vztah mezi dvěma objekty lze definovat pomocí posunu (translation) a otočení (rotation). Matematicky jsou tyto složky reprezentovány maticemi, které po spojení vytváří výslednou transformační matici. Roboti se většinou skládají z velkého množství částí. Ty na sebe bývají navzájem zavěšeny a zároveň se jejich relativní pozice neustále mění. Není proto vhodné počítat tyto vztahy manuálně. A přesně z toho důvodu existuje TF. \cite[str:~63-67]{ros2_introduction}
 
-$$
-\begin{pmatrix}
-	x_B\\
-	y_B\\
-	z_B\\
-	1\\
-\end{pmatrix}
-=
-\begin{pmatrix}
-	R_{A\rightarrow B}^{xx} & R_{A\rightarrow B}^{xy} & R_{A\rightarrow B}^{xz} & T_{A\rightarrow B}^x\\
-	R_{A\rightarrow B}^{yx} & R_{A\rightarrow B}^{yy} & R_{A\rightarrow B}^{yz} & T_{A\rightarrow B}^y\\
-	R_{A\rightarrow B}^{zx} & R_{A\rightarrow B}^{zy} & R_{A\rightarrow B}^{zz} & T_{A\rightarrow B}^z\\
-	0 & 0 & 0 & 1\\
-\end{pmatrix}
-*
-\begin{pmatrix}
-	x_A\\
-	y_A\\
-	z_A\\
-	1\\
-\end{pmatrix}
-$$
+\begin{equation}
+	\begin{pmatrix}
+		x_B\\
+		y_B\\
+		z_B\\
+		1\\
+	\end{pmatrix}
+	=
+	\begin{pmatrix}
+		R_{A\rightarrow B}^{xx} & R_{A\rightarrow B}^{xy} & R_{A\rightarrow B}^{xz} & T_{A\rightarrow B}^x\\
+		R_{A\rightarrow B}^{yx} & R_{A\rightarrow B}^{yy} & R_{A\rightarrow B}^{yz} & T_{A\rightarrow B}^y\\
+		R_{A\rightarrow B}^{zx} & R_{A\rightarrow B}^{zy} & R_{A\rightarrow B}^{zz} & T_{A\rightarrow B}^z\\
+		0 & 0 & 0 & 1\\
+	\end{pmatrix}
+	*
+	\begin{pmatrix}
+		x_A\\
+		y_A\\
+		z_A\\
+		1\\
+	\end{pmatrix}
+\end{equation}
 
 \begin{center}
 	Matice pro manuální výpočet tranformace
 \end{center}
 
-Základním prvkem se kterým TF pracuje je takzvaný frame, neboli rám. Rám reprezentuje nějakou část robota, jako senzor, kolo a podobně. Tyto rámy jsou uspořádány do stromové struktury, kde má každý uzel vždy jednoho předka. Podle konvence je kořenem rámem \verb|base_link|. Ten se fyzicky nachází ve středu robota. Dalším běžným rámem je \verb|odom|. Ten reprezentuje vztah mezi aktuální pozicí robota a počátkem souřadného systému.
+Základním prvkem se kterým TF pracuje je takzvaný frame, neboli rám. Rám reprezentuje nějakou část robota, jako senzor, kolo a podobně. Tyto rámy jsou uspořádány do stromové struktury, kde má každý uzel vždy jednoho předka. Podle konvence je kořenovým rámem robota \verb|base_link|. Ten se fyzicky nachází v jeho středu. Dalším běžným rámem je \verb|odom|. Ten reprezentuje vztah mezi aktuální pozicí robota a počátkem souřadného systému. \cite{ros_reps}
 
-Pro předávání dat mezi uzly jsou využívány dva topicy.
+Pro předávání transformačních dat jsou využívány dva topicy.
 \begin{itemize}
 	\item {\verb|/tf| - dynamické transformace, komponenty připojené přes serva, motory}
 	\item {\verb|/tf_static| - statické transformace, komponenty navzájem pevně spojené}
 \end{itemize}
 Pro interakci s transportním subsystémem se nepoužívají běžné subsribery a publishery ale speciální objekty k tomu určené.
-Pro zasílání nových dat do TF systému slouží \verb|TransformBroadcaster|. Ten se používá vesměs stejně jako klasický publisher.
+Pro zasílání nových dat do TF systému slouží \\ \verb|TransformBroadcaster|. Ten se používá vesměs stejně jako klasický publisher.  \cite{ros2_documentation} 
 
 \begin{algorithm}[h!]
 	\label{}
@@ -793,7 +782,8 @@ Pro zasílání nových dat do TF systému slouží \verb|TransformBroadcaster|.
 	
 \end{algorithm}
 
-Pro získání dat z tf systému pak slouží \verb|TransformListener|. Ten neslouží k jednoduchému čtení zpráv posílaných v topicu, ale umožňuje dotazování se tf systému na konkrétní transformace. Dotaz se skládá ze specifikování dvou rámců, mezi kterými je transformace hledána. Tyto dva rámce nemusí být v tf stromu přímí potomci. Cesta od jednoho k druhému může vést přes několik uzlů, ale dokud jsou navzájem dosažitelné, tak tf vrátí výslednou transformaci. Druhou částí dotazu je čas, ten je potřebný protože, pokud je cesta mezi rámy delší, může se i během několika milisekund výrazně změnit výsledná transformace a použití aktuálního času tak není vhodné. Specifikování času také umožňuje získávat pozice z minulosti.
+\newpage
+Pro získání dat z tf systému pak slouží \verb|TransformListener|. Ten neslouží k jednoduchému čtení zpráv posílaných v topicu, ale umožňuje dotazování se tf systému na konkrétní transformace. Dotaz se skládá ze specifikování dvou rámců, mezi kterými je transformace hledána. Tyto dva rámce nemusí být v tf stromu přímí potomci. Cesta od jednoho k druhému může vést přes několik uzlů, ale dokud jsou navzájem dosažitelné, tak tf vrátí výslednou transformaci. Druhou částí dotazu je čas. Pokud je cesta mezi rámy delší, může se i během několika milisekund výrazně změnit výsledná transformace. Použití aktuálního času tak není vhodné. Specifikování času také umožňuje získávat pozice z minulosti. \cite{ros2_documentation} 
 
 \begin{algorithm}[h!]
 	\label{}
@@ -821,15 +811,15 @@ Pro získání dat z tf systému pak slouží \verb|TransformListener|. Ten nesl
 	
 \end{algorithm}
 
-\section{Formáty pro popis Robotů}
-V robotice se často objevuje potřeba definovat strukturu a fyzikální vlastnosti robotů, objektů případně prostředí, ve kterém se nachází. Nejzjevnějším případem jsou simulátory ale existují i jiné použítí kde programy potřebují znát aktuální stav, odometrii robota, a k tomu je nejprve potřeba znát jeho stukturu.
+\section{Formáty pro popis robotů}
+Popisy slouží k reprezentaci struktury, vzhledu a fyzikálních vlastností reálných robotů v prostředí ROS2. Jedním z nejčastějších použití je generování transformačního stromu zmíněného v minulé sekci.
 
 \subsubsection*{Unified Robotics Description Format}
-URDF je primární formát, který ROS2 používá k popisu robotů. Samotný kód je složený primárně z \verb|<link>| a \verb|<joint>| prvků. Link(článek) reprezentuje fyzické části robota jako jeho tělo či kola. Články jsou složené ze tří složek. Těmi jsou fyzikální \verb|inertial| vizuální \verb|visual| a kolizní \verb|colision|. Vizuální a kolizní složky bývají většinou stejné. Oddělené definice umožňují použít u komplexních objektů jednodušší kolizní složku a šetřit tak výkon. Fyzická složka pak definuje hmotnost a matici setrvačnosti. Joint(kloub) pak tvoří nějaký vztah mezi linky. Jointy můžou být fixní nebo různými způsoby pohyblivé. Pod pohyblivostí je samozřejmě možná rotace kolem některé z os. Ale také je umožněno klouzání podlé některé z os.
+URDF je primární formát, který ROS2 používá k popisu robotů. Samotný kód je složený primárně z \verb|<link>| a \verb|<joint>| prvků. Link(článek) reprezentuje fyzické části robota jako jeho tělo či kola. Články jsou složené ze tří složek. Těmi jsou fyzikální \verb|inertial| vizuální \verb|visual| a kolizní \verb|colision|. Vizuální a kolizní složky bývají většinou stejné. Oddělené definice umožňují použít u komplexních objektů jednodušší kolizní složku a šetřit tak výkon. Fyzická složka pak definuje hmotnost a matici setrvačnosti. Joint(kloub) pak tvoří nějaký vztah mezi články. Klouby můžou být fixní nebo různými způsoby pohyblivé. Klasickým použitím pohyblivosti je buď částečná nebo kontinuální rotace kolem jedné z os. Kromě toho je ale možné definovat také klouzající klouby. \cite{ros2_documentation} 
 
 \subsubsection*{XML Macro}
-Xacro lze použít na jakékoli XML soubory, ale primárně se používá k generování URDF souborů. Cílem tohoto formátu je zjednodušení URDF souborů, které se při popisu složitějších robotů stávají dlouhé a náchylné na chyby. Xcarco tedy přidává funkce sloužící k eliminaci těchto nedostatků. 
-První z nich je možnost definovat konstanty, v urdf se často opakují stejné hodnoty na několika místech, jednoduchým případem může být definice vizuální a kolizní části <link> elementů které bývají často totožné. 
+Xacro lze použít na jakékoli XML soubory, ale primárně se používá k generování URDF. Cílem tohoto formátu je zjednodušení URDF souborů, které se při popisu složitějších robotů stávají dlouhé, nepřehledné a náchylné na chyby. Xcarco tedy přidává funkce sloužící k eliminaci těchto nedostatků. 
+První z nich je možnost definovat konstanty, v urdf se často opakují stejné hodnoty na několika místech, jednoduchým případem může být definice vizuální a kolizní části <link> elementů které bývají často totožné. \cite{ros2_documentation} 
 \begin{verbatim}
 	<xacro:property name="wheel_radius" value="0.035" />
 \end{verbatim}
@@ -837,24 +827,24 @@ Na konstanty pak navazuje vkládání matematických výrazů, místo statickýc
 \begin{verbatim}
 	<cylinder radius="${wheel_diameter/2}" length="0.1"/>
 \end{verbatim}
-Hlavní funkcionalitou tohoto formátu jsou však makra. Ty umožňují zaobalit blok kódu a přiřadit mu identifikátor pomocí kterého lze takové makro vkládat na další místa v kódu. 
-Makra mohou brát na vstupu také parametry. V těle makra lze pak tyto parametry vkládat a v kombinaci s matematickými výrazy vytvářet komplexní definice.
+Hlavní funkcionalitou tohoto formátu jsou však makra. Ty umožňují zaobalit blok kódu a přiřadit mu identifikátor, pomocí kterého lze takové makro vkládat na další místa v kódu. 
+Makra mohou brát na vstupu také parametry. V těle makra lze tyto parametry vkládat a v kombinaci s matematickými výrazy vytvářet komplexní definice.
 \begin{verbatim}
 	<xacro:macro name="identificator" params="name mass:=default_value">
 \end{verbatim}
 Posledním rozšířením které xacro oproti urdf prináší je možnost rozdělení definice robota do více souborů.
 \begin{verbatim}
 	<xacro:include filename="components.xacro"/>
-\end{verbatim}
+\end{verbatim} 
 
 \subsubsection*{Simulation Description Format}
-SDF je formát založený na XML. Jak z názvu vyplývá, slouží k popisu robotů, ale také světů ve kterých se budou následně pohybovat. Jedná se o primární formát využívaný Gazebo simulátorem.
+SDF je formát používaný Gazebo Simulátorem. Kromě robotů slouží také k popisu světů a jejich fyzikálních vlastností. Tento formát není kompatibilní s ROS2 a proto je v této práci použit pouze pro definici prostředí simulátoru.
 
 \section{Mapování a Navigace}
 Problém mapování a navigace je komplexní problematika, jejichž kompletní porozumění výrazně přesahuje rozsah této práce. Nástroje jako \verb|slam_toolbox| a \verb|Navigation 2| umožňují provádět mapování a navigaci na téměř jakémkoli robotovi. Jejich velkou výhodou je fakt, že je lze používat i bez hloubkového porozumění této problematiky.
 
 \subsection*{Simultaneous Localization And Mapping}
-SLAM řeší problém tvorby mapy neznámého prostředí a současné lokalizace robota na této mapě. Vysokoúrovňový princip fungování SLAM zobrazuje následující algoritmus. První krok, observation, získává data ze senzorů a extrahuje z nich významné vlastnosti(features) okolí. Druhým krokem je data association. Jeho úkolem je asociovat získané vlastnosti okolí s významnými body(landmarks) mapy. Další tři kroky se použijí v případě, kdy algoritmus ztratí informaci o aktuální pozici robota. Využitím kombinace dat ze senzorů, odometrie a dalších algoritmů mají za úkol lokalizovat aktuální pozici robota. Poslední dvojice pak slouží k zpřesnění výsledné mapy. Při pohybu robota vznikají malé odchylky v odometrii i mapě. Tyto odchylky se postupně sčítají a delší trasy tak můžou mít relativně velkou chybu. Loop closure má za úkol zaznamenat moment, kdy se robot vrátí do pozice, ve které již v minulosti byl. S touto informací může následně upravit mapu tak, aby byla tato odchylka eliminována. \cite{slam}
+SLAM řeší problém tvorby mapy neznámého prostředí a současné lokalizace robota na této mapě. Vysokoúrovňový princip fungování SLAM zobrazuje následující algoritmus. První krok, observation, získává data ze senzorů a extrahuje z nich významné vlastnosti(features) okolí. Druhým krokem je data association. Jeho úkolem je asociovat získané vlastnosti okolí s významnými body(landmarks) mapy. Další tři kroky se použijí v případě, kdy algoritmus ztratí informaci o aktuální pozici robota. Využitím kombinace dat ze senzorů, odometrie a dalších algoritmů mají za úkol lokalizovat aktuální pozici robota. Poslední dvojice pak slouží k zpřesnění výsledné mapy. Při pohybu robota vznikají malé odchylky v odometrii i mapě. Tyto odchylky se postupně sčítají a delší trasy tak můžou mít relativně velkou chybu. Loop closure má za úkol zaznamenat moment, kdy se robot vrátí do pozice, ve které již v minulosti byl. S touto informací může následně upravit mapu tak, aby byla tato odchylka eliminována. \cite[str:~414-418]{slam}
 
 \begin{algorithm}[h!]
 	\label{}
@@ -886,26 +876,19 @@ SLAM řeší problém tvorby mapy neznámého prostředí a současné lokalizac
 \end{algorithm}
 \begin{center}
 	\vspace{-2em}
-	Tento algoritmus pochází z \cite{slam}
+	Tento algoritmus pochází z \cite[str:~414]{slam}
 \end{center}
 
 \subsection*{Navigation 2}
 Cílem knihovny Navigation 2 je pokročilé řízení robotů v prostředí. Pomocí mapy a transformací robota zvládá navigovat roboty skrze rozsáhlá prostředí. K rozhodování tato knihovna používá Behaviorální stromy. Požadavky na navigaci jsou přijímány pomocí akcí. \cite{nav2_documentation}
 
-V ROS2 systému je Nav2 tvořeno několika navzájem provázanými a spolupracujícími uzly. Dalo by se říct, že se jedná o svůj vlastní podsystém. Hlavními uzly, které Nav2 používá jsou \verb|Planner|, \verb|Controller|, \verb|Smoother| a \verb|Recovery|. Všechny tyto uzly jsou modulární. Jejich chování tak lze měnit použitím různých pluginů. Planner má za úkol vytvořit trajektorii pro navigaci. Úkolem Controlleru je řízení robota podél vypočítané trajektorie do cíle. Recovery pak řeší případy, kdy se robot odchýlí od plánované trajektorie. \cite{nav2_documentation}
+V ROS2 systému je Nav2 tvořeno několika navzájem provázanými a spolupracujícími uzly. Dalo by se říct, že se jedná o svůj vlastní podsystém. Hlavními uzly, které Nav2 používá jsou \verb|Planner|, \verb|Controller|, \verb|Smoother| a \verb|Recovery|. Všechny tyto uzly jsou modulární. Jejich chování tak lze měnit použitím různých pluginů. Planner má za úkol vytvořit trajektorii pro navigaci. Úkolem Controlleru je řízení robota podél vypočítané trajektorie do cíle. Recovery pak řeší případy, kdy se robot od této trajektorie odchýlí. \cite{nav2_documentation}
 
 \chapter{Implementace ROS2 systému}
 Zaměřením této kapitoly je vytvořený ROS2 systém. Následující strany popisují principy použité k implementaci uzlů, ale také demonstrují praktické příklady použití ROS2 funkcionalit.
 
 \section{Uzly pro řízení komponent}
 Z pohledu vzdálenosti od hardwaru se jedná o nejnižší uzly. Úkolem těchto uzlů je využít rozhraní poskytnuté danou komponentou k jejímu ovládání a následnému zpřístupnění její funkcionality zbytku ROS2 systému.
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=0.5]{obrazky-figures/hardware_nodes.pdf}
-	\caption{RQT Graf všech hardwarových uzlů a jejich rozhraní}
-	\label{}
-\end{figure}
 
 \subsection*{Komponenty součástí adeept kitu}
 První skupinou probraných uzlů budou komponenty pocházející z Adeept Kitu.
@@ -915,26 +898,30 @@ Jak už bylo řečeno v teoretické části, součástí Robot HAT je také full
 
 Od zbytku ROS2 systému pak uzel přijímá příkazy pomocí \verb|cmd_vel|(command velocity) topicu. Jedná se o běžně používané jméno pro zasílání příkazů na pohyb robota. Zprávy v tomto topicu jsou typu \verb|geometry_msgs/msg/Twist|. Robot s diferenciální nápravou se může pohybovat pouze v přímo vpřed / vzad, nebo otáčet do stran. Z Twist zprávy jsou pro něj tedy důležité pouze dvě složky \verb|linear.x| a \verb|angular.z|. Pomocí nich lze spočítat výsledná rychlost otáčení kol na jedné a druhé straně.
 
-$$\omega_L = \frac{V - \omega * b/2}{r}$$
-$$\omega_R = \frac{V + \omega * b/2}{r}$$
+\begin{equation}
+	\omega_L = \frac{V - \omega * b/2}{r}
+\end{equation}
+\begin{equation}
+	\omega_R = \frac{V + \omega * b/2}{r}
+\end{equation}
 
 \noindent Kde $\omega_L$ a $\omega_R$ jsou výsledné rychlosti motorů v $[rad/s]$. $V$ je zadaná lineární a $\omega$ angulární rychlost v $[m/s] a [rad/s]$. $b$ je rozpětí mezi koly a $r$ poloměr kola v $[m]$. \cite{diff_drive}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/motors_graph.png}
-	\caption{Lineární rychlost robota pro různé hodnoty střídy motorů}
-	\label{}
+	\caption{Rychlost robota pro různé hodnoty střídy motorů}
+	\label{fig:motor_pwm_graph}
 \end{figure}
-Tento graf zobrazuje lineární rychlost robota pro různé hodnoty PWM střídy motorů. Měření pod zátěží bylo zaznamenáno jako vzdálenost, kterou robot ujede za jednu vteřinu. Hodnoty bez zátěže byly získány pomocí změření času jedné otáčky hřídele motoru. Získaný čas byl následně přepočítán na vzdálenost. Je zde vidět, že hodnoty střídy menší, než 30-40\% nedokážou překonat fyzikální jevy(setrvačnost, tření, \dots) aby motory vůbec roztočily. Zároveň růst není zcela lineární. Pro potřeby řízení motoru jsou hodnoty dostatečně blízko aby je řídící uzel za lineární považoval.
+Tento graf \ref{fig:motor_pwm_graph} zobrazuje lineární rychlost robota pro různé hodnoty PWM střídy motorů. Měření pod zátěží bylo zaznamenáno jako vzdálenost, kterou robot ujede za jednu vteřinu. Hodnoty bez zátěže byly získány pomocí změření času jedné otáčky hřídele motoru. Získaný čas byl následně přepočítán na vzdálenost. Je zde vidět, že hodnoty střídy menší, než 30-40\% nedokážou překonat fyzikální jevy(setrvačnost, tření, \dots) aby motory vůbec roztočily. Zároveň růst není zcela lineární. Pro potřeby řízení motoru jsou hodnoty dostatečně blízko aby je řídící uzel za lineární považoval.
 
-Problém s motory, který se pořádně projevil až u jednoho z rozšíření je jízda po oblouku (současný pohyb vpřed a zatáčení). Nejsem si zcela jistý co je příčinou tohoto jevu, ale hodnoty vypočítané využitím předchozího vzorce nevedou na předpokládaný oblouk. K ujištění, že není chyba na mé straně, byl v pozdější fázi využit framework ros2\_control k řízení motorů. Ten realizuje výpočet kinematiky vlastním vestavěným ovladačem a výsledek byl stejný. Zde je důležité zmínit, že robot se po oblouku pohybovat dokáže, pouze na to vyžaduje větší rozdíl mezi rychlostmi kol. Předpokládanou příčinou je použití levných motorů, protože pokud je na jeden z nich vyvinuta větší váha(stačí aby se motor na opační straně dostal z důvodu nerovnosti povrchu do vzduchu) často se přestane otáčet a naopak když ostatní motory jedou vyšší rychlostí můžou být ty na druhé straně \uv{taženy} za nimi i přes to že by se měly otáčet pomaleji.
+Problém s motory, který se pořádně projevil až u jednoho z rozšíření je jízda po oblouku (současný pohyb vpřed a zatáčení). Nejsem si zcela jistý co je příčinou tohoto jevu, ale hodnoty vypočítané využitím předchozího vzorce nevedou na předpokládaný oblouk. K ujištění, že není chyba na mé straně, byl v pozdější fázi využit framework ros2\_control k řízení motorů. Ten realizuje výpočet kinematiky vlastním vestavěným ovladačem a výsledek byl stejný. Zde je důležité zmínit, že robot se po oblouku pohybovat dokáže, pouze na to vyžaduje větší rozdíl mezi rychlostmi kol. Předpokládanou příčinou je použití jednoduchých motorů, protože pokud je na jeden z nich vyvinuta větší váha(stačí aby se motor na opační straně dostal z důvodu nerovnosti povrchu do vzduchu) často se přestane otáčet a naopak když ostatní motory jedou vyšší rychlostí můžou být ty na druhé straně \uv{taženy} za nimi, i přes to že by se měly otáčet pomaleji.
 
 \subsubsection*{Servo}
-Adeept AWD 4WD je vybaven pouze jedním servem, které slouží k ovládání úhlu natočení kamery. Konkrétní použitý model je Adeept AD002. Úhel serva se nastavuje pomocí PWM signálu. Jeho generování zajišťuje čip PCA9685, který je součástí Robot HAT. V softwaru je k jeho řízení využita knihovna \verb|Adafruit_PCA9685|. Řídící uzel serva se jmenuje \verb|servo_node| a z pohledu ROS2 systému se jedná o demonstraci jednoduchého action serveru. Server příjme požadavek a zkontroluje limity. 
-Rozsah pohybu serva je větší než prostor pro kameru, řídící uzel proto omezuje maximální a minimální hodnoty natočení serva. Následně pomalu otáčí servem a v průběhu odesílá feedback zprávy s aktuálním úhlem.
+Adeept AWD 4WD je vybaven pouze jedním servem, které slouží k ovládání úhlu natočení kamery. Konkrétní použitý model je Adeept AD002. Úhel serva se nastavuje pomocí PWM signálu. Jeho generování zajišťuje čip PCA9685, který je součástí Robot HAT. V softwaru je k jeho řízení využita knihovna \verb|Adafruit_PCA9685|. Řídící uzel serva se jmenuje \verb|servo_node| a z pohledu ROS2 systému se jedná o demonstraci jednoduchého akčního serveru. Server příjme požadavek a zkontroluje limity. 
+Rozsah pohybu serva je větší než prostor pro kameru, řídící uzel proto omezuje maximální a minimální hodnoty natočení serva. Následně pomalu otáčí servem a v průběhu odesílá zpětnou vazbou s aktuálním úhlem serva.
 
-\subsubsection*{Kamera}
+\subsubsection*{Kamera} \label{implementation:camera}
 Zachytávání snímků kamery je realizováno pomocí knihovny OpenCV. Aby bylo možno dosáhnout relativně krátké odezvy při přehrávání videa, není obraz zaznamenáván v nativním rozlišení a snímkovací frekvenci kamery, ale byly použity snížené hodnoty. V základním konfiguraci je použito rozlišení 960 na 540 pixelů a snímkovací frekvence 20hz.
 Pro přenos snímků v ROS2 systému je použita zpráva vestavěného typu \verb|CompressedImage|. Před odesláním jsou ještě data zakódována do \verb|jpeg| formátu pomocí funkce z \verb|OpenCV| knihovny.
 
@@ -949,9 +936,9 @@ Pro přenos snímků v ROS2 systému je použita zpráva vestavěného typu \ver
 	Hodnoty v této tabulce pocházejí z utility \verb|$ros2 topic bw|
 \end{center}
 
-Před finálním rozhodnutím o použití \verb|CompressedImage| formátu bylo experimentováno také se zprávami typu \verb|Image|. Tento typ obsahuje více rozšiřujících informací o přenášeném obrázku jako jeho rozměry, použité kódování a podobně. Na první pohled se tedy zdá jako vhodnější formát. Snímky kamery jsou ale přenášené mezi dvěma různými zařízeními pomocí wifi připojení. Tento objemově větší formát tak přináší příliš velké zpoždění, které překonává použitelné hranice pro streamování. Na počátku vývoje byl použit ještě třetí možný přístup. Ten však nevyužívá ROS2 funkcionality a proto byl později změněn. Tímto přístupem je zakódování přenášených snímků do \verb|base64| formátu a následné přenesení jako jednoduchou \verb|string| zprávu. Base64 kódování se ukázalo jako zcela funkční možnost a dokonce dosahuje podobných výsledků ve zpoždění jako má \verb|CompressedImage|.
+Před finálním rozhodnutím o použití \verb|CompressedImage| formátu bylo experimentováno také se zprávami typu \verb|Image|. Tento typ obsahuje více rozšiřujících informací o přenášeném obrázku jako jeho rozměry, použité kódování a podobně. Na první pohled se tedy zdá jako vhodnější formát. Snímky kamery jsou ale přenášené mezi dvěma různými zařízeními pomocí wifi připojení. Tento objemově větší formát tak přináší příliš velké zpoždění, které překonává použitelné hranice pro streamování. Na počátku vývoje byl použit ještě třetí možný přístup. Ten však nevyužívá ROS2 funkcionality a proto byl později změněn. Tímto přístupem je zakódování přenášených snímků do \verb|base64| formátu a následné přenesení jako jednoduchou \verb|string| zprávu. Base64 kódování se ukázalo jako zcela funkční možnost dosahující podobných výsledků zpoždění jako má \verb|CompressedImage|.
  
-\subsubsection*{Ultrazvukový senzor}
+\subsubsection*{Ultrazvukový senzor} \label{implementation:ultrasonic}
 Jedná o model hc-sr04. Ten dokáže měřit vzdálenost od 2cm do 400cm s přesností na 3mm. Získávání dat z ultrazvukového senzoru je relativně jednoduché a nevyžaduje tedy externí knihovnu. Interakce se senzorem je zajištěna pomocí GPIO pinů. K jejich ovládání je opět použit modul \verb|RPi.GPIO|. 
 
 Uzel zahajuje komunikaci vysláním pulzu na trig vodiči. V ten moment začne senzor měřit a uzel jen čeká na odpověď. Ta přijde na echo pinu. Její začátek je signalizován tím, že senzor nastaví echo pin na hodnotu jedna. V ten moment si uzel uloží časovou značku. Poté počká, než se echo pin vrátí zpět do nuly. V ten moment získává druhou značku. Pomocí těchto dvou momentů lze vypočítat výslednou vzdálenost. Výpočet vzdálenosti je podrobněji popsán v teoretické části (str: \pageref{theory:ultrasonic}).
@@ -969,26 +956,26 @@ Do ROS2 systému tento uzel odesílá kromě pravidelné informace o aktuální 
 			$$\sin(82.5^\circ) = \frac{\text{protilehla}}{61.3\text{cm}} \Rightarrow 60.77\text{cm}$$
 	\end{minipage}
 	\caption{Překážky přehlédnutelné ultrazvukovým senzorem}
-	\label{}
+	\label{fig:ultrasonic_blind_spot}
 \end{figure}
 
-Tento obrázek demonstruje případy, které se snaží druhé varování zachytit. Je na něm vidět, že existuje meziprostor, ve kterém může překážka zmizet ze senzoru, ale i přes to vést ke kolizi s robotem. Tento meziprostor je na jedné straně ohraničen vzdáleností pro klasické detekování překážek, například 20cm. Na druhé straně lze hranici vypočítat pomocí úhlu ve kterém senzor detekuje překážky a šířky robota.
-V tomto případě se jedná o 61cm. Druhá zpráva tedy informuje o tom, že nějaká překážka zmizela z radaru v této potenciálně nebezpečné zóně.
+Obrázek \ref{fig:ultrasonic_blind_spot} demonstruje případy, které se snaží druhé varování zachytit. Je na něm vidět, že existuje meziprostor, ve kterém může překážka zmizet ze senzoru, ale i přes to vést ke kolizi s robotem. Tento meziprostor je na jedné straně ohraničen vzdáleností pro klasické detekování překážek, například 20cm. Na druhé straně lze hranici vypočítat pomocí úhlu ve kterém senzor detekuje překážky a šířky robota.
+V tomto případě se jedná o přibližně 61cm. Druhá zpráva tedy informuje o tom, že nějaká překážka zmizela z radaru v této potenciálně nebezpečné zóně.
 
 \subsubsection*{Sledování čáry}
 Posledním praktickým senzorem kterým robot Adeept AWR disponuje je třícestný senzor na sledování čáry.
 Komunikace je v tomto případě ještě jednodušší. Senzor má tři výstupy připojené na tři GPIO piny. Každá dvojice vysílače a senzoru má svůj vlastní vývod. Hodnoty těchto výstupů obsahují aktuální stav detekování čáry. Z pohledu uzlu tak stačí pravidelně číst hodnoty a odesílat je dále do ROS2 systému. K práci s GPIO piny tento uzel také používá modul \verb|RPi.GPIO|.
 
 \subsubsection*{Led}
-Součástí Adeept sady je také několik adresovatelných led diod. Jedná se o hardware, který je pro hlavní funkcionalitu naprosto nepotřebný. Ponechat však na robotu nevyužitý a neovládatelný hardware nedává smysl. Proto byl nakonec implementován uzel na jejich řízení. Z pohledu ROS2 se jedná o klasický service server. Požadavky obsahují RGB barevnou hodnotu, pro nastavení všech led zároveň. Řízení tohoto typu led pásku je komplexnější záležitost a proto je k jeho ovládání využit python modul \verb|rpi_ws281x|. 
+Součástí Adeept sady je také několik adresovatelných led diod. Jedná se o hardware, který je pro hlavní funkcionalitu naprosto nepotřebný. Ponechat však na robotu nevyužitý a neovládatelný hardware nedává smysl. Proto byl nakonec implementován uzel na jejich řízení. Z pohledu ROS2 se jedná o klasickou službu. Požadavky obsahují RGB barevnou hodnotu, pro nastavení všech led zároveň. Řízení tohoto typu led pásku je komplexnější záležitost a proto je k jeho ovládání využit python modul \verb|rpi_ws281x|. 
 Aby tento modul mohl správně pracovat, vyžaduje spuštění s vyššími oprávněními. Důvodem k tomuto požadavku je fakt, že vnitřně využívá kód v jazyce C, který pracuje s GPIO piny přímo přes /dev/mem. Problém nastává v tom, že ROS2 při svém běhu nevyžaduje a tedy ani nepoužívá zvýšená oprávnění. Z toho důvodu na tyto případy není připravený a prosté přidání \verb|sudo| před spouštěcí příkaz nefunguje. Toto lze obejít a spustit uzel s oprávněními podobnými příkazu \verb|sudo|. Avšak uzly spuštěné tímto způsobem nedokážou komunikovat s klasicky spuštěnými uzly. 
 Problém je ve výsledku vyřešen použitím druhého skriptu. Ten obsahuje jen minimum kódu pro ovládání zmíněného modulu. V \verb|sudoers| je tomuto konkrétnímu souboru umožněno spuštění se \verb|sudo| oprávněními, aniž by bylo vyžadováno heslo. Tento skript je následně volán z hlavního uzlu použitím \verb|subprocess| modulu. Jedná se o velmi neelegantní řešení. Vzhledem k tomu, že se svícení LED diodami není důležitá funkcionalita a zbytečně upravuje systémově důležitý soubor \verb|sudoers|, je tento krok v instalačním skriptu separátně volitelný.
 
 \subsection*{Další hardware nad rámec Adeept Kitu}
-V tento moment byly probrány všechny uzly, které řídí komponenty stavebnice Adeept Awr 4WD. Následuje popis rozšíření původního hardwaru o další komponenty, které buď rozšiřují funkcionalitu robota, nebo usnadňují jeho použití.
+V tento moment byly probrány všechny uzly, které řídí komponenty stavebnice Adeept AWR 4WD. Následuje popis rozšíření původního hardwaru o další komponenty, které buď rozšiřují funkcionalitu robota, nebo usnadňují jeho použití.
 
 \subsubsection*{Nabíjení}
-V originální konfiguraci napájí robota dvě sériově zapojené 18650 baterie. V tomto zapojení poskytují napětí 8V s maximálním proudem 4A. Součástí Adeept Kitu jsou kolébky na baterie. Ty jsou přímo připojené k zátěži(robot HAT). Nabíjení baterií musí být realizováno externě. Tento způsob je nepohodlný hlavně proto, že přístup ke kolébkám vyžaduje sundání kol robota. Prvním rozšířením je tedy přidání BMS a nabíjecí desky. 
+V originální konfiguraci napájí robota dvě sériově zapojené 18650 baterie. V tomto zapojení poskytují napětí 8V s maximálním proudem 4A. Součástí Adeept Kitu jsou kolébky na baterie. Ty jsou přímo připojené k zátěži(robot HAT). Nabíjení baterií musí být realizováno externě. Tento způsob je nepohodlný hlavně proto, že přístup ke kolébkám vyžaduje sundání kol robota. Prvním rozšířením je tedy přidání BMS a nabíjecí desky \ref{fig:battery}. 
 Nejrozšířenějším způsobem nabíjení baterií 18650 jsou desky s čipem TP4056. Jedná se o hojně dostupný produkt, který lze koupit v různých kombinacích ochran a vstupů pro napájení. Problémem je fakt, že tyto desky jsou určeny pro nabíjení jedné 18650 baterie. Potenciálním řešením pro paralelní zapojení je použití více těchto desek. Pro baterie zapojené sériově, které používá tento robot, jsou tyto desky nevhodné.
 Lepší přístup je využití Battery Management System. Jak z názvu vyplývá, jedná se o desku pro správu baterií. BMS se vyrábí specificky pro konkrétní zapojení, které bude monitorovat. Použitý model je typu 2S, pro dvě sériově zapojené baterie. Kromě kladného a záporného pólu disponuje také připojením pro bod mezi bateriemi. Tento bod umožňuje desce monitorovat stav každé z baterií zvlášť.
 V kombinaci s BMS je dále využita samotná nabíjecí deska. Jedná se o model, který na rozdíl od TP4056 nabíjí dvakrát vyšším nabíjecím napětím.
@@ -997,7 +984,7 @@ V kombinaci s BMS je dále využita samotná nabíjecí deska. Jedná se o model
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/battery_circuite.pdf}
 	\caption{Zapojení BMS a nabíjecí desky}
-	\label{}
+	\label{fig:battery}
 \end{figure}
 
 \subsubsection*{Inertial Mesurement Unit - IMU}
@@ -1008,10 +995,10 @@ Do ROS2 systému tento uzel nejprve odesílá aktuální hodnoty zaznamenané se
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/accelerometer_graph.png}
-	\caption{Výsledná rychlost po zintegrování tohoto grafu je -0.1496m/s}
-	\label{}
+	\caption[Graf hodnot akcelerometru]{Zobrazení hodnot akcelerometru v průběhu zrychlení a zastavení robota. Výsledná rychlost po zintegrování tohoto grafu je -0.1496m/s}
+	\label{fig:accel_readings}
 \end{figure}
-Tento graf zobrazuje případ kdy došlo k špatnému zaznamenání zpomalení a výsledná rychlost je následně záporná. Důležité je zmínit že případy kdy dochází k špatnému měření nejsou časté (cca každé 10). Z grafu je také vidět, že když se robot pohybuje je měření ovlivněno vibracemi motorů. Při testování se tento jev neprojevil dostatečně aby ovlivnil funkcionalitu.
+Graf \ref{fig:accel_readings} zobrazuje případ kdy došlo k špatnému zaznamenání zpomalení a výsledná rychlost je následně záporná. Důležité je zmínit že případy kdy dochází k špatnému měření nejsou běžné (cca každé 15-20). Z grafu je také vidět, že když se robot pohybuje je měření ovlivněno vibracemi motorů. Při testování se tento jev neprojevil dostatečně aby ovlivnil funkcionalitu.
 
 Ve finální verzi jsou tyto vlivy převážně eliminovány využitím dat z \verb|cmd_vel| topicu. Tento přistup umožňuje ignorovat výkyvy dat získaných z imu senzoru v momentech, kdy by podle příkazů z \verb|cmd_vel| měl být robot statický.
 
@@ -1029,49 +1016,41 @@ Druhý uzel pak realizuje příjem a přehrávání získaných dat. Jedná se o
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/audio_transfer_diagram.pdf}
 	\caption{RQT Graf obousměrného přenášení zvuku}
-	\label{}
+	\label{fig:rqt_sound}
 \end{figure}
 
-Pro obousměrný přenos dat mezi robotem a stacionárním zařízením jsou použity dvě dvojice těchto uzlů. Oba uzly disponují mechanizmem pro pozastavení záznamu / přehrávání. 
+Pro obousměrný přenos dat mezi robotem a stacionárním zařízením jsou použity dvě dvojice těchto uzlů \ref{fig:rqt_sound}. Oba uzly disponují mechanizmem pro pozastavení záznamu / přehrávání. 
 
 \section{Řízení robota na vyšší úrovni}
 V tento moment jsou implementovány všechny uzly pro ovládání komponent. Následuje sekce zabývající se řídícími uzly. Ty se nachází v balíku \verb|controllers|. Jejich úkolem je zpracovávat data z několika hardwarových uzlů současně a v podle získaných dat řídit robota jako celek.
-
-\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=0.5]{obrazky-figures/controller_nodes.pdf}
-	\caption{RQT Graph struktura řídícího systému}
-	\label{}
-\end{figure}
 
 \subsubsection{Distribuovanost}
 Řídící jednotky robotů bývají z pohledu výpočetního výkonu relativně slabá zařízení. Výpočetně náročné uzly mohou mít problémy s během na těchto zařízeních. Z toho, a dalších důvodů umožňuje ROS2 distribuovat uzly mezi více fyzických zařízení. Z vývojářského pohledu je distribuovanost zcela v režii ROS2. Jediný předpoklad pro její fungování je vzájemná dosažitelnost zařízení přes počítačovou síť. Druhým požadavkem je nastavení stejného DOMAIN\_ID na obě zařízení, což je ve výchozím nastavení splněno. Ve správně fungujícím distribuovaném systému mohou uzly běžící na různých zařízeních navzájem komunikovat a interagovat stejně jako by běžely na jednom. V této práci se tedy předpokládá, že následující uzly poběží na druhém stacionárním zařízení. 
 
 \subsection*{Manuální řízení}
-Pro manuální řízení je systém vybaven dvěma uzly. První čte vstupy z klávesnice. Využívá k tomu modul \verb|pynput|. Druhý pak s pomocí \verb|pygame| knihovny získává vstupy ovladače. Oba uzly ovládají motory a servo pomocí jejich specifických rozhraní. Na obou uzlech se také nachází service servery pro příjem příkazů sloužících k zastavení nebo spuštění smyček, které zajišťují zachytávání vstupu od uživatele.
+Pro manuální řízení je systém vybaven dvěma uzly. První čte vstupy z klávesnice. Využívá k tomu modul \verb|pynput|. Druhý pak s pomocí \verb|pygame| knihovny získává vstupy ovladače. Oba uzly ovládají motory a servo pomocí jejich specifických rozhraní. Na obou uzlech se také nachází služby pro příjem příkazů sloužících k zastavení nebo spuštění smyček, které zajišťují zachytávání vstupu od uživatele. \ref{fig:rqt_manual}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/manual_control_diagram.pdf}
 	\caption{RQT Graf uzlů pro manuální řízení}
-	\label{}
+	\label{fig:rqt_manual}
 \end{figure}
 
 \subsection*{Pomocný uzel pro přesné otáčení robota}
-Vzhledem k tomu, že použité motory nejsou opatřeny enkodéry je, bez využití dalších senzorů, jakékoli otáčení velice nepřesné. Motorům lze samozřejmě zadat konkrétní rychlost na určitý časový interval a dostat se tak na přibližně správnou orientaci. Ale opravdu se jedná jen o přibližný úhel z důvodů externích vlivů a nepřesností. Například setrvačnost hraje velkou roli při otáčení o úhly menší než 90° nebo při vyšším využití prostředků mikrokontroléru, můžou být reakce na příkazy zpožděné.
-Proto byl vytvořen tento uzel, který využívá gyroskopická data z imu senzoru, aby zajistil, že se robot dokáže v případě potřeby otáčet o přesně dané úhly. V ROS2 systému se jedná o action server. Přijímá požadavky a následně zasílá příkazy na \verb|cmd\_vel| topic. Podle hodnot získaných z imu pak postupně snižuje rychlost otáčení v závislosti na vzdálenosti od cílového úhlu. 
+Vzhledem k tomu, že použité motory nejsou opatřeny enkodéry je, bez využití dalších senzorů, jakékoli otáčení velice nepřesné. Motorům lze samozřejmě zadat konkrétní rychlost na určitý časový interval a dostat se tak na přibližně správnou orientaci. Z důvodu externích vlivů a nepřesností se jedná opravdu jen o přibližný úhel. Například setrvačnost hraje velkou roli při otáčení o úhly menší než 90° nebo při vyšším využití prostředků mikrokontroléru, můžou být reakce na příkazy zpožděné.
+Proto byl vytvořen tento uzel, který využívá gyroskopická data z imu senzoru, aby zajistil, že se robot dokáže v případě potřeby otáčet o přesně dané úhly. V ROS2 systému se jedná o akční server. Přijímá požadavky a následně zasílá příkazy na \verb|cmd\_vel| topic. Podle hodnot získaných z imu pak postupně snižuje rychlost otáčení v závislosti na vzdálenosti od cílového úhlu. \ref{fig:alg_motor_controller}
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/precise_turning.pdf}
 	\caption{Algoritmus přesného otáčení}
-	\label{}
+	\label{fig:alg_motor_controller}
 \end{figure}
 
-Z pohledu demonstrace ROS2 funkcionality tento uzel využívá pokročilejší možnosti action serveru. Konkrétně se jedná o schopnost definování a předání vlastních callback funkcí, pro jednotlivé události související s akcemi. V případě standardního použití action serveru se pracuje pouze s execute callback funkcí. V jejím těle by mělo proběhnou celé zpracování požadavku.
+Z pohledu demonstrace ROS2 funkcionality tento uzel využívá pokročilejší možnosti akčního serveru. V případě standardního použití se pracuje pouze s execute callback funkcí (viz strana \pageref{theory:action}). V jejím těle by mělo proběhnou celé zpracování požadavku. Tento přístup však nelze vždy použít. Problémem tohoto uzlu je fakt, že v průběhu vykonávání požadavku jsou vyžadována data o aktuálním natočení robota. ROS2 uzly se točí(spin) a reagují při tom na události. V průběhu obsluh je točení pozastaveno. Z toho vyplývá, že v průběhu obsluhy požadavku akčního serveru nedochází k zpracování událostí a tedy ani získání nových dat z IMU senzoru.
 
-V případě tohoto uzlu tento přístup nelze použít. Každý spuštěný ROS2 uzel má svůj vlastní execution loop, funkce spin(). Když se uzel točí, reaguje na události a volá callback funkce. V průběhu vykonávání takové funkce se však uzel netočí. A zde nastává problém. V průběhu vykonávání execute callbacku by tento uzel potřeboval průběžná data z imu senzoru. Ty se však získávají v subscriber callback funkci, která se nezavolá v průběhu vykonávání execute callbacku. Proto bylo potřeba použít další callback funkce action serveru k zprovoznění tohoto uzlu. 
- 
+\newpage
 \begin{itemize}[leftmargin=*]
 	\item{goal\_callback}
 	\vspace*{-0.5em}
@@ -1126,37 +1105,37 @@ Callback funkce mají dané rozhraní, které musí následovat. Nejvýraznějš
 \subsection*{Bloudění}
 Náhodné bloudění robota po místnosti je základním autonomním pohybem. Cílem tohoto režimu je náhodný pohyb robota v prostoru, s cílem vyhýbat se překážkám.
 
-K získávání informací o svém okolí používá tento uzel data ze dvou senzorů. Prvním je ultrazvukový senzor vzdálenosti. Ten je umístěn na přední straně robota a detekuje překážky v 15° úhlu před robotem. Druhým použitým senzorem je IMU. Přímo z něj získává pouze varování o kolizi. Nepřímo jej využívá při přesném otáčení s využitím  \verb|motor_controller_node| uzlu.
+K získávání informací o svém okolí používá tento uzel data ze dvou senzorů. Prvním je ultrazvukový senzor vzdálenosti. Ten je umístěn na přední straně robota a detekuje překážky v 15° úhlu před robotem. Druhým použitým senzorem je IMU. Přímo z něj získává pouze varování o kolizi. \ref{fig:rqt_wandering}  Nepřímo jej využívá při přesném otáčení s využitím  \verb|motor_controller_node| uzlu.
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/wandering_rqt.pdf}
-	\caption{RQT Graf Bloudění}
-	\label{}
+	\caption{RQT Graf bloudění}
+	\label{fig:rqt_wandering}
 \end{figure}
 
 Jádrem implementace je konečný automat. Ten byl v průběhu vývoje obohacen o další funkcionalitu. Primárně bylo potřeba reagovat na externí události a volat funkce jiných uzlů. Výsledný kód tedy není čistým konečným automatem. Z abstraktnějšího pohledu tento režim provádí tři hlavní akce. Tou první je jednoduchý pohyb vpřed. Další dvě zajímavější akce pak realizují vyhýbání překážkám. Úvodními stavy těchto akcí je \verb|OBSTACLE| a \verb|SCAN_START|.
 
-\verb|OBSTACLE| má za úkol reagovat a vyřešit překážky nacházející se přímo před robotem. Detekování a přechod do tohoto stavu zajišťuje buď zpráva od ultrazvukového senzoru o překážce nacházející se příliš blízko, nebo zpráva od imu senzoru varující o tom, že \verb|cmd_vel| vyslala příkaz o pohybu vpřed avšak akcelerometr změnu nezaznamenal, což implikuje, že se robot opírá o nějakou překážku.
+\verb|OBSTACLE| má za úkol reagovat a vyřešit překážky nacházející se přímo před robotem. Detekování a přechod do tohoto stavu zajišťuje buď zpráva od ultrazvukového senzoru o překážce nacházející se příliš blízko, nebo zpráva od imu senzoru varující o kolizi robota s objektem.
 
-Algoritmus hledání volné cesty je zobrazen na následujícím diagramu. Ve zkratce funguje následovně. V náhodném pořadí zkontroluje obě strany robota. Pokud na jedné z nich najde volný prostor ihned tudy pokračuje v jízdě. Pokud je v obou směrech překážka, vrací se zpět odkud přijel.
+Algoritmus hledání volné cesty je zobrazen na následujícím diagramu \ref{fig:alg_obstacle}. Ve zkratce funguje následovně. V náhodném pořadí zkontroluje obě strany robota. Pokud na jedné z nich najde volný prostor ihned tudy pokračuje v jízdě. Pokud je v obou směrech překážka, vrací se zpět odkud přijel.
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.75]{obrazky-figures/wandering_obstacle_diagram.pdf}
-	\caption{Algoritmus vyhnutí se překážky přímo před robotem.}
-	\label{}
+	\caption{Algoritmus vyhýbání se překážkám}
+	\label{fig:alg_obstacle}
 \end{figure}
 
-\verb|SCAN_START| je oproti předchozímu chování více obezřetné. Jeho originálním záměrem bylo hledat překážky, které zmizely z ultrazvukového senzoru (více o tomto jevu v kapitole x). Tato funkcionalita byla následně rozšířena a ve finální verzi probíhá pravidelné skenování prostoru před robotem. Vzhledem k tomu, že se jedná o preventivní akci, nesnaží se vyhýbat překážkám přímo před robotem. Jeho cílem je nalézt překážky v blízkosti aktuální trajektorie robota. A v reakci na ně odklonit směr pohybu dále od nich. Pokud skenování nalezne překážku přímo před robotem, pokračuje v pohybu vpřed. Tím efektivně přenechává vyřešení tohoto problému \verb|OBSTACLE| stavu. Možné přechody do úvodního stavu skenování lze vyvodit z předchozího textu. Prvním je přijmutí varování o detekci zmizelé překážky od ultrazvukového senzoru. Druhým je pak pravidelný přechod ze stavu \verb|DRIVE|. 
+\verb|SCAN_START| je oproti předchozímu chování více obezřetné. Jeho originálním záměrem bylo hledat překážky, které zmizely z ultrazvukového senzoru (více o tomto jevu na straně \pageref{implementation:ultrasonic}). Tato funkcionalita byla následně rozšířena a ve finální verzi probíhá pravidelné skenování prostoru před robotem. Vzhledem k tomu, že se jedná o preventivní akci, nesnaží se vyhýbat překážkám přímo před robotem. Jeho cílem je nalézt překážky v blízkosti aktuální trajektorie robota. A v reakci na ně odklonit směr pohybu dále od nich. Pokud skenování nalezne překážku přímo před robotem, pokračuje v pohybu vpřed. Tím efektivně přenechává vyřešení tohoto problému \verb|OBSTACLE| stavu. Možné přechody do úvodního stavu skenování lze vyvodit z předchozího textu. Prvním je přijmutí varování o detekci zmizelé překážky od ultrazvukového senzoru. Druhým je pak pravidelný přechod ze stavu \verb|DRIVE|.
 
-Algoritmu skenování je opět zobrazen na následujícím diagramu. Úhel hledání překážek je 90°. Celkem je provedeno šest čtení začínající na úhlu -45° a končící na +45°. Získaná data jsou následně interpretovány a je učiněna adekvátní reakce.
+Algoritmu skenování je opět zobrazen na následujícím diagramu \ref{fig:alg_scan}. Úhel hledání překážek je 90°. Celkem je provedeno šest čtení začínající na úhlu -45° a končící na +45°. Získaná data jsou následně interpretovány a je učiněna adekvátní reakce.
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.65]{obrazky-figures/wandering_scan_diagram.pdf}
 	\caption{Algoritmus preventivního hledání překážek.}
-	\label{}
+	\label{fig:alg_scan}
 \end{figure}
 
 \subsection*{Sledování čáry}
@@ -1177,7 +1156,7 @@ IncludeLaunchDescription(
 )
 \end{verbatim}
 
-Hromadné spouštěcí soubory startují mnoho uzlů zároveň. Běžným požadavkem tak je výměna několika málo uzlů za jiné. V takovém případě by bylo potřeba vytvořit druhý, převážně totožný soubor. K eliminaci tohoto problému slouží podmíněné spouštění. Jeho jednoduchou verzi využívá \verb|adeept_robot_launch.py|. V tomto případě slouží k rozhodnutí, který ze dvou možných uzlů k řízení motorů bude použit. Cílům spouštěcího souboru se do proměnné \verb|condition| přidá podmínka. Jedná se o speciální třídy (\verb|Ifcondition|, \verb|Unlesscondition|, \dots). V konstruktoru se jim předává true / false výraz. Jeho hodnotu lze získat například z parametru. Podmíněné spouštění může být i komplexnější a to v kombinací s \verb|PythonExpression|. Tato třída je použita v \verb|gazebo_simulation_launch.py| souboru, kde se porovnáním hodnoty parametru určuje, který svět bude spuštěn.
+Hromadné spouštěcí soubory startují mnoho uzlů zároveň. Běžným požadavkem tak je výměna několika málo uzlů za jiné. V takovém případě by bylo potřeba vytvořit druhý, převážně totožný soubor. K eliminaci tohoto problému slouží podmíněné spouštění. Jeho jednoduchou verzi využívá \verb|adeept_robot_launch.py|. V tomto případě slouží k rozhodnutí, který ze dvou uzlů určených k řízení motorů bude použit. Cílům spouštěcího souboru se do proměnné \verb|condition| přidá podmínka. Jedná se o speciální třídy (\verb|Ifcondition|, \verb|Unlesscondition|, \dots). V konstruktoru se jim předává true / false výraz. Jeho hodnotu lze získat například z parametru. Podmíněné spouštění může být i komplexnější a to v kombinací s \verb|PythonExpression|. Tato třída je použita v \verb|gazebo_simulation_launch.py| souboru, kde se porovnáním hodnoty parametru určuje, který svět bude spuštěn.
 \begin{verbatim}
 IncludeLaunchDescription(
     launch_goal,
@@ -1209,8 +1188,8 @@ RegisterEventHandler(
 )
 \end{verbatim}
 
-\section{Model Robota}
-Model robota slouží k předání informace o jeho struktuře, vzhledu a fyzikálních vlastnostech dalším částem ROS2 systému. Formát pro definici modelu, který ROS2 používá je \verb|urdf|. Většina nástrojů však nepracuje přímo s definicí v \verb|urdf| formátu, ale získává tyto informace z \verb|/tf| subsystému. Zpracování, interpretaci a následné odesílání informací o aktuálním stavu robota zajišťuje \verb|robot_state_publisher|. Jedná se o oficiální ROS2 uzel. Vstupem tohoto uzlu je \verb|urdf| model robota. Prvním výstupem je odesílání statických i dynamických transformací do \verb|/tf| systému. Aby mohl odesílat dynamické tranformace musí mít informaci o aktuálních natočení kloubů. Ty získává posloucháním \verb|joint_states| topicu.
+\section{Model Robota} \label{implementation:model}
+Model robota slouží k předání informace o jeho struktuře, vzhledu a fyzikálních vlastnostech dalším částem ROS2 systému. Formát pro definici modelu, který ROS2 používá je \verb|urdf|. Většina nástrojů však nepracuje přímo s definicí v \verb|urdf| formátu, ale získává tyto informace z \verb|/tf| subsystému. Zpracování, interpretaci a následné odesílání informací o aktuálním stavu robota zajišťuje \verb|robot_state_publisher|. Jedná se o oficiální ROS2 uzel. Vstupem tohoto uzlu je \verb|urdf| model robota. Prvním výstupem je odesílání statických i dynamických transformací do \verb|/tf| systému. Aby mohl odesílat dynamické tranformace musí mít informaci o aktuálních natočení kloubů. Ty získává posloucháním \verb|joint_states| topicu. \ref{fig:rviz_robot_desc}
 
 Druhým výstupem tohoto uzlu je topic \verb|robot_description|. Jeho obsahem je celý \verb|urdf| popis, odeslaný jakožto string zpráva.
 
@@ -1224,15 +1203,15 @@ Druhým výstupem tohoto uzlu je topic \verb|robot_description|. Jeho obsahem je
 		\centering
 		\includegraphics[scale=0.4]{obrazky-figures/robot_description_joint_states.png}
 	\end{minipage}
-	\caption{Zobrazení dat z robot\_state\_publisheru v nástroji RVIZ. Levý obrázek zobrazuje pouze statické tranformace (joint\_states topic je prázdný), a pravý pak celý model}
-	\label{}
+	\caption[Zobrazení popisu robota v nástroji Rviz]{Zobrazení dat z robot\_state\_publisheru v nástroji RVIZ. Levý obrázek zobrazuje pouze statické tranformace (joint\_states topic je prázdný), a pravý pak celý model}
+	\label{fig:rviz_robot_desc}
 \end{figure}
 
 \subsection*{Tvorba Modelu}
 Jak už bylo řečeno, základní formát používaný k popisu modelů je \verb|urdf|. ROS2 využívá také druhý, rozšiřující formát \verb|xacro|. Cílem \verb|xacra| je vyřešit některé neduhy čistého \verb|urdf| a  usnadnit tak vývojářům psaní popisů robotů. Tato práce používá k popisu robota \verb|xacro| formát.
 
 Následující blok kódu demonstruje využití téměř všech možností \verb|xacra| na jednom místě.
-V čistém \verb|urdf| se velmi často opakuje téměř totožná definice \verb|link| elementu. Jedná se o zdlouhavý zápis s minimálními změnami pouze v hodnotách. Následující blok kódu vytváří makro, které umožní zkrátit tuto nepřehlednou a na chyby náchylnou sekci na jednořádkové zavolání makra. Pro zvýšení znovupoužitelnosti, využívá toto makro také parametry. Ty jsou předány v místě použití makra. Díky nim může být makro obecnější a tedy použitelné na více místech. Poslední parametr ukazuje také možnost nastavení výchozí hodnoty parametru. Parametry lze využít také v matematických výrazech. Výpočet matice setrvačnosti pro každý \verb|<link>| element je zbytečně složité a opět náchylné na chyby. Použití matematického výrazu, který se sám vyhodnotí podle hodnot předaných parametry je výrazně lepší a pohodlnější přístup.
+V čistém \verb|urdf| se velmi často opakuje téměř totožná definice \verb|<link>| elementu. Jedná se o zdlouhavý zápis s minimálními změnami. Následující blok kódu vytváří makro, které umožní zkrátit tuto nepřehlednou a na chyby náchylnou sekci na jednořádkové zavolání makra. Pro zvýšení znovupoužitelnosti, využívá toto makro také parametry. Ty jsou předány v místě použití makra. Díky nim může být makro obecnější a tedy použitelné na více místech. Poslední parametr ukazuje také možnost nastavení výchozí hodnoty parametru. Parametry lze využít také v matematických výrazech. Výpočet matice setrvačnosti pro každý \verb|<link>| element je zbytečně složité a opět náchylné na chyby. Použití matematického výrazu, který se sám vyhodnotí podle hodnot předaných parametry je výrazně lepší a pohodlnější přístup.
 
 \begin{algorithm}[h!]
 	\label{}
@@ -1282,22 +1261,23 @@ Popis robota v \verb|xacro| formátu nelze použít jako přímou náhradu \verb
 \end{verbatim}
 Při překladu dojde k spojení případných více souborů dohromady, nahrazení a vyhodnocení maker, matematických výrazů a parametrů.
 
+\newpage
 \section{Uživatelské rozhraní}
-Uživatelské rozhraní na straně stacionárního zařízení využívá knihovnu Qt, konkrétně její python verzi PyQt5. Rozhraní jako takové je odděleno od ostatních řídících funkcionalit a pouze zajišťuje zobrazování informací získatelných z topiců a odesílání příkazů ostatním uzlům. Zbytek ROS2 systému je tedy plně ovladatelný z prostředí příkazové řádky. Co se týče implementace tak ROS2 i qt mají svůj vlastní execution loop, což vytváří problém, protože pokud jeden z nich neběží, tak daná část nefunguje. Jednou možností řešení je použití více procesů. To však vede na problémy se synchronizací. Lepší a také použitý přístup tedy je řídit oba cykly manuálně. 
+Uživatelské rozhraní na straně stacionárního zařízení využívá knihovnu Qt, konkrétně její Python verzi PyQt5. Rozhraní jako takové je odděleno od ostatních řídících funkcionalit a pouze zajišťuje zobrazování informací získatelných z topiců a odesílání příkazů ostatním uzlům. Zbytek ROS2 systému je tedy plně ovladatelný z prostředí příkazové řádky. Co se týče implementace, tak ROS2 i QT mají svůj vlastní execution loop. To vytváří problém, protože pokud jeden z nich neběží, tak daná část nefunguje. Jedním z možných řešení je použití více procesů. To však vede na problémy se synchronizací. Lepší a také použitý přístup je řídit oba cykly manuálně. 
 \begin{verbatim}
 	while controllers.user_interface.global_variables.executeEventLoop:
 	rclpy.spin_once(node, timeout_sec=0.001)
 	app.processEvents()
 \end{verbatim}
-ROS2 část zajišťuje komunikaci se zbytkem systému. Obsahuje subscribery na topicy ze kterých volá qt funkce na zobrazení získaných dat. Kromě těch pak obsahuje také funkce sloužící k zasílání příkazů na servery či odesílání dat do topicků. Ty jsou volané z qt části.
-Qt část se pak stará čistě o zobrazování získaných dat nebo volání ROS části v reakci na uživatelské akce.
+Tímto způsobem můžou obě části řešit svou vlastní funkcionalitu a zároveň volat funkce té druhé. ROS2 část zajišťuje komunikaci se zbytkem systému. Získává z něj data, které předává Qt části. Qt část zajistí jejich zobrazení a reakce na uživatelské příkazy. Příkazy na zaktivování uzlů pak přeposílá zpět do ROS2 části, které je odešle do systému.
 
 \chapter{Nástroje související s ROS2}
+Tato kapitola se již odchýlí od čistého ROS2 systému a původního zadání práce. Jejím cílem je představit související nástroje, které buď usnadňují vývoj nebo výrazným způsobem rozšiřují schopnosti výsledného systému.
 
 \section{Gazebo Simulátor}
 Použití simulátoru při vývoji softwaru na řízení robotů je časté a užitečné. Umožňuje vyvíjet software i bez fyzického robota, případně testovat funkcionalitu bez vlivů reálného světa. Tato práce využívá novou \verb|ignition| větev Gazebo simulátoru. 
 
-Před tím, než lze začít využívat výhody simulátoru, je nejprve potřeba vytvořit model robota a světy ve kterých se bude pohybovat. Nativním formátem který Gazebo využívá je \verb|sdf|. V této práci je \verb|sdf| použito k definici světů.
+Před tím, než lze začít využívat výhody simulátoru, je nejprve potřeba vytvořit model robota a světy ve kterých se bude pohybovat. Nativním formátem, který Gazebo využívá je \verb|sdf|. V této práci je \verb|sdf| použito k definici světů.
 
 \subsection*{Definice světa}
 Definice světů se skládá ze dvou základních částí. Nejprve se zpravidla definují obecné vlastnosti jako parametry simulace, fyzikální charakteristiky světa a pluginy. Druhou částí je pak samotná definice objektů, které se budou ve světě nacházet. Ty můžou být složené z jednoduchých tvarů, které lze definovat přímo v souboru.
@@ -1311,9 +1291,9 @@ Definice světů se skládá ze dvou základních částí. Nejprve se zpravidla
 \subsection*{Definice modelu}
 Pro definice modelů existuje několik použitelných formátů. První možností je využít stejně jako pro světy formát \verb|sdf|. Tímto způsobem lze zapsat definici modelu ve stejném souboru jako zbytek světa. Pokud se jedná o komplexnější definici lze ji zapsat externě a vložit od stvěta pomocí \verb|<include>| tagu. Z důvodu kompatibility se zbytkem ROS2 systému umožňuje gazebo použít také \verb|urdf| potažmo \verb|xacro| soubory. Modely definované v \verb|urdf| se do světa nevkládají přímo, ale \uv{spawnují} se až po spuštění simulace. Slouží k tomu gazebo service jménem \verb|/world/world_name/create| a příkaz \verb|ign service|.
 
-Klasický, již probraný, model definuje vizuální a fyzikální vlastnosti robota. Tato definice struktury je pro většinu nástrojů dostačující. Simulátor, který má za úkol simulovat chování robota, potřebuje dodatečné informace o tom, co jednotlivé elementy modelu reprezentují z pohledu funkcionality. K tomu slouží \verb|<gazebo>| tagy. Zde by bylo dobré zmínit, že do definic modelů lze vkládat aplikačně specifické tagy. Příkladem je právě \verb|<gazebo>|, nebo \verb|<ros2_contorl>| tag. Ostatní nástroje zpracovávající takovou definici tyto neznámé tagy ignorují.
+Klasický model (viz strana: \pageref{implementation:model}) definuje vizuální a fyzikální vlastnosti robota. Tato definice struktury je pro většinu nástrojů dostačující. Simulátor, který má za úkol simulovat chování robota, potřebuje dodatečné informace o tom, co jednotlivé elementy modelu reprezentují z pohledu funkcionality. K tomu slouží \verb|<gazebo>| tagy. Zde by bylo dobré zmínit, že do definic modelů lze vkládat aplikačně specifické tagy. Příkladem je právě \verb|<gazebo>|, nebo \verb|<ros2_contorl>| tag. Ostatní nástroje zpracovávající takovou definici tyto neznámé tagy ignorují.
 
-Možným obsahem \verb|<gazebo>| tagu je buď \verb|<senzor>| nebo \verb|<plugin>|. Senzory se vždy přiřazují k nějakému existujícímu \verb|link| elementu. Tento \verb|link| pak reprezentuje fyzické vlastnosti a vzhled daného senzoru. Argumentem \verb|senzor| tagu je určení konkrétního typu snímače. V jeho těle se pak definují parametry. Ty jsou specifické pro jednotlivé typy senzorů. Gazebem podporované senzory jsou typicky komplexnější modely jako lidar a hloubkové kamery. Naopak jednodušší snímače použité na demonstračním robotovi nejsou nativně implementovány. Ultrazvukový senzor vzdálenosti je tedy ve výsledném modelu nahrazen lidarem. Aby se jeho fungování více blížilo referenčnímu senzoru, byl omezen úhel měření na 15° a počet vysílaných paprsků na tři. Modul pro sledování čáry je pak realizován pomocí tří kamer. Každá s rozlišením jeden pixel. Získanou RGB hodnotu následně zpracovává pomocný uzel.
+Možným obsahem \verb|<gazebo>| tagu je buď \verb|<senzor>| nebo \verb|<plugin>|. Senzory se vždy přiřazují k nějakému existujícímu \verb|<link>| elementu. Tento článek pak reprezentuje fyzické vlastnosti a vzhled daného senzoru. Argumentem \verb|senzor| tagu je určení konkrétního typu snímače. V jeho těle se pak definují parametry. Ty jsou specifické pro jednotlivé typy senzorů. Gazebem podporované senzory jsou typicky ty komplexnější jako lidar a hloubkové kamery. Naopak jednodušší snímače použité na demonstračním robotovi nejsou nativně implementovány. Ultrazvukový senzor vzdálenosti je tedy ve výsledném modelu nahrazen lidarem. Aby se jeho fungování více blížilo referenčnímu senzoru, byl omezen úhel měření na 15° a počet vysílaných paprsků na tři. Modul pro sledování čáry je pak realizován pomocí tří kamer. Každá s rozlišením jeden pixel. Získanou RGB hodnotu následně zpracovává pomocný uzel.
 
 Pluginy jsou kusy kódu, umožňující rozšířit simulátor o další funkcionalitu. Jejich použití v definici modelu slouží převážně k simulaci motorů a serv. Základní instalace Gazebo Simulátoru obsahuje mnoho užitečných pluginů. Příkladem může být \verb|DiffDrive| nebo \verb|JointController|. První zmíněný simuluje řízení robota s diferenciálním podvozkem. Druhý pak umožňuje simulovat chování podobné servu. 
 
@@ -1322,7 +1302,8 @@ Krása Gazebo Simulátoru je jeho provázání s ROS2 systémem. Pomocí oficiá
 
 Spouští se pomocí příkazu:
 \begin{verbatim}
-	ros2 run ros_gz_bridge parameter_bridge /topic_name@gazebo_msg_type@ignition_msg_type
+	ros2 run ros_gz_bridge parameter_bridge 
+	/topic_name@gazebo_msg_type@ignition_msg_type
 \end{verbatim}
 Pro efektivnější použití lze předat bridge uzlu config soubor s definicí více topiců které budou přemostěny.
 \begin{verbatim}
@@ -1333,20 +1314,21 @@ Pro efektivnější použití lze předat bridge uzlu config soubor s definicí 
 	direction: IGN_TO_ROS  # BIDIRECTIONAL or ROS_TO_IGN
 \end{verbatim}
 
-\subsubsection*{Zařízení kompatibility}
+\newpage
+\subsubsection*{Zajištění kompatibility}
 Ve většině případů stačí k zajištění kompatibility čisté přemostění topiců mezi Gazebem a ROSem. Ale existují také speciální případy, kdy je potřeba data nějakým způsobem upravit aby blíže odpovídaly reálnému světu. 
 
 \begin{itemize}[leftmargin=*]
 	\item{Kamera}
 \end{itemize}
 \vspace*{-0.5em}
-Most pro přenos obrazových dat využívá na ROS2 straně zprávy typu Image. Ale jak bylo podrobněji probráno v sekci o fyzické kameře. Výstup z uzlu pro její ovládání je ve formátu CompressedImage. Data vycházející ze simulátoru musí proto být přetypovány aby byla zajištěna kompatibilita.
+Most pro přenos obrazových dat využívá na ROS2 straně zprávy typu Image. Ale jak bylo podrobněji probráno v sekci o fyzické kameře (str: \pageref{implementation:camera}). Výstup z uzlu pro její ovládání je ve formátu CompressedImage. Data vycházející ze simulátoru musí proto být přetypovány, aby byla zajištěna kompatibilita.
 
 \begin{itemize}[leftmargin=*]
 	\item{Sledování Čáry}
 \end{itemize}
 \vspace*{-0.5em}
-Jak bylo řečeno výše, Gazebo nemá nativní podporu senzoru pro sledování čáry. Výstup ze simulátoru je tedy ve formátu tří Image zpráv, každá obsahující jeden RGB pixel. Vzhledem k tomu, že se jedná o tři samostatné zprávy, musí být nejprve seskupeny podle časových značek. Poté jsou získaná data převedena na binární hodnotu reprezentující viditelnost čáry. To je provedeno zkombinováním RGB složek pixelu na jedu grayscale hodnotu. Na ni lze jednoduše aplikovat thresholding a získat tak výsledné rozhodnutí o viditelnosti čáry.
+Jak bylo řečeno výše, Gazebo nemá nativní podporu senzoru pro sledování čáry. Výstup ze simulátoru je tedy ve formátu tří Image zpráv, každá obsahující jeden RGB pixel. Vzhledem k tomu, že se jedná o tři samostatné zprávy, musí být nejprve seskupeny podle časových značek. Poté jsou získaná data převedena na binární hodnotu reprezentující viditelnost čáry. To je provedeno zkombinováním RGB složek pixelu na jedu grayscale hodnotu. Na ni lze aplikovat thresholding a získat tak výsledné rozhodnutí o viditelnosti čáry.
 
 \begin{itemize}[leftmargin=*]
 	\item{Měření vzdálenosti}
@@ -1366,26 +1348,29 @@ Uzel pro ovládání fyzického serva používá action server. Tento simulovan�
 \vspace*{-0.5em}
 U těchto uzlů probíhá pouze jednoduché přemapování jmen. U odometrie je rozdíl v tom, že výstupem není klasický topic ale \verb|/tf| rám.
 
+%todo nemam odometrii pres ros2 control?
+
 \section{ROS2 Control}
-Ros2 control je framework implementující teorii řízení. V sekci o ovládání komponent byl představen uzel, který ovládá dc motory s cílem realizovat diferenciální pohyb robota. Tvorba vlastního uzlu k tomuto účelu je zcela validní přístup. Problém je v tom, že podobný uzel bude potřebovat každý mobilní robot. A proto existuje ros2 control, který má za cíl zjednodušit tvorbu řídících systémů.
+Ros2 control je framework implementující teorii řízení. V sekci o ovládání komponent byl představen uzel, který ovládá stejnosměrné motory s cílem realizovat diferenciální pohyb robota. Tvorba vlastního uzlu k tomuto účelu je zcela validní přístup. Problém je v tom, že podobný uzel bude potřebovat každý mobilní robot. A proto existuje ros2 control, který má za cíl zjednodušit tvorbu řídících systémů.
 
 \subsection*{Controller Manager}
-Je hlavní řídící jednotkou, která zajišťuje navázání ovladačů(controllers) a hardwarových pluginů (drivers). Manager se spouští pomocí uzlu \verb|ros2_control_node|. Jako první krok po spuštění potřebuje získat informace o robotu, kterého bude ovládat. Ty hledá v \\ \verb|robot_description| topicu. Konkrétně z něj získá seznam kloubů a hardwarových rozhraní, kterými tyto klouby disponují. Příkazové rozhraní \verb|command_interface| slouží k posílání dat směrem k hardwaru, například nastavení rychlosti(velocity) otáčení motoru. Stavové rozhraní \verb|state_interface| pak slouží k získávání informací z dané komponenty zpět do ROS2 systému, může se jednat například o výstup enkodéru motoru. Další inicializačním krokem je zpracování konfiguračního souboru. Ten obsahuje seznam použitelných ovladačů a jejich nastavení. V tento moment bude manager čekat na spuštění některého z ovladačů definovaných v konfiguračním souboru, aby mohlo dojít k jeho navázání na kompatibilní hardwarové rozhraní. Tímto krokem je vše připraveno a může započít ovládání robota.
+Je hlavní řídící jednotkou, která zajišťuje navázání ovladačů(controllers) a hardwarových pluginů (drivers). Manager se spouští pomocí uzlu \verb|ros2_control_node|. Jako první krok po spuštění potřebuje získat informace o robotu, kterého bude ovládat. Ty hledá v \\ \verb|robot_description| topicu. Konkrétně jej zajímá tag \verb|<ros2_control>|. Z něj získá seznam kloubů a hardwarových rozhraní, kterými tyto klouby disponují. Příkazové rozhraní \verb|command_interface| slouží k posílání dat směrem k hardwaru, například nastavení rychlosti(velocity) otáčení motoru. Stavové rozhraní \verb|state_interface| pak slouží k získávání informací z dané komponenty zpět do ROS2 systému, může se jednat například o výstup enkodéru motoru. Další inicializačním krokem je zpracování konfiguračního souboru. Ten obsahuje seznam použitelných ovladačů a jejich nastavení. V tento moment bude manager čekat na spuštění některého z ovladačů definovaných v konfiguračním souboru, aby mohlo dojít k jeho navázání na kompatibilní hardwarové rozhraní. Tímto krokem je vše připraveno a může započít ovládání robota.
 U příkladu ovládání robota s diferenciálním podvozkem je využit, již implementovaný ovladač, který zajišťuje výpočty týkající se kinematiky. Hardware plugin se pak stará pouze o ovládání motorů pomocí GPIO rozhraní.
 
 \subsection*{Model}
 Aby Control Manager věděl, se kterými částmi robota bude pracovat, musí být upravena jeho \verb|urdf| definice. Konkrétně je potřeba přidat \verb|<ros2_control>| tag. V jeho obsahu je jako první vybrán konkrétní hardware plugin, který bude zajišťovat řízení komponent. Jsou zde také zapsány parametry, které budou při spuštění předány danému pluginu. Dále jsou vybrány klouby a jejich rozhraní, které bude tento plugin a potažmo ros2 control ovládat. 
 
 \subsection*{Hw Plugin}
-Hardware Pluginy jak z názvu vyplývá jsou části kódu které budou v ros2 control ekosystému zajišťovat komunikaci s hardware komponentami. Na rozdíl od controlerů, u kterých lze často využít existující implementace, protože se požadované funkcionality často opakují. U hardware pluginů existuje mnoho různých komponent s různými rozhraními a, tak je často potřeba si napsat vlastní. Pro psaní pluginů se používá jazyk C++. Struktura jako taková je podobná lifecycle uzlům ROS2. Znamená to, že třída musí definovat speciální metody, které se volají v průběhu inicializace / destrukce objektu.
+Hardware Pluginy, jak z názvu vyplývá, jsou části kódu, které budou v ros2 control ekosystému zajišťovat komunikaci s hardware komponentami. Na rozdíl od controlerů, u kterých lze často využít existující implementace, protože se požadované funkcionality často opakují. U hardware pluginů existuje mnoho různých komponent s různými rozhraními a, tak je často potřeba si napsat vlastní. Pro psaní pluginů se používá jazyk C++. Struktura jako taková je podobná lifecycle uzlům ROS2. Znamená to, že třída musí definovat speciální metody, které se volají v průběhu inicializace / destrukce objektu \ref{fig:lifecycle_diagram}.
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.8]{obrazky-figures/ros2_control_wh_plugin_transitions.pdf}
-	\caption{Základní postup volání lifecycle funkcí}
-	\label{}
+	\caption{Běžný postup volání lifecycle funkcí}
+	\label{fig:lifecycle_diagram}
 \end{figure}
 
+\newpage
 \begin{itemize}[leftmargin=*]
 	\item{\verb|on_init|}
 	\vspace*{-0.5em}
@@ -1445,53 +1430,54 @@ Slouží k tomu balíček \verb|gz_ros2_control|. Struktura ros2 control zůstá
 	
 \end{algorithm}
 
-
+\newpage
 \section{Navigace a mapování}
-
-
-Před zahájením mapování je nejprve potřeba vytvořit několik uzlů, které budou poskytovat informace o aktuální pozici robota, jeho struktuře a podobně.
+Jádrem mapování a navigace jsou použité knihovny \verb|slam_toolbox| a \verb|navigation2|. Aby fungovaly, musí jim existující systém poskytnout určité informace. Těmi je struktura použitého robota, jeho pozice v prostoru a další.
 
 \subsubsection*{Model}
-Jak mapování tak navigace hojně využívají \verb|/tf| subsystém. Z něj získávají informace o struktuře a transformacích robota. Podrobněji se o \verb|/tf| mluví v [] a o modelech v []. 
+Obě funkce hojně využívají \verb|/tf| subsystém. Z něj získávají informace o struktuře a transformacích robota. Podrobněji se o \verb|/tf| mluví na straně \pageref{theory:tf} a o modelech na \pageref{implementation:model}.
 
 \subsubsection*{Odometrie}
-Druhým krokem k mapování a lokalizaci je získání aktuálních souřadnic, orientace a rychlosti robota. K tomu slouží odometrie. Odometrická dala lze získat několika způsoby. Jedním z často používaných a také poměrně přesných přístupů je využití dat získaných z enkodérů motorů kol a následný výpočet vzdálenosti, kterou urazily jednotlivá kola diferenciálního podvozku. Vzhledem k tomu, že použitý robot nedisponuje motory s enkodéry byl v této práci využit druhý přístup. Tím je zpracování dat získaných z imu senzoru. Integrací dat z akcelerometru a gyroskopu lze získat aktuální pozici a natočení vůči počátku. Nevýhodou tohoto přístupu je její menší přesnost a akumulace chyb vedoucí k postupnému vzdalování těchto dat od reality. Postupná akumulace chyby u odometrie vzniká u všech přístupů a ostatní části ROS2 systému realizující mapování a navigaci tak s touto skutečností počítají. V této práci tuto funkcionalitu zajišťuje uzel \verb|imu_node|, který výsledná data odesílá jako odom frame do tf subsystému. 
+Druhým krokem k mapování a lokalizaci je získání aktuálních souřadnic, orientace a rychlosti robota. K tomu slouží odometrie \ref{fig:rviz_odom}. Odometrická dala lze získat několika způsoby. Jedním z často používaných a také poměrně přesných přístupů je využití dat získaných z enkodérů motorů kol a následný výpočet vzdálenosti, kterou urazily jednotlivá kola diferenciálního podvozku. Vzhledem k tomu, že použitý robot nedisponuje motory s enkodéry, byl v této práci využit druhý přístup. Tím je zpracování dat získaných z imu senzoru. Integrací dat z akcelerometru a gyroskopu lze získat aktuální pozici a natočení vůči počátku. Nevýhodou tohoto přístupu je její menší přesnost a akumulace chyb vedoucí k postupnému vzdalování těchto dat od reality. Postupná akumulace chyby u odometrie vzniká u všech přístupů a ostatní části ROS2 systému realizující mapování a navigaci tak s touto skutečností počítají. V této práci tuto funkcionalitu zajišťuje uzel \verb|imu_node|, který výsledná data odesílá jako odom frame do tf subsystému. 
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.6]{obrazky-figures/odom.png}
-	\caption{Zobrazení robota včetně jeho transformačních rámů v Rviz, fixed\_frame je nastaven na odom a robot se tedy může pohybovat oproti počátku souřadného systému}
-	\label{}
+	\caption[Zobrazení transformací a odometrie v nástroji Rviz]{Zobrazení robota včetně jeho transformačních rámů v Rviz, fixed\_frame je nastaven na odom a robot se tedy může pohybovat oproti počátku souřadného systému}
+	\label{fig:rviz_odom}
 \end{figure}
 
 \subsubsection*{Mapování}
-Posledním krokem k úspěšnému mapování je získání dat o okolním prostředí. To zajišťuje lidar senzor umístěný na robotu. Aby bylo možné data získané z lidaru správně vizualizovat v rviz musí existovat transformace mezi rámem lidaru a base frame robota. Pokud je lidar součástí definice modelu, postará se o tuto transformaci \verb|robot state publisher|.
+Posledním krokem k úspěšnému mapování je získání dat o okolním prostředí. To zajišťuje lidar senzor umístěný na robotu. Aby bylo možné data získané z lidaru použít, musí existovat transformace mezi rámem lidaru a base frame robota. Pokud je lidar součástí definice modelu, postará se o tuto transformaci \verb|robot state publisher|.
 
-Mapování jako takové pak zajišťuje perfektní knihovna \verb|slam_toolbox|. Jedná se o komplexní soubor nástrojů souvisejících se SLAM. Tato práce využívá \verb|async_slam_toolbox_node|. Jedná se o online, async mapování. Online znamená, že uzel pracuje nad aktuálními daty, knihovna totiž umožňuje také tvorbu mapy z předem zaznamenané historie. Async pak zajišťuje zpracování vždy nejnovějších dat, což zlepšuje latenci, ale může vést k přeskočení některých scanů. Vzhledem k tomu, že slam je komplexní problém, existuje mnoho nastavitelných parametrů. Ty se předávají při spouštění pomocí konfiguračního souboru. V demo příkladech se nahází ukázkový konfigurační soubor, který byl jen s menšími modifikacemi využit i v této práci. Hlavní změnou je zvýšení rozlišení vytvářené mapy. Vývojáři knihovny předpokládají její využití v průmyslu a základní hodnoty tedy pracují s předpokladem, že robot je větší a pohybuje se ve velkých halách. Uzel pak odesílá výslednou mapu ve standardním formátu \verb|nav_msgs/OccupancyGrid| do \verb|/map| topicu.
+Mapování jako takové pak zajišťuje perfektní knihovna \verb|slam_toolbox|. Jedná se o komplexní soubor nástrojů souvisejících se SLAM. Tato práce využívá \verb|async_slam_toolbox_node|. Jedná se o online, async mapování. Online znamená, že uzel pracuje nad aktuálními daty, knihovna totiž umožňuje také tvorbu mapy z předem zaznamenané historie. Async pak zajišťuje zpracování vždy nejnovějších dat, což zlepšuje latenci, ale může vést k přeskočení některých scanů. Vzhledem k tomu, že slam je komplexní problém, existuje mnoho nastavitelných parametrů. Ty se předávají při spouštění pomocí konfiguračního souboru. V demo příkladech se nahází ukázkový konfigurační soubor, který byl jen s menšími modifikacemi využit i v této práci. Hlavní změnou je zvýšení rozlišení vytvářené mapy. Vývojáři knihovny předpokládají její využití v průmyslu a základní hodnoty tedy pracují s předpokladem, že robot je větší a pohybuje se ve velkých halách. Uzel pak odesílá výslednou mapu ve standardním formátu \verb|nav_msgs/OccupancyGrid| do \verb|/map| topicu \ref{fig:rviz_slam_map}. 
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.7]{obrazky-figures/slam.png}
 	\caption{Mapa vytvořená slam toolboxem zobrazená v nástroji Rviz}
-	\label{}
+	\label{fig:rviz_slam_map}
 \end{figure}
 
 \subsubsection*{Navigace}
 Pro navigaci byla využita knihovna Navigation 2. Nav2 je rozsáhlý nástroj, který tvoří v podstatě samostatný ROS2 systém skládající se z několika navzájem spolupracujících uzlů. Principiálně je Nav2 založen na behaviorálních stromech.
 
-Z vnějšího pohledu uzly Nav2 poslouchají topicy \verb|/scan|(lidar data) \verb|map|(slam mapa) a transformace z tf systému, primárně ty související s \verb|odom| rámem. Zobrazitelným výstupem je několik costmap. Jedná se o upravenou mapu z \verb|map| topicu obohacenou o ceny jednotlivých polí. Tyto ceny jsou používány plánovacím serverem (jeden z uzlů Nav2) k určení optimální cesty k cíli. Příkaz pro zahájení navigace je přijímán action serverem se jménem \verb|/navigate_to_pose|. 
+Z vnějšího pohledu uzly Nav2 poslouchají topicy \verb|/scan|(lidar data) \verb|map|(slam mapa) a transformace z tf systému, primárně ty související s \verb|odom| rámem. Zobrazitelným výstupem je několik costmap \ref{fig:rviz_costmap}. Jedná se o upravenou mapu z \verb|map| topicu obohacenou o ceny jednotlivých polí. Tyto ceny jsou používány plánovacím serverem (jeden z uzlů Nav2) k určení optimální cesty k cíli. Příkaz pro zahájení navigace je přijímán action serverem se jménem \verb|/navigate_to_pose|. 
 
 Uživatel může ovlivnit chování Nav2 systému pomocí konfiguračního souboru. Ten je poměrně komplexní a umožňuje nastavovat velké množství parametrů a dokonce vyměňovat řídící pluginy. V porovnání s slam konfigurací zde bylo potřeba změnit hodně parametrů. Použité motory nedokážou vyvinout menší rychlost než 0.2m/s byly proto upraveny minimální rychlosti. Stejně jako u slam konfigurace je robot menší a pohybuje se v menších prostorách, byly proto zmenšeny inflation vzdálenosti. Ty jsou okolo překážek a ovlivňují ceny polí při plánování cesty.
+
+%todo popsat co funguje a co ne
 
 \begin{figure}[h!]
 	\centering
 	\includegraphics[scale=0.7]{obrazky-figures/nav2.png}
 	\caption{Slam mapa překrytá lokální navigation 2 costmapou v nástroji Rviz}
-	\label{}
+	\label{fig:rviz_costmap}
 \end{figure}
 
+\newpage %remove once you add some text after the heading
 \section*{Instalace}
-Výsledný systém je komplexní a obsahuje mnoho závislostí které vyžaduje pro jeho správnou funkcionalitu.
+%todo
 
 \chapter{Závěr}
 Cílem práce bylo vytvořit ROS2 systém pro ovládání robota Adeept AWR 4WD a demonstrovat na něm možnosti ROS2. Tohoto cíle bylo dosaženo a implementovaný systém tak může fungovat jako ukázka možností ROS2. V rámci implementace bylo využito všech důležitých funkcionalit a konceptů používaných v ROS2. Dokumentace pak funguje jako vysvětlení jednotlivých funkcionalit případně jako rozcestník při hledání příkladu konkrétní funkcionality.
