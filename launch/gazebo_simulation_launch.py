@@ -43,9 +43,9 @@ def generate_launch_description():
         )
     )
 
-    motor = IncludeLaunchDescription(
+    ros2_controlers = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_motor_launch.py'
+            FindPackageShare("gazebo_simulator_nodes"), '/launch', '/ros2_controlers_launch.py'
         ])
     )
 
@@ -79,30 +79,16 @@ def generate_launch_description():
         ])
     )
 
-    odometry = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_odometry_launch.py'
-        ])
-    )
-
-    joint_states = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_joint_states_launch.py'
-        ])
-    )
-
     return LaunchDescription([
         world_select_arg,
         main_world,
         wandering_world,
         line_following_world,
         
-        motor,        
-        joint_states,
+        ros2_controlers, #diff drive, odometry, joint_states
         servo,
         camera,
         line_following,
         ultrasonic,
         lidar,
-        odometry,
     ])

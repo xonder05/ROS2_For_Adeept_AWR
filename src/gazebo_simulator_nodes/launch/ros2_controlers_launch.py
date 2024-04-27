@@ -4,13 +4,24 @@ from launch.actions import TimerAction
 
 def generate_launch_description():
 
-    robot_controller_spawner = TimerAction(
+    diff_drive_controller_spawner = TimerAction(
         period=7.5,
         actions=[
             Node(
                 package="controller_manager",
                 executable="spawner",
-                arguments=["diffbot_base_controller"],
+                arguments=["diff_drive_controller"],
+            )
+        ]
+    )
+
+    joint_state_broadcaster_spawner = TimerAction(
+        period=7.5,
+        actions=[
+            Node(
+                package="controller_manager",
+                executable="spawner",
+                arguments=["joint_state_broadcaster"],
             )
         ]
     )
@@ -24,6 +35,7 @@ def generate_launch_description():
     )
 
     return launch.LaunchDescription([
-        robot_controller_spawner,
+        diff_drive_controller_spawner,
+        joint_state_broadcaster_spawner,
         bridge,
     ])

@@ -176,7 +176,7 @@
         <parameters>$(find adeept_awr_diffdrive_control_plugin)/config/controllers.yaml</parameters>
         <parameters>$(find adeept_awr_diffdrive_control_plugin)/config/controllers_sim.yaml</parameters>
         <ros>
-          <remapping>/diffbot_base_controller/cmd_vel_unstamped:=/cmd_vel</remapping>
+          <remapping>/diff_drive_controller/cmd_vel_unstamped:=/cmd_vel</remapping>
           <remapping>/robot_description:=/controller_manager/robot_description</remapping>
         </ros>
       </plugin>
