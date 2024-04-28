@@ -28,7 +28,7 @@ from nav2_common.launch import RewrittenYaml
 
 def generate_launch_description():
     # Get the launch directory
-    bringup_dir = get_package_share_directory('nav2_bringup')
+    controllers_dir = get_package_share_directory('controllers')
 
     namespace = LaunchConfiguration('namespace')
     use_sim_time = LaunchConfiguration('use_sim_time')
@@ -82,15 +82,9 @@ def generate_launch_description():
         default_value='false',
         description='Use simulation (Gazebo) clock if true')
 
-    default_params_file = os.path.join(
-        get_package_share_directory('controllers'),
-        'config',
-        'custom_nav2_params.yaml'
-    )
-
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=default_params_file,
+        default_value=os.path.join(controllers_dir, 'config', 'custom_nav2_params.yaml'),
         description='Full path to the ROS2 parameters file to use for all launched nodes')
 
     declare_autostart_cmd = DeclareLaunchArgument(
@@ -155,7 +149,7 @@ def generate_launch_description():
                 respawn_delay=2.0,
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings + [("cmd_vel", "cmd_vel_in")]),
+                remappings=remappings),
             Node(
                 package='nav2_bt_navigator',
                 executable='bt_navigator',
@@ -186,7 +180,7 @@ def generate_launch_description():
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings +
-                        [('cmd_vel', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel_in')]),
+                        [('cmd_vel', 'cmd_vel_nav'), ('cmd_vel_smoothed', 'cmd_vel')]),
             Node(
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',

@@ -1,7 +1,6 @@
+#!/usr/bin/env python3
 import sys
-sys.path.append('/home/pi/.local/lib/python3.10/site-packages')
 from rpi_ws281x import *
-
 
 LED_COUNT      = 16      # Number of LED pixels.
 LED_PIN        = 12      # GPIO pin connected to the pixels (18 uses PWM!).

@@ -12,28 +12,23 @@ def generate_launch_description():
         'controllers.yaml'
     )
 
-    control_node = Node(
+    manager_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
         parameters=[controller_config_file],
         remappings=[
-            ('/diffbot_base_controller/cmd_vel_unstamped', '/cmd_vel'),
+            ('/diff_drive_controller/cmd_vel_unstamped', '/cmd_vel'),
             ('/controller_manager/robot_description', '/robot_description')
         ]
     )
 
-    delayed_robot_controller_spawner = TimerAction(
-        period=10.0,
-        actions=[
-            Node(
-                package="controller_manager",
-                executable="spawner",
-                arguments=["diffbot_base_controller"],
-            )
-        ]
+    controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["diff_drive_controller", "--controller-manager-timeout", "60"],
     )
 
     return LaunchDescription([
-        control_node,
-        delayed_robot_controller_spawner,
+        manager_node,
+        controller_spawner,
     ])

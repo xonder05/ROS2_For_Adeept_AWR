@@ -7,7 +7,7 @@ from launch.conditions import IfCondition, UnlessCondition
 
 def generate_launch_description():
     
-    use_ros2_control_arg = DeclareLaunchArgument('use_ros2_control', default_value="True")
+    use_ros2_control_arg = DeclareLaunchArgument('use_ros2_control', default_value="False")
 
     dc_motor = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
