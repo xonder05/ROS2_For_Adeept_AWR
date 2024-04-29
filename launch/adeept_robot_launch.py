@@ -48,6 +48,11 @@ def generate_launch_description():
                 FindPackageShare("adeept_awr_nodes"), '/launch', '/imu_launch.py'])
     )
 
+    lidar =IncludeLaunchDescription(
+            PythonLaunchDescriptionSource([
+                FindPackageShare("ld19_lidar"), '/launch', '/lidar.launch.py'])
+    )
+
     line = IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 FindPackageShare("adeept_awr_nodes"), '/launch', '/line_tracking_launch.py'])
@@ -78,6 +83,7 @@ def generate_launch_description():
         led,
         ultrasonic,
         imu,
+        lidar,
         line,
         sound_receiver,
         sound_transmitter,
