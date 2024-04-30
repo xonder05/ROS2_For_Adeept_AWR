@@ -88,3 +88,9 @@ simulator_joint_states_bridge:
     topic: "/joint_states"
     ros_message_type: "sensor_msgs/msg/JointState"
     gazebo_message_type: "ignition.msgs.Model"
+
+simulator_imu_bridge:
+  ros__parameters:
+    topic: "/simulator_imu"
+    ros_message_type: "sensor_msgs/msg/Imu"
+    gazebo_message_type: "ignition.msgs.IMU"

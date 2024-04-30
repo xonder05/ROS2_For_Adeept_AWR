@@ -14,6 +14,7 @@
     <xacro:fixed_joint name="base_footprint" parent="base_link" child="base_footprint"/>
 
     <xacro:box_link name="chassis" mass="2" x="${chassis_length}" y="${chassis_width}" z="${chassis_height}" material="black"/>  
+    <xacro:imu/>
     <xacro:fixed_joint name="chassis" parent="base_link" child="chassis" origin_position="0 0 0.1"/>
 
     <xacro:diff_drive/>

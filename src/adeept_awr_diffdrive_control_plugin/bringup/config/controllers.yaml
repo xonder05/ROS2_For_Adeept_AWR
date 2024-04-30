@@ -13,5 +13,7 @@ diff_drive_controller:
     wheel_separation: 0.15
     wheel_radius: 0.035
 
+    cmd_vel_timeout: 30.0
+
     enable_odom_tf: false
     use_stamped_vel: false

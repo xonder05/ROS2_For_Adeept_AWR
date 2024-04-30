@@ -67,6 +67,12 @@ def generate_launch_description():
         ])
     )
 
+    imu = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_imu_launch.py'
+        ])
+    )
+
     line_following = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             FindPackageShare("gazebo_simulator_nodes"), '/launch', '/simulator_line_tracking_launch.py'
@@ -90,5 +96,6 @@ def generate_launch_description():
         camera,
         line_following,
         ultrasonic,
+        imu,
         lidar,
     ])

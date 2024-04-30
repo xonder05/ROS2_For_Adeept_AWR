@@ -35,6 +35,7 @@ setup(
             "simulator_ultrasonic = gazebo_simulator_nodes.simulator_ultrasonic:main",
             'simulator_lidar = gazebo_simulator_nodes.simulator_lidar:main',
             'simulator_odometry = gazebo_simulator_nodes.simulator_odometry:main',
+            'simulator_imu = gazebo_simulator_nodes.simulator_imu:main',
         ],
     },
 )
