@@ -37,6 +37,7 @@ hardware_interface::CallbackReturn AdeeptDiffDriveHardware::on_init(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
+  // loading parameters
   left_side.enable_pin = std::stoi(info_.hardware_parameters["motor_left_enable_pin"]);
   left_side.forward_pin = std::stoi(info_.hardware_parameters["motor_left_forward_pin"]);
   left_side.backward_pin = std::stoi(info_.hardware_parameters["motor_left_backward_pin"]);
@@ -74,6 +75,8 @@ std::vector<hardware_interface::StateInterface> AdeeptDiffDriveHardware::export_
 {
   std::vector<hardware_interface::StateInterface> state_interfaces;
   
+  // there is no feedback from the motors so theese interfaces are practically useless
+  // but used controller requires theirs exsitence to function
   state_interfaces.emplace_back(hardware_interface::StateInterface(
     "left_front_wheel_joint", hardware_interface::HW_IF_POSITION, &left_side.front_wheel_position));
   state_interfaces.emplace_back(hardware_interface::StateInterface(
@@ -101,6 +104,7 @@ std::vector<hardware_interface::CommandInterface> AdeeptDiffDriveHardware::expor
 {
   std::vector<hardware_interface::CommandInterface> command_interfaces;
 
+  // input commands from controller are passed throw them
   command_interfaces.emplace_back(hardware_interface::CommandInterface(
     "left_front_wheel_joint", hardware_interface::HW_IF_VELOCITY, &left_side.front_wheel_velocity));
 
@@ -121,6 +125,7 @@ hardware_interface::CallbackReturn AdeeptDiffDriveHardware::on_activate(
 {
   RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "Activating ...please wait...");
 
+  // gpio initialization
   chip = gpiod_chip_open("/dev/gpiochip0");
   if (!chip) {
       std::cerr << "Error opening GPIO chip\n";
@@ -170,6 +175,7 @@ hardware_interface::CallbackReturn AdeeptDiffDriveHardware::on_deactivate(
 {
   RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "Deactivating ...please wait...");
 
+  // stopping motors before exiting
   left_side.pwm_gen.stop();
   right_side.pwm_gen.stop();
 
@@ -204,12 +210,14 @@ hardware_interface::return_type adeept_awr_diffdrive_control_plugin ::AdeeptDiff
     RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"), "Not same speed\n");
   }
 
-  double left_motor_speed = std::max(std::min(left_side.front_wheel_velocity, 18.5), -18.5);
-  double normalized_left_motor_speed = (left_motor_speed / (18.5 + 1)) * 100;
+  // recieved command cut to limits of the motor and scaled to pwm freq
+  double left_motor_speed = std::max(std::min(left_side.front_wheel_velocity, left_side.max_motor_rotation_speed), -left_side.max_motor_rotation_speed);
+  double normalized_left_motor_speed = (left_motor_speed / (left_side.max_motor_rotation_speed + 1)) * 100;
   
-  double right_motor_speed = std::max(std::min(right_side.front_wheel_velocity, 18.5), -18.5);
-  double normalized_right_motor_speed = (right_motor_speed / (18.5 + 1)) * 100;
+  double right_motor_speed = std::max(std::min(right_side.front_wheel_velocity, right_side.max_motor_rotation_speed), -right_side.max_motor_rotation_speed);
+  double normalized_right_motor_speed = (right_motor_speed / (right_side.max_motor_rotation_speed + 1)) * 100;
   
+  // controlling gpio and pwm gen
   if (normalized_left_motor_speed > 0) {
     gpiod_line_set_value(left_side.forward_line, 1);
     gpiod_line_set_value(left_side.backward_line, 0);

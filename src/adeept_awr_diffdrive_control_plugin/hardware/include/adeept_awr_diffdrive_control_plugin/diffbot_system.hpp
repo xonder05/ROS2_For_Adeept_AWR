@@ -44,7 +44,7 @@ struct Sides {
   int enable_pin = -1;
   int forward_pin = -1;
   int backward_pin = -1;
-  float max_motor_rotation_speed = -1.0;
+  double max_motor_rotation_speed = -1.0;
 
   struct gpiod_line *enable_line;
   struct gpiod_line *forward_line;

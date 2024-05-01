@@ -39,7 +39,9 @@ private:
 
     void generate_pwm() {
         while (!stop_flag) {
-            gpiod_line_set_value(line, 1);
+            if (duty_cycle != 0) {
+                gpiod_line_set_value(line, 1);
+            }
             std::this_thread::sleep_for(std::chrono::microseconds(duty_cycle));
 
             gpiod_line_set_value(line, 0);
