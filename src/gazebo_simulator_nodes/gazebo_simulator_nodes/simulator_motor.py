@@ -23,6 +23,7 @@ class SimulatorMotor(Node):
         
         self.get_logger().info("InitDone")
 
+    #just topic name change
     def callback(self, msg: Twist):
         self.publisher.publish(msg)
 

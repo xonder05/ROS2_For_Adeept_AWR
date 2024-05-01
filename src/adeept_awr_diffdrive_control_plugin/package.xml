@@ -3,14 +3,8 @@
 <package format="3">
   <name>adeept_awr_diffdrive_control_plugin</name>
   <version>0.0.0</version>
-  <description>Demo package of `ros2_control` hardware for DiffBot.</description>
-
-  <maintainer email="denis.stogl@stoglrobotics.de">Dr.-Ing. Denis Štogl</maintainer>
-  <maintainer email="bence.magyar.robotics@gmail.com">Bence Magyar</maintainer>
-  <maintainer email="christoph.froehlich@ait.ac.at">Christoph Froehlich</maintainer>
-
-  <author email="denis.stogl@stoglrobotics.de">Dr.-Ing. Denis Štogl</author>
-
+  <description>ros2_control plugin for full-bridge gpio pwm diff-drive robots</description>
+  <maintainer email="daniel.onderk@gmail.com">daniel</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

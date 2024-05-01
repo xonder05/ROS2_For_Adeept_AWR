@@ -12,11 +12,11 @@ def generate_launch_description():
 
     main_world = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
-            FindPackageShare("gazebo_simulator_nodes"), '/launch', '/gazebo_main_world_launch.py'
+            FindPackageShare("gazebo_simulator_nodes"), '/launch', '/gazebo_garden_world_launch.py'
         ]),
         condition=IfCondition(
             PythonExpression([
-                '"', world_select_val, '"', ' == "main"'
+                '"', world_select_val, '"', ' == "garden"'
             ])
         )
     )

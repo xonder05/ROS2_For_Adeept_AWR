@@ -1,7 +1,3 @@
-line_following_node:
-  ros__parameters:
-    start_right_away: True
-
 gamepad_node:
   ros__parameters:
     maximum_linear_speed: 0.7

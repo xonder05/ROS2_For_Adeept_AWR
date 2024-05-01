@@ -1,6 +1,6 @@
 dc_motor_node:
   ros__parameters:
-    motor_left_enable_pin: 4
+    motor_left_enable_pin: 4 #gpio pin numbers
     motor_left_forward_pin: 21
     motor_left_backward_pin: 26
     motor_right_enable_pin: 17
@@ -12,7 +12,7 @@ dc_motor_node:
 
 servo_node:
   ros__parameters:
-    control_board_channel: 0
+    pwm_gen_channel: 0 #channel on the PCA9685
     default_position: 300
     rotation_limit_up: 150 #almost vertical
     rotation_limit_down: 350 #something below horizontal
@@ -22,25 +22,35 @@ pi_camera_node:
     video_capture: '/dev/video0'
     video_resolution_width: 960
     video_resolution_height: 540
-    video_framerate: 0.05
+    video_framerate: 0.05 #sec
 
 ultrasonic_node:
   ros__parameters:
-    tr_pin: 11
+    tr_pin: 11 #gpio pins
     ec_pin: 8
-    ec_timeout: 0.05
+    ec_timeout: 0.05 #sec
     obstacle_warning_distance: 0.15 #m
     side_obstacle_minimum_detection_distance: 0.2 #m
     side_obstacle_maximum_detection_distance: 0.7 #m
 
 line_tracking_node:
   ros__parameters:
-    left_pin: 19
+    left_pin: 19 #gpio pins
     middle_pin: 16
     right_pin: 20
     scanning_period: 0.05
 
 imu_node:
   ros__parameters:
-    data_topic: "/imu_data"
-    warning_topic: "/not_moving_warning"
+    acc_x_offset: -0.165931074 
+    acc_y_offset: 0.201548310205276
+    acc_z_offset: -0.141471371
+    gyro_x_offset: 1.5990274809160256
+    gyro_y_offset: 0.4370078625954107
+    gyro_z_offset: -0.196853435114507
+    acc_x_low_cutoff: 0.1
+    acc_y_low_cutoff: 0.05
+    acc_z_low_cutoff: 0.5
+    gyro_x_low_cutoff: 5.0
+    gyro_y_low_cutoff: 1.0
+    gyro_z_low_cutoff: 5.0

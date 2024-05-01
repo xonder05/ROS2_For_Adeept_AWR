@@ -132,6 +132,7 @@ class DCMotorNode(Node):
         self.left_side_motor(normalized_left_motor_speed)
         self.right_side_motor(normalized_right_motor_speed)
 
+    #stops motors if imu detects obstacle (it is here because that way it works independently from used controller)
     def obstacle_callback(self, msg: Bool):
         if msg.data:
             if not self.obstacle:

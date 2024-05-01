@@ -20,6 +20,7 @@ class SimulatorImu(Node):
         self.get_logger().info("InitDone")
 
     def callback(self, msg):
+        #convert quaternions
         euler = transforms3d.euler.quat2euler([
             msg.orientation.w,
             msg.orientation.x,
@@ -27,15 +28,18 @@ class SimulatorImu(Node):
             msg.orientation.z
         ])
 
+        #only interested in z axis
         current_rotation = euler[2]
 
         rotation_difference = current_rotation - self.previous_rotation
 
+        #the data are from -3.14 to +3.14, so passing across this border must be handeled
         if rotation_difference > math.pi:
             rotation_difference -= 2 * math.pi
         elif rotation_difference < -math.pi:
             rotation_difference += 2 * math.pi
 
+        #save absolute rotation required by other nodes
         self.cumulative_rotation += rotation_difference
 
         msg = Twist()

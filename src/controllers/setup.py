@@ -19,7 +19,7 @@ setup(
     zip_safe=True,
     maintainer='pi',
     maintainer_email='daniel.onderk@gmail.com',
-    description='TODO: Package description',
+    description='Contains user inteface and manual (gamepad and keyboard) as well as automatic (wandering, line following) nodes.',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={

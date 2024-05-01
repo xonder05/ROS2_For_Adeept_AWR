@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QColorDialog
 from PyQt5 import uic
 from PyQt5.QtGui import QPixmap, QImage, QColor
-from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QPainterPath
+from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen
 from PyQt5.QtCore import Qt
 
 from ament_index_python.packages import get_package_share_directory
@@ -14,6 +14,13 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.workspace_path = get_package_share_directory('controllers')
         self.initUI()
+
+    def put_node(self, node):
+        self.node = node
+
+    def closeEvent(self, event):
+        controllers.user_interface.global_variables.executeEventLoop = False
+        event.accept()
 
     def initUI(self):
         uic.loadUi(self.workspace_path + '/controllers/user_interface/ui.ui', self)
@@ -30,19 +37,22 @@ class MainWindow(QMainWindow):
         self.keyboard_start_button.clicked.connect(lambda: self.node.keyboard_toggle(True))
         self.keyboard_stop_button.clicked.connect(lambda: self.node.keyboard_toggle(False))
 
+        #3/5 of window width and keep 16:9
         self.camera_width = int(round((self.size().width() / 5) * 3, 0))
         self.camera_height = int((self.camera_width / 16) * 9)
 
         self.video_stream_label.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/camera_placeholder.png").scaled(self.camera_width, self.camera_height))
         self.video_stream_label.setScaledContents(True)
 
+        self.ultrasonic_distance_indicator.setMaximum(450)
+        self.ultrasonic_distance_indicator.setValue(0)
+        self.ultrasonic_distance_indicator.setFormat("")
+
         self.line_tracking_left_label.setPixmap(self.create_vector_image())
         self.line_tracking_middle_label.setPixmap(self.create_vector_image())
         self.line_tracking_right_label.setPixmap(self.create_vector_image())
 
-        self.ultrasonic_distance_indicator.setMaximum(450)
-        self.ultrasonic_distance_indicator.setValue(0)
-        self.ultrasonic_distance_indicator.setFormat("")
+        self.led_color_picker_button.clicked.connect(self.showColorDialog)
 
         self.mic_state = "muted"
         self.audio_microphone_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/mic_muted.svg").scaled(100, 100))
@@ -53,8 +63,6 @@ class MainWindow(QMainWindow):
         self.audio_speaker_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
         self.audio_speaker_label_button.setCursor(Qt.PointingHandCursor)
         self.audio_speaker_label_button.mousePressEvent = self.audio_speaker_toggle
-
-        self.led_color_picker_button.clicked.connect(self.showColorDialog)
 
         self.show()
 
@@ -82,14 +90,32 @@ class MainWindow(QMainWindow):
 
     def update_line_tracking_state_label(self, state):
         self.line_following_state_label.setText(state)
-
-    def put_node(self, node):
-        self.node = node
-
-    def closeEvent(self, event):
-        controllers.user_interface.global_variables.executeEventLoop = False
-        event.accept()
     
+    def showColorDialog(self):
+        color = QColorDialog.getColor()
+        if color.isValid():
+            self.node.change_rgb_color(color)
+
+    def audio_microphone_toggle(self, event):
+        self.node.audio_microphone_toggle(self.mic_state)
+
+        if self.mic_state == "muted":
+            self.audio_microphone_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/mic.svg").scaled(100, 100))
+            self.mic_state = "unmuted"
+        else:
+            self.audio_microphone_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/mic_muted.svg").scaled(100, 100))
+            self.mic_state = "muted"
+
+    def audio_speaker_toggle(self, event):
+        self.node.audio_speaker_toggle(self.speaker_state)
+
+        if self.speaker_state == "muted":
+            self.audio_speaker_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/speaker.svg").scaled(100, 100))
+            self.speaker_state = "unmuted"
+        else:
+            self.audio_speaker_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
+            self.speaker_state = "muted"
+
     def create_vector_image(self, filled=False):
         pixmap = QPixmap(int(self.size().width() / 25), int(self.size().width() / 25))
         pixmap.fill(Qt.transparent)
@@ -111,28 +137,3 @@ class MainWindow(QMainWindow):
         painter.end()
 
         return pixmap
-    
-    def audio_microphone_toggle(self, event):
-        self.node.audio_microphone_toggle(self.mic_state)
-
-        if self.mic_state == "muted":
-            self.audio_microphone_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/mic.svg").scaled(100, 100))
-            self.mic_state = "unmuted"
-        else:
-            self.audio_microphone_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/mic_muted.svg").scaled(100, 100))
-            self.mic_state = "muted"
-
-    def audio_speaker_toggle(self, event):
-        self.node.audio_speaker_toggle(self.speaker_state)
-
-        if self.speaker_state == "muted":
-            self.audio_speaker_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/speaker.svg").scaled(100, 100))
-            self.speaker_state = "unmuted"
-        else:
-            self.audio_speaker_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
-            self.speaker_state = "muted"
-
-    def showColorDialog(self):
-        color = QColorDialog.getColor()
-        if color.isValid():
-            self.node.change_rgb_color(color)

@@ -19,7 +19,7 @@ setup(
     zip_safe=True,
     maintainer='daniel',
     maintainer_email='daniel.onderk@gmail.com',
-    description='TODO: Package description',
+    description='Contains nodes for controling hardware componennts of the Adeept AWR 4WD robot.',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={

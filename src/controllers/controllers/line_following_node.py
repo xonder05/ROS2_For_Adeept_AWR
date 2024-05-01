@@ -73,11 +73,11 @@ class LineFollowingNode(Node):
 
         self.next_state = State(status)
 
-        #what to do when lose line
+        #reaction to losing line
         if self.next_state == State.NO_LINE:
             self.counter += 1
             
-            #run for 5 seconds
+            #try to recover for 5 seconds
             if self.counter < 500:
                 self.next_state = self.state
 
@@ -95,6 +95,7 @@ class LineFollowingNode(Node):
         if self.next_state == State.UNALLOWED_STATE:
             self.next_state = self.state
 
+        #handling more than 90 deg angles (not good enough, could use better solution)
         if self.next_state in [State.STEER_LEFT, State.STEER_LIGHT_LEFT, State.STEER_RIGHT, State.STEER_LIGHT_RIGHT]:
             self.last_direction_counter = 0
             self.last_direction = self.next_state

@@ -3,7 +3,7 @@
 <package format="3">
   <name>controllers</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Contains user inteface and manual (gamepad and keyboard) as well as automatic (wandering, line following) nodes.</description>
   <maintainer email="daniel.onderk@gmail.com">pi</maintainer>
   <license>Apache-2.0</license>
 

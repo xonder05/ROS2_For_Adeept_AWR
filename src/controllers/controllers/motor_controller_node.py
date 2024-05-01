@@ -23,12 +23,12 @@ class MotorControllerNode(Node):
         self.commands_topic = self.get_parameter('commands_topic').get_parameter_value().string_value
 
         self.subscriber = self.create_subscription(Twist, self.imu_topic, self.imu_callback, 10)
+        self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         self.action_server = ActionServer(self, MCC, self.commands_topic,
                                             goal_callback=self.goal_callback,
                                             handle_accepted_callback=self.handle_accepted_callback,
                                             execute_callback=self.execute_callback,
                                             cancel_callback=self.cancel_callback)
-        self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
 
         self.current_angle = 0
         self.goal_handle = None
@@ -41,13 +41,16 @@ class MotorControllerNode(Node):
     def imu_callback(self, msg):
         self.current_angle = msg.angular.z
 
+        #cancel
         if self.canceled_goal_handle is not None and self.canceled_goal_handle.is_cancel_requested:
             self.canceled_goal_handle.execute()
             return
 
+        #active handle
         if self.goal_handle is not None and self.goal_handle.is_active:
             distance = (self.current_angle - self.goal_angle)
             
+            #changing speed based on remainig distance
             if abs(distance) < 0.02:
                 if self.waited:
                     self.waited = False
@@ -63,6 +66,7 @@ class MotorControllerNode(Node):
             else:
                 speed = 6.24
     
+            #simple publish
             msg = Twist()
             if distance > 0:
                 msg.angular.z = -speed
@@ -83,6 +87,7 @@ class MotorControllerNode(Node):
         self.goal_handle = None
         return CancelResponse.ACCEPT
 
+    #save goal angle and handle
     def handle_accepted_callback(self, goal_handle):
         self.goal_angle = self.current_angle + (goal_handle.request.angle)
         self.goal_handle = goal_handle

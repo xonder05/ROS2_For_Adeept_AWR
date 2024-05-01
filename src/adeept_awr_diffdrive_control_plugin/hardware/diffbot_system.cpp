@@ -101,9 +101,6 @@ std::vector<hardware_interface::CommandInterface> AdeeptDiffDriveHardware::expor
 {
   std::vector<hardware_interface::CommandInterface> command_interfaces;
 
-  RCLCPP_INFO(rclcpp::get_logger("AdeeptDiffDriveHardware"),
-            "Did i get here?");
-
   command_interfaces.emplace_back(hardware_interface::CommandInterface(
     "left_front_wheel_joint", hardware_interface::HW_IF_VELOCITY, &left_side.front_wheel_velocity));
 

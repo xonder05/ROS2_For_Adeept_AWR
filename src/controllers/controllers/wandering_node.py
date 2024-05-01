@@ -52,7 +52,6 @@ class WanderingNode(Node):
             self.timer.cancel()
 
         self.state = State.DRIVE
-        self.cautious_mode = True
         self.scan_counter = 0
         self.distance = 0
         self.goal_handle = None
@@ -84,18 +83,12 @@ class WanderingNode(Node):
             self.state = State.OBSTACLE
             self.timer.cancel()
 
+            #stopping motor controller (action server)
             if self.goal_handle is not None and self.controller_state == "working":
                 self.cancel_future = self.goal_handle.cancel_goal_async()
                 self.cancel_future.add_done_callback(self.obstacle_second_part)
             else:
                 self.timer = self.create_timer(0, self.fsm_step)
-
-    def obstacle_second_part(self, future):
-        handle = future.result()
-        if len(handle.goals_canceling) > 0:
-            self.timer = self.create_timer(0, self.fsm_step)
-        else:
-            pass
 
     def side_obstacle_callback(self, msg: Bool):
         #only react when going forward
@@ -103,12 +96,22 @@ class WanderingNode(Node):
             self.state = State.SCAN_START
             self.timer.cancel()
 
+            #stopping motor controller (action server)
             if self.goal_handle is not None and self.controller_state == "working":
                 self.cancel_future = self.goal_handle.cancel_goal_async()
                 self.cancel_future.add_done_callback(self.obstacle_second_part)
             else:
                 self.timer = self.create_timer(0, self.fsm_step)
 
+    #response from action server
+    def obstacle_second_part(self, future):
+        handle = future.result()
+        if len(handle.goals_canceling) > 0:
+            self.timer = self.create_timer(0, self.fsm_step)
+        else:
+            pass
+
+    #action server communication function and callbacks
     def call_motor_controller(self, angle):
         self.timer.cancel()
         self.motor_controller_client.wait_for_server()
@@ -134,6 +137,7 @@ class WanderingNode(Node):
         if result.status == GoalStatus.STATUS_SUCCEEDED:
             self.timer = self.create_timer(0, self.fsm_step)
 
+    #the core fsm
     def fsm_step(self):
         #default state, causes robot to stop and after a while transition to DRIVE
         if self.state == State.PAUSE:
@@ -155,13 +159,10 @@ class WanderingNode(Node):
             msg.linear.x = 0.5
             self.publisher.publish(msg)
 
-            if self.cautious_mode:
-                self.state = State.SCAN_START
-            else:    
-                self.state = State.PAUSE
-
             duration = random.uniform(1, 5)
             self.timer = self.create_timer(duration, self.fsm_step)
+
+            self.state = State.SCAN_START
 
         #transition to this state is triggered by event
         elif self.state == State.OBSTACLE:

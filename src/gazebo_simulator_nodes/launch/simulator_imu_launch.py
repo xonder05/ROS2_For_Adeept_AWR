@@ -27,7 +27,7 @@ def generate_launch_description():
         executable='parameter_bridge',
         arguments=[
             config_contents["simulator_imu_bridge"]["ros__parameters"]["topic"] + '@' + 
-            config_contents["simulator_imu_bridge"]["ros__parameters"]["ros_message_type"] + '@' + 
+            config_contents["simulator_imu_bridge"]["ros__parameters"]["ros_message_type"] + '[' + 
             config_contents["simulator_imu_bridge"]["ros__parameters"]["gazebo_message_type"]
         ]
     )

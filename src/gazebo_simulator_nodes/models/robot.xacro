@@ -7,7 +7,7 @@
     <xacro:include filename="components.xacro"/>
     <xacro:include filename="sensors.xacro"/>
 
-
+    <!-- robot -->
     <link name="base_link"/>
 
     <link name="base_footprint"/>
@@ -18,7 +18,6 @@
     <xacro:fixed_joint name="chassis" parent="base_link" child="chassis" origin_position="0 0 0.1"/>
 
     <xacro:diff_drive/>
-    <xacro:joint_state_publisher/>
 
     <xacro:lidar/>
     <xacro:ultrasonic/>

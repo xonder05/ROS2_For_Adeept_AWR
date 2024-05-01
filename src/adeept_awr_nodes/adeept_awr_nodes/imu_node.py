@@ -3,7 +3,7 @@ from rclpy.node import Node
 
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
-from geometry_msgs.msg import TransformStamped, Quaternion
+from geometry_msgs.msg import TransformStamped
 import tf2_ros
 
 import math
@@ -15,19 +15,11 @@ class ImuNode(Node):
     def __init__(self):
         super().__init__("imu_node")
         
-        self.declare_parameters(
-            namespace='',
-            parameters=[
-                ('data_topic', rclpy.Parameter.Type.STRING),
-                ('warning_topic', rclpy.Parameter.Type.STRING),
-            ]
-        )
-        self.data_topic = self.get_parameter('data_topic').get_parameter_value().string_value
-        self.warning_topic = self.get_parameter('warning_topic').get_parameter_value().string_value
-        
+        self.init_params()
+
         self.subscriber = self.create_subscription(Twist, "/cmd_vel", self.twist_callback, 10)
-        self.publisher = self.create_publisher(Twist, self.data_topic, 10)
-        self.colision_publisher = self.create_publisher(Bool, self.warning_topic, 10)
+        self.publisher = self.create_publisher(Twist, "/imu_data", 10)
+        self.colision_publisher = self.create_publisher(Bool, "/not_moving_warning", 10)
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
         self.tf_timer = self.create_timer(0.01, self.publish_tf_data)
         
@@ -46,6 +38,37 @@ class ImuNode(Node):
 
         self.get_logger().info("InitDone")
 
+    def init_params(self):
+        self.declare_parameters(
+            namespace='',
+            parameters=[
+                ('acc_x_offset', rclpy.Parameter.Type.DOUBLE),
+                ('acc_y_offset', rclpy.Parameter.Type.DOUBLE),
+                ('acc_z_offset', rclpy.Parameter.Type.DOUBLE),
+                ('gyro_x_offset', rclpy.Parameter.Type.DOUBLE),
+                ('gyro_y_offset', rclpy.Parameter.Type.DOUBLE),
+                ('gyro_z_offset', rclpy.Parameter.Type.DOUBLE),
+                ('acc_x_low_cutoff', rclpy.Parameter.Type.DOUBLE),
+                ('acc_y_low_cutoff', rclpy.Parameter.Type.DOUBLE),
+                ('acc_z_low_cutoff', rclpy.Parameter.Type.DOUBLE),
+                ('gyro_x_low_cutoff', rclpy.Parameter.Type.DOUBLE),
+                ('gyro_y_low_cutoff', rclpy.Parameter.Type.DOUBLE),
+                ('gyro_z_low_cutoff', rclpy.Parameter.Type.DOUBLE),
+            ]
+        )
+        self.acc_x_offset = self.get_parameter('acc_x_offset').get_parameter_value().double_value
+        self.acc_y_offset = self.get_parameter('acc_y_offset').get_parameter_value().double_value
+        self.acc_z_offset = self.get_parameter('acc_z_offset').get_parameter_value().double_value
+        self.gyro_x_offset = self.get_parameter('gyro_x_offset').get_parameter_value().double_value
+        self.gyro_y_offset = self.get_parameter('gyro_y_offset').get_parameter_value().double_value
+        self.gyro_z_offset = self.get_parameter('gyro_z_offset').get_parameter_value().double_value
+        self.acc_x_low_cutoff = self.get_parameter('acc_x_low_cutoff').get_parameter_value().double_value
+        self.acc_y_low_cutoff = self.get_parameter('acc_y_low_cutoff').get_parameter_value().double_value
+        self.acc_z_low_cutoff = self.get_parameter('acc_z_low_cutoff').get_parameter_value().double_value
+        self.gyro_x_low_cutoff = self.get_parameter('gyro_x_low_cutoff').get_parameter_value().double_value
+        self.gyro_y_low_cutoff = self.get_parameter('gyro_y_low_cutoff').get_parameter_value().double_value
+        self.gyro_z_low_cutoff = self.get_parameter('gyro_z_low_cutoff').get_parameter_value().double_value
+    
     def twist_callback(self, msg: Twist):
         self.linear_command = msg.linear.x
         self.angular_command = msg.angular.z
@@ -53,26 +76,26 @@ class ImuNode(Node):
     def get_accel_data(self):
         accel_data = {'x': 0.0, 'y': 0.0, 'z': 0.0}
         
-        #average value from x samples
+        #average value from x samples (not used in final solution but the option is there)
         for i in range(0, 1):
             new_data = self.sensor.get_accel_data()
 
-            accel_data['x'] += (new_data['x'] - 0.165931074)
-            accel_data['y'] += (new_data['y'] + 0.201548310205276)
-            accel_data['z'] += (new_data['z'] - 0.141471371)
+            accel_data['x'] += (new_data['x'] + self.acc_x_offset)
+            accel_data['y'] += (new_data['y'] + self.acc_y_offset)
+            accel_data['z'] += (new_data['z'] + self.acc_z_offset)
 
         accel_data['x'] = accel_data['x'] / 1.0
         accel_data['y'] = accel_data['y'] / 1.0
         accel_data['z'] = accel_data['z'] / 1.0
 
         #cut low values (so the robot does not drift while stationary)
-        if abs(accel_data['x']) < 0.1:
+        if abs(accel_data['x']) < self.acc_x_low_cutoff:
             accel_data['x'] = 0
 
-        if abs(accel_data['y']) < 0.05:
+        if abs(accel_data['y']) < self.acc_y_low_cutoff:
             accel_data['y'] = 0
 
-        if abs(accel_data['z']) < 0.5:
+        if abs(accel_data['z']) < self.acc_z_low_cutoff:
             accel_data['z'] = 0
 
         #align physical axis with those used by ros2
@@ -87,26 +110,26 @@ class ImuNode(Node):
     def get_gyro_data(self):
         gyro_data_deg = {'x': 0.0, 'y': 0.0, 'z': 0.0}
 
-        #average value from x samples
+        #average value from x samples (not used in final solution but the option is there)
         for i in range(0, 1):
             new_data = self.sensor.get_gyro_data()
 
-            gyro_data_deg['x'] += (new_data['x'] - -1.7608719847328245)
-            gyro_data_deg['y'] += (new_data['y'] - -0.4370078625954107)
-            gyro_data_deg['z'] += (new_data['z'] + 0.10326725190839636)
+            gyro_data_deg['x'] += (new_data['x'] + self.gyro_x_offset)
+            gyro_data_deg['y'] += (new_data['y'] + self.gyro_y_offset)
+            gyro_data_deg['z'] += (new_data['z'] + self.gyro_z_offset)
 
         gyro_data_deg['x'] = gyro_data_deg['x'] / 1.0
         gyro_data_deg['y'] = gyro_data_deg['y'] / 1.0
         gyro_data_deg['z'] = gyro_data_deg['z'] / 1.0
 
         #cut low values (so the robot does not drift while stationary)
-        if abs(gyro_data_deg['x']) < 5:
+        if abs(gyro_data_deg['x']) < self.gyro_x_low_cutoff:
             gyro_data_deg['x'] = 0
 
-        if abs(gyro_data_deg['y']) < 1:
+        if abs(gyro_data_deg['y']) < self.gyro_y_low_cutoff:
             gyro_data_deg['y'] = 0
         
-        if abs(gyro_data_deg['z']) < 5:
+        if abs(gyro_data_deg['z']) < self.gyro_z_low_cutoff:
             gyro_data_deg['z'] = 0
 
         #align physical axis with those used by ros2
@@ -136,7 +159,9 @@ class ImuNode(Node):
 
         accel_data = self.get_accel_data()
 
+        #don't move robot when it should be stationary
         if self.linear_command == 0:
+            #to let the robot stop when the command becomes zero
             if self.inertia < 10:
                 self.inertia += 1
             else:

@@ -31,7 +31,7 @@ class SoundTransmitterNode(Node):
         self.subscriber = self.create_subscription(Bool, self.audio_stream_name + "_toggle", self.toggle_callback, 10)
 
         self.stream = sd.InputStream(
-            callback=self.callback, 
+            callback=self.audio_stream_callback, 
             samplerate=self.sample_rate, 
             channels=self.channels, 
             blocksize=self.blocksize)
@@ -47,7 +47,7 @@ class SoundTransmitterNode(Node):
         else:
             self.stream.stop()
 
-    def callback(self, indata, frames, time, status):
+    def audio_stream_callback(self, indata, frames, time, status):
         msg = SoundBlock()
         try:
             msg.left_channel = indata[:, 0]

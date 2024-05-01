@@ -29,7 +29,7 @@ def generate_launch_description():
         output='screen',
     )
 
-    #xacro robot.xacro -o robot1.urdf
+    #xacro robot.xacro -o robot.urdf
     convert_xacro = ExecuteProcess(
         cmd=['xacro', xacro_model_path, '-o', urdf_model_path],
         output='screen',
@@ -38,7 +38,7 @@ def generate_launch_description():
     #ign service -s /world/empty/create --reqtype ignition.msgs.EntityFactory --reptype ignition.msgs.Boolean --timeout 1000 --req 'sdf_filename: "/home/daniel/ros2_ws/src/gazebo_simulator_nodes/models/robot.urdf", name: "urdf_model"'
     spawn_robot = ExecuteProcess(
         cmd=['ign', 'service', 
-             '--service', '/world/empty/create', 
+             '--service', '/world/wandering/create', 
              '--reqtype', 'ignition.msgs.EntityFactory', 
              '--reptype', 'ignition.msgs.Boolean', 
              '--timeout', '5000', 

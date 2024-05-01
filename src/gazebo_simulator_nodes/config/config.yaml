@@ -1,14 +1,3 @@
-simulator_motor:
-  ros__parameters:
-    gazebo_topic: "/cmd_vel"
-    ros_topic: "/model/adeept_awr/cmd_vel"
-
-simulator_motor_bridge:
-  ros__parameters:
-    topic: "/model/adeept_awr/cmd_vel"
-    ros_message_type: "geometry_msgs/msg/Twist"
-    gazebo_message_type: "ignition.msgs.Twist"
-
 simulator_camera:
   ros__parameters:
     gazebo_topic: "/simulator_camera"
@@ -46,16 +35,16 @@ simulator_ultrasonic_bridge:
 
 simulator_line_tracking:
   ros__parameters:
-    gazebo_topic: "/line_tracking"
+    gazebo_topic: "/simulator_line_visibility"
     ros_topic: "/line_visibility"
-    left_sensor_name: "adeept_awr/base_link/line_tracking_left"
+    left_sensor_name: "adeept_awr/base_link/line_tracking_left" #name of the frame
     middle_sensor_name: "adeept_awr/base_link/line_tracking_middle"
     right_sensor_name: "adeept_awr/base_link/line_tracking_right"
-    line_detection_threshold: 50
+    line_detection_threshold: 50 #grayscale value
 
 simulator_line_tracking_bridge:
   ros__parameters:
-    topic: "/line_tracking"
+    topic: "/simulator_line_visibility"
     ros_message_type: "sensor_msgs/msg/Image"
     gazebo_message_type: "gz.msgs.Image"
 
@@ -70,24 +59,6 @@ simulator_lidar_bridge:
     topic: "/simulator_lidar"
     ros_message_type: "sensor_msgs/msg/LaserScan"
     gazebo_message_type: "ignition.msgs.LaserScan"
-
-simulator_odometry:
-  ros__parameters:
-    gazebo_topic: "/model/adeept_awr/odometry"
-    frame_id: "odom"
-    child_frame_id: "base_link"
-
-simulator_odometry_bridge:
-  ros__parameters:
-    topic: "/model/adeept_awr/odometry"
-    ros_message_type: "nav_msgs/msg/Odometry"
-    gazebo_message_type: "ignition.msgs.Odometry"
-
-simulator_joint_states_bridge:
-  ros__parameters:
-    topic: "/joint_states"
-    ros_message_type: "sensor_msgs/msg/JointState"
-    gazebo_message_type: "ignition.msgs.Model"
 
 simulator_imu_bridge:
   ros__parameters:

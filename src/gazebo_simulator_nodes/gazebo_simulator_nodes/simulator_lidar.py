@@ -12,7 +12,7 @@ class SimulatorLidar(Node):
             parameters=[
                 ('gazebo_topic', rclpy.Parameter.Type.STRING),
                 ('ros_topic', rclpy.Parameter.Type.STRING),
-                ('frame_id', rclpy.Parameter.Type.STRING), #frame id from gazebo is not the same as what robot state publisher makes, so it has to be renamed
+                ('frame_id', rclpy.Parameter.Type.STRING),
             ]
         )
         self.gazebo_topic = self.get_parameter('gazebo_topic').get_parameter_value().string_value
@@ -24,6 +24,7 @@ class SimulatorLidar(Node):
 
         self.get_logger().info("InitDone")
 
+    #frame id from gazebo is not the same as the one from robot state publisher, so it has to be renamed
     def callback(self, msg: LaserScan):
         msg_out = LaserScan()
         msg_out = msg

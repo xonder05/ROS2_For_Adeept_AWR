@@ -31,7 +31,7 @@ class SoundReceiverNode(Node):
         self.subscriber = self.create_subscription(Bool, self.audio_stream_name + "_toggle", self.toggle_callback, 10)
         
         self.stream = sd.OutputStream(
-            callback=self.callback, 
+            callback=self.audio_stream_callback, 
             samplerate=self.sample_rate, 
             channels=self.channels, 
             blocksize=self.blocksize)
@@ -47,6 +47,8 @@ class SoundReceiverNode(Node):
         if msg.data:
             self.stream.start()
         else:
+            #otherwise buffered data would play after unmuting
+            self.buffer = np.empty((0, self.channels))
             self.stream.stop()
 
     #recieved data are buffered
@@ -54,7 +56,8 @@ class SoundReceiverNode(Node):
         new_data = np.vstack((msg.left_channel, msg.right_channel)).T
         self.buffer = np.concatenate((self.buffer, new_data))
         
-    def callback(self, outdata, frames, time, status):
+    def audio_stream_callback(self, outdata, frames, time, status):
+        #to eliminate sound atrefacts when not enough data are in buffer
         if len(self.buffer) >= len(outdata):
             outdata[:] = self.buffer[:len(outdata)]
             self.buffer = self.buffer[len(outdata):]

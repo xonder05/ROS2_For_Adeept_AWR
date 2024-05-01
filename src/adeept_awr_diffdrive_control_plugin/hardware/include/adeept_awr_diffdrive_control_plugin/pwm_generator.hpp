@@ -14,10 +14,8 @@ public:
     }
 
     void start() {
-        printf("called_start\n");
         stop_flag = false;
         pwm_thread = std::thread(&PWMGenerator::generate_pwm, this);
-        printf("created threea\n");
     }
 
     void stop() {
