@@ -174,13 +174,13 @@ if [[ "$install_nav_map" == "y" ]]; then
 fi
 
 #workspace setup
+echo "Setting up workspace"
 sudo NEEDRESTART_SUSPEND=1 apt-get install git -y
 source /opt/ros/iron/setup.bash
 cd "$workspace_location"
 git submodule update --init --recursive
 colcon build --symlink-install;
 grep -qF "source ${workspace_location}/install/setup.bash" ~/.bashrc || echo "source ${workspace_location}/install/setup.bash" >> ~/.bashrc
-
 
 #optional steps
 if [[ "$lidar" == "y" ]]; then

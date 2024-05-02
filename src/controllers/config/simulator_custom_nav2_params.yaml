@@ -136,8 +136,8 @@ controller_server:
       primary_controller: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
       angular_dist_threshold: 0.1
       forward_sampling_distance: 0.5
-      rotate_to_heading_angular_vel: 4.71
-      max_angular_accel: 98.4
+      rotate_to_heading_angular_vel: 1.57
+      max_angular_accel: 31.4
       simulate_ahead_time: 1.0
 
 local_costmap:
@@ -284,8 +284,8 @@ behavior_server:
     robot_base_frame: base_link
     transform_tolerance: 0.1
     simulate_ahead_time: 2.0
-    max_rotational_vel: 6.28
-    min_rotational_vel: 6.28
+    max_rotational_vel: 1.0
+    min_rotational_vel: 0.4
     rotational_acc_lim: 3.2
 
 waypoint_follower:
@@ -304,12 +304,12 @@ velocity_smoother:
     smoothing_frequency: 20.0
     scale_velocities: false
     feedback: "OPEN_LOOP"
-    max_velocity: [0.6, 0.0, 6.24]
-    min_velocity: [-0.6, 0.0, -6.24]
+    max_velocity: [0.5, 0.0, 2.5]
+    min_velocity: [-0.5, 0.0, -2.5]
     deadband_velocity: [0.0, 0.0, 0.0]
     velocity_timeout: 1.0
-    max_accel: [2.5, 0.0, 98.5]
-    max_decel: [-2.5, 0.0, -98.5]
+    max_accel: [2.5, 0.0, 31.4]
+    max_decel: [-2.5, 0.0, -31.4]
     odom_topic: "odom"
     odom_duration: 0.1
     use_realtime_priority: false

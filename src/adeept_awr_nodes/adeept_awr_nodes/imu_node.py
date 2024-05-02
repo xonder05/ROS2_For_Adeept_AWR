@@ -21,7 +21,7 @@ class ImuNode(Node):
         self.publisher = self.create_publisher(Twist, "/imu_data", 10)
         self.colision_publisher = self.create_publisher(Bool, "/not_moving_warning", 10)
         self.tf_broadcaster = tf2_ros.TransformBroadcaster(self)
-        self.tf_timer = self.create_timer(0.01, self.publish_tf_data)
+        self.tf_timer = self.create_timer(0.05, self.publish_tf_data)
         
         self.sensor = sensor = mpu6050(0x68)
         sensor.set_filter_range(0x05)
@@ -35,6 +35,7 @@ class ImuNode(Node):
         self.orientation = {'roll': 0.0, 'pitch': 0.0, 'yaw': 0.0}
         self.absolute_position = {'x': 0.0, 'y': 0.0}
         self.inertia = 10
+        self.warning_count = 0
 
         self.get_logger().info("InitDone")
 
@@ -183,15 +184,15 @@ class ImuNode(Node):
         self.publisher.publish(msg)
 
         #publish not moving warning
-        if accel_data['x'] < 0.1 and (self.linear_command - self.velocity['x']) > 0.2:
-            if self.strike:
+        if self.linear_command > 0 and abs(self.linear_command - self.velocity['x']) > 0.25:
+            if self.warning_count > 5:
                 msg = Bool()
                 msg.data = True
                 self.colision_publisher.publish(msg)
             else:
-                self.strike = True
+                self.warning_count += 1
         else:
-            self.strike = False
+            self.warning_count = 0
 
             msg = Bool()
             msg.data = False
