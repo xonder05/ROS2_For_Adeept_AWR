@@ -65,6 +65,10 @@ class WanderingNode(Node):
             self.timer.cancel()
             self.timer = self.create_timer(0.1, self.fsm_step)
         else:
+            #stopping motor controller (action server)
+            if self.goal_handle is not None and self.controller_state == "working":
+                self.cancel_future = self.goal_handle.cancel_goal_async()
+
             msg = Twist()
             self.publisher.publish(msg)
             self.timer.cancel()
