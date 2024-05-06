@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2024-04-16T16:13:23.921Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0" etag="wWQ_Fewsz0mdWY9O7rEg" version="24.2.2" type="device">
+<mxfile host="app.diagrams.net" modified="2024-05-05T09:39:44.886Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0" etag="H1q6gAS24M9Toe75VCuw" version="24.3.1" type="device">
   <diagram name="Stránka-1" id="fmnIoT6PYUQdcqCPxSIe">
-    <mxGraphModel dx="1883" dy="1541" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="500" math="0" shadow="0">
+    <mxGraphModel dx="2326" dy="1785" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="500" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -8,7 +8,7 @@
           <mxGeometry x="-620" y="-775" width="580" height="275" as="geometry" />
         </mxCell>
         <mxCell id="QRZ7cnuRy46th7LW0SF6-8" value="" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="-600" y="-900" width="530" height="170" as="geometry" />
+          <mxGeometry x="-670" y="-900" width="600" height="180" as="geometry" />
         </mxCell>
         <mxCell id="QRZ7cnuRy46th7LW0SF6-2" value="" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-760" y="-890" width="200" height="130" as="geometry" />
@@ -19,7 +19,7 @@
         <mxCell id="QRZ7cnuRy46th7LW0SF6-55" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="QRZ7cnuRy46th7LW0SF6-22" target="QRZ7cnuRy46th7LW0SF6-23" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="QRZ7cnuRy46th7LW0SF6-22" value="Scan Event" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+        <mxCell id="QRZ7cnuRy46th7LW0SF6-22" value="EVENT" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="-880" y="-840" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="QRZ7cnuRy46th7LW0SF6-23" value="send turning command (45°)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -31,8 +31,8 @@
         <mxCell id="QRZ7cnuRy46th7LW0SF6-26" value="SCAN_STOP_AND_WAIT_FOR_DISTANCE_READING" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-505" y="-960" width="340" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="QRZ7cnuRy46th7LW0SF6-27" value="SCAN_LOG_DISTANCE_AND_TURN" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="-460" y="-770" width="240" height="30" as="geometry" />
+        <mxCell id="QRZ7cnuRy46th7LW0SF6-27" value="SCAN_LOG_DISTANCE_AND_TURN" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;rotation=0;" parent="1" vertex="1">
+          <mxGeometry x="-580" y="-775" width="240" height="30" as="geometry" />
         </mxCell>
         <mxCell id="QRZ7cnuRy46th7LW0SF6-28" value="SCAN_RESOLVE_RESULT" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;rotation=0;" parent="1" vertex="1">
           <mxGeometry x="-408.5" y="-540" width="177" height="30" as="geometry" />
@@ -44,7 +44,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="QRZ7cnuRy46th7LW0SF6-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="QRZ7cnuRy46th7LW0SF6-30" target="QRZ7cnuRy46th7LW0SF6-42" edge="1">
+        <mxCell id="QRZ7cnuRy46th7LW0SF6-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="QRZ7cnuRy46th7LW0SF6-31" target="QRZ7cnuRy46th7LW0SF6-42" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="QRZ7cnuRy46th7LW0SF6-30" value="send turning command (18°)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
@@ -126,7 +126,7 @@
         <mxCell id="QRZ7cnuRy46th7LW0SF6-58" value="Straight" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="-290" y="-640" width="60" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="mbLixzTThZ89HaId-PTJ-1" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="QRZ7cnuRy46th7LW0SF6-23" target="QRZ7cnuRy46th7LW0SF6-32">
+        <mxCell id="mbLixzTThZ89HaId-PTJ-1" value="" style="endArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="QRZ7cnuRy46th7LW0SF6-23" target="QRZ7cnuRy46th7LW0SF6-32" edge="1">
           <mxGeometry width="50" height="50" relative="1" as="geometry">
             <mxPoint x="-670" y="-700" as="sourcePoint" />
             <mxPoint x="-620" y="-750" as="targetPoint" />
