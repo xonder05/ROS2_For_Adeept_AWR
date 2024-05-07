@@ -1,0 +1,50 @@
+<sdf version="1.6">
+    <model name="line_tracking">
+        <link name="line_tracking">
+            <inertial>
+                <mass>0.001</mass>
+                <inertia>
+                    <ixx>1.6666e-08</ixx>
+                    <iyy>1.6666e-08</iyy>
+                    <izz>1.6666e-08</izz>
+                </inertia>
+            </inertial>
+            <visual name='visual'>
+                <geometry>
+                    <box>
+                        <size>0.01 0.01 0.01</size>
+                    </box>
+                </geometry>
+                <material>
+                    <ambient>0 0 0.0 1</ambient>
+                    <diffuse>0 0 0.0 1</diffuse>
+                    <specular>0 0 0.0 1</specular>
+                </material>
+            </visual>
+            <collision name='collision'>
+                <geometry>
+                    <box>
+                        <size>0.01 0.01 0.01</size>
+                    </box>
+                </geometry>
+            </collision>
+            
+            <sensor name='camera' type='camera'>
+                <topic>line_tracking</topic>
+                <update_rate>10</update_rate>
+                <camera name='__default__'>
+                    <horizontal_fov>0.11</horizontal_fov>
+                    <image>
+                        <width>1</width>
+                        <height>1</height>
+                        <format>RGB_INT8</format>
+                    </image>
+                    <clip>
+                        <near>0.01</near>
+                        <far>100</far>
+                    </clip>
+                </camera>
+            </sensor>
+        </link>
+    </model>
+</sdf>

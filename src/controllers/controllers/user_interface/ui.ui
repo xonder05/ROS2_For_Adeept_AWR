@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1280</width>
+    <height>720</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Adeept_UI_Controller</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <layout class="QGridLayout" name="gridLayout" columnstretch="3,2">
+    <item row="2" column="1">
+     <layout class="QGridLayout" name="senzor_status_grid">
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="line_tracking_visualization_grid">
+        <item>
+         <widget class="QLabel" name="line_tracking_left_label">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="line_tracking_middle_label">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="line_tracking_right_label">
+          <property name="text">
+           <string>TextLabel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="ultrasonic_label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Distance detected by ultrasonic sensor:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="line_tracking_label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Line status by line tracking sensor</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QProgressBar" name="ultrasonic_distance_indicator">
+        <property name="value">
+         <number>24</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="video_stream_label">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <layout class="QGridLayout" name="voice_grid">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="0" column="1" rowspan="2">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="gamepad_tab">
+       <attribute name="title">
+        <string>Gamepad</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="2">
+         <widget class="QPushButton" name="gamepad_stop_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="gamepad_start_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="gamepad_controls_label">
+          <property name="text">
+           <string>Controls:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="3">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="keyboard_tab">
+       <attribute name="title">
+        <string>Keyboard</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="2">
+         <widget class="QPushButton" name="keyboard_stop_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPushButton" name="keyboard_start_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="3">
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="keyboard_controls_label">
+          <property name="text">
+           <string>Controls:</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="wandering_tab">
+       <attribute name="title">
+        <string>Wandering</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0,0,0">
+        <item row="1" column="3">
+         <widget class="QPushButton" name="wandering_stop_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="4">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="wandering_start_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="wandering_label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Current state:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QPushButton" name="wandering_gazebo_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Use Gazebo</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QPushButton" name="wandering_adeept_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Use Adeept</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="3">
+         <widget class="QLabel" name="wandering_state_label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="wandering_controls_label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Controls:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QLabel" name="wandering_multiplier_label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Speed multiplier:</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="line_following_tab">
+       <attribute name="title">
+        <string>Line Following</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="3" column="0" colspan="4">
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="line_following_label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Current state:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="line_following_start_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Start</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QPushButton" name="line_following_stop_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QPushButton" name="line_following_adeept_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Use Adeept</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QPushButton" name="line_following_gazebo_button">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Use Gazebo</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QLabel" name="line_following_multiplier_label">
+          <property name="text">
+           <string>Speed multiplier:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="line_following_controls_label">
+          <property name="text">
+           <string>Controls</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" colspan="3">
+         <widget class="QLabel" name="line_following_state_label">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
