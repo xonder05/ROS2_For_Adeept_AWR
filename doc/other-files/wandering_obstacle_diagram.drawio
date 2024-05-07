@@ -1,0 +1,88 @@
+<mxfile host="app.diagrams.net" modified="2024-04-08T12:00:01.885Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0" etag="bwiP4m4ManvTxdIA1mTm" version="24.2.2" type="device">
+  <diagram name="Stránka-1" id="JD8dAoj7NXl2l0GK-vRz">
+    <mxGraphModel dx="2640" dy="1083" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="700" pageHeight="400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-5" value="" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-1385" y="-160.75" width="460" height="147.5" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-2" value="" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-1285" y="-387" width="560" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-4" value="" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-1160" y="-264.5" width="445" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="UPCtoeQ9_7aUuDPxApxn-14" target="UPCtoeQ9_7aUuDPxApxn-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-14" value="Obstacle Detection Event" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-1385" y="-347" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="UPCtoeQ9_7aUuDPxApxn-25" target="UPCtoeQ9_7aUuDPxApxn-26">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-25" value="reverse" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-1225" y="-347" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-32" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="UPCtoeQ9_7aUuDPxApxn-26" target="UPCtoeQ9_7aUuDPxApxn-28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-26" value="randomly choose direction" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-1065" y="-347" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="UPCtoeQ9_7aUuDPxApxn-28" target="UPCtoeQ9_7aUuDPxApxn-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-28" value="send turning command (90°)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-905" y="-347" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-49" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="UPCtoeQ9_7aUuDPxApxn-36" target="UPCtoeQ9_7aUuDPxApxn-41">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-36" value="send turning command (180°)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-1095" y="-227" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-38" value="DRIVE" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-905" y="-117" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-47" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="UPCtoeQ9_7aUuDPxApxn-41" target="UPCtoeQ9_7aUuDPxApxn-45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-41" value="obstacle?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-1365" y="-127" width="210" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-48" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="UPCtoeQ9_7aUuDPxApxn-45" target="UPCtoeQ9_7aUuDPxApxn-38">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-45" value="send turning command (90°)" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-1095" y="-117" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-35" value="obstacle?" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-940" y="-237" width="190" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-51" value="" style="endArrow=classic;html=1;rounded=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="UPCtoeQ9_7aUuDPxApxn-35" target="UPCtoeQ9_7aUuDPxApxn-36">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-1335" y="-197" as="sourcePoint" />
+            <mxPoint x="-1285" y="-247" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-52" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="UPCtoeQ9_7aUuDPxApxn-35" target="UPCtoeQ9_7aUuDPxApxn-38">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="-1335" y="-177" as="sourcePoint" />
+            <mxPoint x="-1285" y="-227" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-53" value="OBSTACLE" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-1050" y="-387" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-54" value="CHECK_FIRST_SIDE" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-1002.5" y="-264.5" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="UPCtoeQ9_7aUuDPxApxn-55" value="CHECK_SECOND_SIDE" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-1245" y="-47" width="150" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

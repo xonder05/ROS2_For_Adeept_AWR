@@ -1,0 +1,37 @@
+<mxfile host="app.diagrams.net" modified="2024-05-02T17:16:04.786Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0" etag="VNdEbgH9S-SGbf6oIgY2" version="24.2.7" type="device">
+  <diagram name="Stránka-1" id="fzQrTKtSGffQG8E5_SS7">
+    <mxGraphModel dx="1426" dy="785" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="500" pageHeight="200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Osc7wF1sRpcKzehfEPrX-1" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="30" y="15" width="270" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="Osc7wF1sRpcKzehfEPrX-2" value="Gazebo simulace" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="170" y="115" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Osc7wF1sRpcKzehfEPrX-3" value="Ovládání robota" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="40" y="45" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Osc7wF1sRpcKzehfEPrX-4" value="slam_toolbox&lt;div&gt;navigation2&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="170" y="45" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Osc7wF1sRpcKzehfEPrX-5" value="ros2_control" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="40" y="115" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Osc7wF1sRpcKzehfEPrX-6" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="300" y="15" width="170" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="Osc7wF1sRpcKzehfEPrX-7" value="Řízení komponent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="310" y="45" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Osc7wF1sRpcKzehfEPrX-8" value="Stacionární zařízení" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="30" y="15" width="120" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="Osc7wF1sRpcKzehfEPrX-9" value="Robot" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="300" y="15" width="50" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
