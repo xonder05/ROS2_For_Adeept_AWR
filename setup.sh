@@ -35,8 +35,8 @@ if [[ "$mode" == "m" ]]; then
 
     while
         echo "Install ROS2 Iron?"
-        echo "  d - Desktop version of ROS2 (Recomended for stationary device)"
-        echo "  b - Base version of ROS2 (Recomended for robot)"
+        echo "  d - Desktop version of ROS2 (Recommended for stationary device)"
+        echo "  b - Base version of ROS2 (Recommended for robot)"
         echo "  n - Don't install ROS2"
         read -p ": " install_ros
         ! [[ "$install_ros" =~ ^[dbn]$ ]]
@@ -44,16 +44,16 @@ if [[ "$mode" == "m" ]]; then
 
     while
         echo "Install python modules?"
-        echo "  c - Modules used by controllers (Recomended for stationary device)"
-        echo "  r - Modules for controlling hardware components (Recomended for robot)"
-        echo "  a - Both previous options (Recomended if you want to run controller nodes on robot)"
+        echo "  c - Modules used by controllers (Recommended for stationary device)"
+        echo "  r - Modules for controlling hardware components (Recommended for robot)"
+        echo "  a - Both previous options (Recommended if you want to run controller nodes on robot)"
         echo "  n - Skip modules installation"
         read -p ": " install_python
         ! [[ "$install_python" =~ ^[cran]$ ]]
     do echo "Unexpected value entered!"; done
 
     while
-        read -p "Install Gazebo Simulator? (requires instalation of ros2_control in the next step) [y/n]: " install_gazebo
+        read -p "Install Gazebo Simulator? (requires installation of ros2_control in the next step) [y/n]: " install_gazebo
         ! [[ "$install_gazebo" =~ ^[yn]$ ]]
     do echo "Unexpected value entered!"; done
 
@@ -113,7 +113,7 @@ while
 do pass; done
 
 #-------------------------------------------------------------------------------------------
-#Instalation
+#Installation
 
 sudo NEEDRESTART_SUSPEND=1 apt-get update -y
 

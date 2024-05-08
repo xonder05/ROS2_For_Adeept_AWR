@@ -60,7 +60,7 @@ class MotorControllerNode(Node):
                     self.waited = True
                     speed = 0.0
             elif abs(distance) < 0.3:
-                speed = 3.14
+                speed = 4.71
             elif abs(distance < 1):
                 speed = 4.71
             else:
