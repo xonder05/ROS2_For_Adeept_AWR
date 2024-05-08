@@ -149,7 +149,7 @@ if [[ "$install_python" =~ ^[cra]$ ]]; then
 
     if [[ "$install_python" =~ ^[ac]$ ]]; then
         sudo NEEDRESTART_SUSPEND=1 apt-get install portaudio19-dev -y
-        pip install PyQt5 pygame pynput sounddevice
+        pip install PyQt5 pygame pynput sounddevice transforms3d
     fi
 fi
 
