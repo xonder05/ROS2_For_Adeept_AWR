@@ -1,0 +1,76 @@
+<mxfile host="app.diagrams.net" modified="2024-04-08T09:25:46.153Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36 Edg/123.0.0.0" etag="AIsffNfphPIY32-occ4I" version="24.2.2" type="device">
+  <diagram name="Stránka-1" id="0_tW8jTlnt18CZD94Kqc">
+    <mxGraphModel dx="1678" dy="2424" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="800" pageHeight="300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="xlkPIfRlKNVEWd9A4Fhn-1" target="xlkPIfRlKNVEWd9A4Fhn-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-1" value="/ultrasonic_distance" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="45" y="-1480" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="xlkPIfRlKNVEWd9A4Fhn-2" target="xlkPIfRlKNVEWd9A4Fhn-8">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="325" y="-1380" />
+              <mxPoint x="325" y="-1450" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-2" value="/ultrasonic_obstacle_warning" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="45" y="-1410" width="180" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="xlkPIfRlKNVEWd9A4Fhn-3" target="xlkPIfRlKNVEWd9A4Fhn-8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-3" value="/ultrasonic_obstacle_disappearance_warning" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="45" y="-1340" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="xlkPIfRlKNVEWd9A4Fhn-4" target="xlkPIfRlKNVEWd9A4Fhn-8">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="345" y="-1240" />
+              <mxPoint x="345" y="-1450" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-4" value="/not_moving_warning" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="45" y="-1270" width="140" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-5" value="/cmd_vel" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="605" y="-1410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-6" value="motor_controller_node" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="-1340" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-7" value="/wandering_state" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="605" y="-1480" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="xlkPIfRlKNVEWd9A4Fhn-8" target="xlkPIfRlKNVEWd9A4Fhn-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="xlkPIfRlKNVEWd9A4Fhn-8" target="xlkPIfRlKNVEWd9A4Fhn-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="xlkPIfRlKNVEWd9A4Fhn-8" target="xlkPIfRlKNVEWd9A4Fhn-10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="555" y="-1450" />
+              <mxPoint x="555" y="-1312" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-8" value="wandering_node" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="365" y="-1490" width="140" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="xlkPIfRlKNVEWd9A4Fhn-10" target="xlkPIfRlKNVEWd9A4Fhn-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xlkPIfRlKNVEWd9A4Fhn-10" value="&lt;div&gt;&amp;lt;&amp;lt;action&amp;gt;&amp;gt;&lt;/div&gt;/motor_command" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;" vertex="1" parent="1">
+          <mxGeometry x="605" y="-1330" width="150" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

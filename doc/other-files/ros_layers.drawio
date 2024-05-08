@@ -1,0 +1,34 @@
+<mxfile host="app.diagrams.net" modified="2023-12-14T17:51:13.428Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0" etag="6aQUS-_mZ_u3EFS6STi3" version="22.1.9" type="device">
+  <diagram name="Stránka-1" id="sCroJCe1XbS3tSLlFUMv">
+    <mxGraphModel dx="1188" dy="654" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="400" pageHeight="300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="9XeqRqZYip71DmSKxlEP-1" value="Uživatelský Kód (packages, nodes)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="35" width="330" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9XeqRqZYip71DmSKxlEP-2" value="RCL - Implementace ROS2" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="35" y="120" width="330" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9XeqRqZYip71DmSKxlEP-3" value="DDS - Data Distribution Service" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="35" y="180" width="330" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9XeqRqZYip71DmSKxlEP-4" value="RCLPY" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="35" y="60" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9XeqRqZYip71DmSKxlEP-5" value="RCLCPP" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="95" y="60" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9XeqRqZYip71DmSKxlEP-6" value="RCLC" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="155" y="60" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9XeqRqZYip71DmSKxlEP-7" value="Další Klientské Knihovny" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="215" y="60" width="150" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="9XeqRqZYip71DmSKxlEP-8" value="Operační Systém" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="35" y="240" width="330" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
