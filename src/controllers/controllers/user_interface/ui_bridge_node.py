@@ -1,13 +1,12 @@
-import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import String
+from std_msgs.msg import Bool
+from std_msgs.msg import Float32
+from sensor_msgs.msg import CompressedImage
 from interfaces.msg import LineTracking
 from std_srvs.srv import SetBool 
-from std_msgs.msg import String
-from sensor_msgs.msg import CompressedImage
-from std_msgs.msg import Float32
-from interfaces.srv import SetFloat32
+from interfaces.srv import RGB
 
 import numpy as np
 
@@ -16,25 +15,28 @@ class UiBridgeNode(Node):
         super().__init__('ui_bridge_node')
 
         self.subscriber = self.create_subscription(CompressedImage, "/camera_stream", self.camera_callback, 10)
-        self.first = True
-
         self.subscriber = self.create_subscription(Float32, "/ultrasonic_distance", self.ultrasonic_callback, 10)
         self.subscriber = self.create_subscription(LineTracking, "/line_visibility", self.line_visibility_callback, 10)
-        
         self.subscriber = self.create_subscription(String, "/wandering_state", self.wandering_state_callback, 10)
         self.subscriber = self.create_subscription(String, "/line_following_state", self.line_following_state_callback, 10)
+
+        self.audio_out_toggle = self.create_publisher(Bool, "/control_transmitter_robot_receiver_toggle", 10)
+        self.audio_in_toggle = self.create_publisher(Bool, "/robot_transmitter_control_receiver_toggle", 10)
 
         self.gamepad_toggle_client = self.create_client(SetBool, "/toggle_gamepad")
         self.line_following_toggle_client = self.create_client(SetBool, "/toggle_line_following")
         self.wandering_toggle_client = self.create_client(SetBool, "/toggle_wandering")
         self.keyboard_toggle_client = self.create_client(SetBool, "/toggle_keyboard")
-        self.wandering_multiplier_client = self.create_client(SetFloat32, "/set_multiplier")
-        self.line_following_multiplier_client = self.create_client(SetFloat32, "/line_following_node/set_multiplier")
+        self.rgb_led_client = self.create_client(RGB, "/change_rgb_color")
 
         self.get_logger().info("InitDone")
 
     def put_window(self, qt):
         self.qt = qt
+
+    def camera_callback(self, msg: CompressedImage):
+        np_array = np.frombuffer(msg.data, np.uint8)
+        self.qt.update_image(np_array)
 
     def ultrasonic_callback(self, msg: Float32):
         self.qt.update_ultrasonic_label(msg.data)
@@ -48,54 +50,90 @@ class UiBridgeNode(Node):
     def line_following_state_callback(self, msg: String):
         self.qt.update_line_tracking_state_label(msg.data)
 
+    def keyboard_toggle(self, action):
+        count = 0
+        while not self.keyboard_toggle_client.wait_for_service(timeout_sec=1.0):
+            if count < 5: 
+                self.get_logger().info("service not available - waiting")
+                count += 1
+            else:
+                self.get_logger().info("timeout")
+                break
+        else:
+            request = SetBool.Request()
+            request.data = action
+            self.keyboard_toggle_client.call_async(request)
+
     def gamepad_toggle(self, action):        
+        count = 0
         while not self.gamepad_toggle_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("service not available waiting")
-
-        request = SetBool.Request()
-        request.data = action
-        self.gamepad_toggle_client.call_async(request)
-
-    def line_following_toggle(self, action):
-        while not self.line_following_toggle_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("service not available waiting")
-
-        request = SetBool.Request()
-        request.data = action
-        self.line_following_toggle_client.call_async(request)
+            if count < 5: 
+                self.get_logger().info("service not available - waiting")
+                count += 1
+            else:
+                self.get_logger().info("timeout")
+                break
+        else:
+            request = SetBool.Request()
+            request.data = action
+            self.gamepad_toggle_client.call_async(request)
 
     def wandering_toggle(self, action):
+        count = 0
         while not self.wandering_toggle_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("service not available waiting")
+            if count < 5: 
+                self.get_logger().info("service not available - waiting")
+                count += 1
+            else:
+                self.get_logger().info("timeout")
+                break
+        else:
+            request = SetBool.Request()
+            request.data = action
+            self.wandering_toggle_client.call_async(request)
 
-        request = SetBool.Request()
-        request.data = action
-        self.wandering_toggle_client.call_async(request)
+    def line_following_toggle(self, action):
+        count = 0
+        while not self.line_following_toggle_client.wait_for_service(timeout_sec=1.0):
+            if count < 5: 
+                self.get_logger().info("service not available - waiting")
+                count += 1
+            else:
+                self.get_logger().info("timeout")
+                break
+        else:
+            request = SetBool.Request()
+            request.data = action
+            self.line_following_toggle_client.call_async(request)
 
-    def keyboard_toggle(self, action):
-        while not self.keyboard_toggle_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("service not available waiting")
+    def change_rgb_color(self, color):
+        count = 0
+        while not self.rgb_led_client.wait_for_service(timeout_sec=1.0):
+            if count < 5: 
+                self.get_logger().info("service not available - waiting")
+                count += 1
+            else:
+                self.get_logger().info("timeout")
+                break
+        else:
+            request = RGB.Request()
+            request.r = color.red()
+            request.g = color.green()
+            request.b = color.blue()
+            self.rgb_led_client.call_async(request)
 
-        request = SetBool.Request()
-        request.data = action
-        self.keyboard_toggle_client.call_async(request)
+    def audio_microphone_toggle(self, mic_state):
+        msg = Bool()
+        if mic_state == "muted":
+            msg.data = True
+        else:
+            msg.data = False
+        self.audio_out_toggle.publish(msg)
 
-    def camera_callback(self, msg: CompressedImage):
-        np_array = np.frombuffer(msg.data, np.uint8)
-        self.qt.update_image(np_array)
-
-    def wandering_multipler(self, value):
-        while not self.wandering_multiplier_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("service not available waiting")
-
-        request = SetFloat32.Request()
-        request.data = value
-        self.wandering_multiplier_client.call_async(request)
-
-    def line_following_multipler(self, value):
-        while not self.line_following_multiplier_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info("service not available waiting")
-
-        request = SetFloat32.Request()
-        request.data = value
-        self.line_following_multiplier_client.call_async(request)
+    def audio_speaker_toggle(self, speaker_state):
+        msg = Bool()
+        if speaker_state == "muted":
+            msg.data = True
+        else:
+            msg.data = False
+        self.audio_in_toggle.publish(msg)

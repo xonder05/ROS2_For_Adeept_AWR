@@ -1,14 +1,3 @@
-simulator_motor:
-  ros__parameters:
-    gazebo_topic: "/drive_directions"
-    ros_topic: "/model/adeept_awr/cmd_vel"
-
-simulator_motor_bridge:
-  ros__parameters:
-    topic: "/model/adeept_awr/cmd_vel"
-    ros_message_type: "geometry_msgs/msg/Twist"
-    gazebo_message_type: "ignition.msgs.Twist"
-
 simulator_camera:
   ros__parameters:
     gazebo_topic: "/simulator_camera"
@@ -46,15 +35,33 @@ simulator_ultrasonic_bridge:
 
 simulator_line_tracking:
   ros__parameters:
-    gazebo_topic: "/line_tracking"
+    gazebo_topic: "/simulator_line_visibility"
     ros_topic: "/line_visibility"
-    left_sensor_name: "adeept_awr/left/line_tracking/camera"
-    middle_sensor_name: "adeept_awr/middle/line_tracking/camera"
-    right_sensor_name: "adeept_awr/right/line_tracking/camera"
-    line_detection_threshold: 50
+    left_sensor_name: "adeept_awr/base_link/line_tracking_left" #name of the frame
+    middle_sensor_name: "adeept_awr/base_link/line_tracking_middle"
+    right_sensor_name: "adeept_awr/base_link/line_tracking_right"
+    line_detection_threshold: 50 #grayscale value
 
 simulator_line_tracking_bridge:
   ros__parameters:
-    topic: "/line_tracking"
+    topic: "/simulator_line_visibility"
     ros_message_type: "sensor_msgs/msg/Image"
     gazebo_message_type: "gz.msgs.Image"
+
+simulator_lidar:
+  ros__parameters:
+    gazebo_topic: "/simulator_lidar"
+    ros_topic: "/scan"
+    frame_id: "lidar"
+
+simulator_lidar_bridge:
+  ros__parameters:
+    topic: "/simulator_lidar"
+    ros_message_type: "sensor_msgs/msg/LaserScan"
+    gazebo_message_type: "ignition.msgs.LaserScan"
+
+simulator_imu_bridge:
+  ros__parameters:
+    topic: "/simulator_imu"
+    ros_message_type: "sensor_msgs/msg/Imu"
+    gazebo_message_type: "ignition.msgs.IMU"

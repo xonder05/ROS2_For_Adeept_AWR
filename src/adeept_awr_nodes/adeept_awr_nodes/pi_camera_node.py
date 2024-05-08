@@ -32,6 +32,7 @@ class PiCameraNode(Node):
 
         self.get_logger().info("InitDone")
 
+    #captures image, compresses it and sends to topic
     def get_frame(self):
         ret, frame = self.cap.read()
 

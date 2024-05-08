@@ -2,8 +2,5 @@
 /build
 /install
 /log
-/src/**/__pycache__
 /launch/__pycache__
-/launch/build
-/launch/install
-/launch/log
+/src/**/__pycache__

@@ -3,7 +3,7 @@
 <package format="3">
   <name>gazebo_simulator_nodes</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>Contains worlds, launch files and bridges for Gazebo simulation. Also defines model of the Adeept AWR 4WD robot, which is used throughout the entire system.</description>
   <maintainer email="daniel.onderk@gmail.com">daniel</maintainer>
   <license>Apache-2.0</license>
 

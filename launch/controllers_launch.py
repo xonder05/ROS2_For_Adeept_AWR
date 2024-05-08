@@ -2,7 +2,6 @@ from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.substitutions import FindPackageShare
-from launch.substitutions import LaunchConfiguration
 
 def generate_launch_description():
     
@@ -33,6 +32,12 @@ def generate_launch_description():
         launch_arguments={'start_right_away': 'false'}.items()
     )
 
+    motor_controller = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("controllers"), '/launch', '/motor_controller_node_launch.py'
+        ])
+    )
+
     line_following = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             FindPackageShare("controllers"), '/launch', '/line_following_node_launch.py'
@@ -40,10 +45,27 @@ def generate_launch_description():
         launch_arguments={'start_right_away': 'false'}.items()
     )
 
+    controller_sound_receiver = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("adeept_awr_nodes"), '/launch', '/sound_transmitter_launch.py'
+        ]),
+        launch_arguments={'start_right_away': 'false', 'audio_stream_name':  '/control_transmitter_robot_receiver'}.items()
+    )
+    
+    controller_sound_transmitter = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            FindPackageShare("adeept_awr_nodes"), '/launch', '/sound_receiver_launch.py'
+        ]),
+        launch_arguments={'start_right_away': 'false', 'audio_stream_name':  '/robot_transmitter_control_receiver'}.items()
+    )
+
     return LaunchDescription([
         user_interface,
         keyboard,
         gamepad,
         wandering,
+        motor_controller,
         line_following,
+        controller_sound_receiver,
+        controller_sound_transmitter,
     ])

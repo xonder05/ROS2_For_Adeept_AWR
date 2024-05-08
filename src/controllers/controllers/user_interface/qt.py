@@ -1,10 +1,10 @@
-from PyQt5.QtWidgets import QMainWindow, QLabel, QPushButton, QColorDialog
+from PyQt5.QtWidgets import QMainWindow, QColorDialog
 from PyQt5 import uic
-from PyQt5.QtCore import QByteArray
-from PyQt5.QtGui import QPixmap, QImage, QImageReader, QColor
-from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen, QPainterPath
+from PyQt5.QtGui import QPixmap, QImage, QColor
+from PyQt5.QtGui import QPixmap, QPainter, QColor, QPen
 from PyQt5.QtCore import Qt
 
+from ament_index_python.packages import get_package_share_directory
 import controllers.user_interface.global_variables
 
 import math
@@ -12,10 +12,18 @@ import math
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        self.workspace_path = get_package_share_directory('controllers')
         self.initUI()
 
+    def put_node(self, node):
+        self.node = node
+
+    def closeEvent(self, event):
+        controllers.user_interface.global_variables.executeEventLoop = False
+        event.accept()
+
     def initUI(self):
-        uic.loadUi('/home/daniel/ros2_ws/src/controllers/controllers/user_interface/ui.ui', self)
+        uic.loadUi(self.workspace_path + '/controllers/user_interface/ui.ui', self)
 
         self.gamepad_start_button.clicked.connect(lambda: self.node.gamepad_toggle(True))
         self.gamepad_stop_button.clicked.connect(lambda: self.node.gamepad_toggle(False))
@@ -29,29 +37,32 @@ class MainWindow(QMainWindow):
         self.keyboard_start_button.clicked.connect(lambda: self.node.keyboard_toggle(True))
         self.keyboard_stop_button.clicked.connect(lambda: self.node.keyboard_toggle(False))
 
-        self.wandering_adeept_button.clicked.connect(lambda: self.node.wandering_multipler(2.0))
-        self.wandering_gazebo_button.clicked.connect(lambda: self.node.wandering_multipler(0.0))
-
-        self.line_following_adeept_button.clicked.connect(lambda: self.node.line_following_multipler(1.5))
-        self.line_following_gazebo_button.clicked.connect(lambda: self.node.line_following_multipler(1.0))
-
+        #3/5 of window width and keep 16:9
         self.camera_width = int(round((self.size().width() / 5) * 3, 0))
         self.camera_height = int((self.camera_width / 16) * 9)
 
-        self.video_stream_label.setPixmap(QPixmap("/home/daniel/ros2_ws/src/controllers/controllers/user_interface/camera_placeholder.png").scaled(self.camera_width, self.camera_height))
+        self.video_stream_label.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/camera_placeholder.png").scaled(self.camera_width, self.camera_height))
         self.video_stream_label.setScaledContents(True)
-
-        self.line_tracking_left_label.setPixmap(self.create_vector_image())
-        self.line_tracking_middle_label.setPixmap(self.create_vector_image())
-        self.line_tracking_right_label.setPixmap(self.create_vector_image())
 
         self.ultrasonic_distance_indicator.setMaximum(450)
         self.ultrasonic_distance_indicator.setValue(0)
         self.ultrasonic_distance_indicator.setFormat("")
 
-        # self.button = QPushButton('Pick a Color', self)
-        # self.button.clicked.connect(self.showColorDialog)
-        # self.button.setGeometry(50, 50, 200, 100)
+        self.line_tracking_left_label.setPixmap(self.create_vector_image())
+        self.line_tracking_middle_label.setPixmap(self.create_vector_image())
+        self.line_tracking_right_label.setPixmap(self.create_vector_image())
+
+        self.led_color_picker_button.clicked.connect(self.showColorDialog)
+
+        self.mic_state = "muted"
+        self.audio_microphone_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/mic_muted.svg").scaled(100, 100))
+        self.audio_microphone_label_button.setCursor(Qt.PointingHandCursor)
+        self.audio_microphone_label_button.mousePressEvent = self.audio_microphone_toggle
+
+        self.speaker_state = "muted"
+        self.audio_speaker_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
+        self.audio_speaker_label_button.setCursor(Qt.PointingHandCursor)
+        self.audio_speaker_label_button.mousePressEvent = self.audio_speaker_toggle
 
         self.show()
 
@@ -79,14 +90,32 @@ class MainWindow(QMainWindow):
 
     def update_line_tracking_state_label(self, state):
         self.line_following_state_label.setText(state)
-
-    def put_node(self, node):
-        self.node = node
-
-    def closeEvent(self, event):
-        controllers.user_interface.global_variables.executeEventLoop = False
-        event.accept()
     
+    def showColorDialog(self):
+        color = QColorDialog.getColor()
+        if color.isValid():
+            self.node.change_rgb_color(color)
+
+    def audio_microphone_toggle(self, event):
+        self.node.audio_microphone_toggle(self.mic_state)
+
+        if self.mic_state == "muted":
+            self.audio_microphone_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/mic.svg").scaled(100, 100))
+            self.mic_state = "unmuted"
+        else:
+            self.audio_microphone_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/mic_muted.svg").scaled(100, 100))
+            self.mic_state = "muted"
+
+    def audio_speaker_toggle(self, event):
+        self.node.audio_speaker_toggle(self.speaker_state)
+
+        if self.speaker_state == "muted":
+            self.audio_speaker_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/speaker.svg").scaled(100, 100))
+            self.speaker_state = "unmuted"
+        else:
+            self.audio_speaker_label_button.setPixmap(QPixmap(self.workspace_path + "/controllers/user_interface/speaker_muted.svg").scaled(100, 100))
+            self.speaker_state = "muted"
+
     def create_vector_image(self, filled=False):
         pixmap = QPixmap(int(self.size().width() / 25), int(self.size().width() / 25))
         pixmap.fill(Qt.transparent)
@@ -108,8 +137,3 @@ class MainWindow(QMainWindow):
         painter.end()
 
         return pixmap
-    
-    # def showColorDialog(self):
-    #     color = QColorDialog.getColor()
-    #     if color.isValid():
-    #         self.node.get_logger().info(f"selected color {color.name()}")

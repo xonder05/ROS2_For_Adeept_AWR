@@ -1,0 +1,9 @@
+<library path="adeept_awr_diffdrive_control_plugin">
+  <class name="adeept_awr_diffdrive_control_plugin/AdeeptDiffDriveHardware"
+         type="adeept_awr_diffdrive_control_plugin::AdeeptDiffDriveHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      The ros2_control DiffDrive plugin for full-bridge gpio pwm driven motors.
+    </description>
+  </class>
+</library>

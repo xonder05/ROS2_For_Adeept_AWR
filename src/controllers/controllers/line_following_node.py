@@ -5,7 +5,6 @@ from geometry_msgs.msg import Twist
 from interfaces.msg import LineTracking
 from std_srvs.srv import SetBool
 from std_msgs.msg import String
-from interfaces.srv import SetFloat32
 
 from enum import Enum
 
@@ -33,17 +32,15 @@ class LineFollowingNode(Node):
         self.start_right_away = self.get_parameter('start_right_away').get_parameter_value().bool_value
 
         self.line_visibility_subscriber = self.create_subscription(LineTracking, "/line_visibility", self.line_visibility_callback, 10)
-        self.publisher = self.create_publisher(Twist, "/drive_directions", 10)
+        self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         self.state_publisher = self.create_publisher(String, "/line_following_state", 10)
         self.toggle_service = self.create_service(SetBool, "/toggle_line_following", self.toggle_callback)
-        self.multiplier_service = self.create_service(SetFloat32, "/line_following_node/set_multiplier", self.multiplier_callback)
 
         self.timer = self.create_timer(0.01, self.fsm_next_state)
         if not self.start_right_away:
             self.timer.cancel()
 
         self.line_status = LineTracking()
-        self.multiplier = 1
         self.state = State.NO_LINE
         self.counter = 0
         self.last_direction = State.FORWARD_ALL
@@ -64,12 +61,6 @@ class LineFollowingNode(Node):
         response.success = True
         return response
 
-    #speed multiplier for adeept
-    def multiplier_callback(self, request: SetFloat32, response):
-        self.multiplier = request.data
-        response.success = True
-        return response
-
     #getting sensor readings from other node
     def line_visibility_callback(self, msg: LineTracking):
         self.line_status.left = msg.left
@@ -82,11 +73,11 @@ class LineFollowingNode(Node):
 
         self.next_state = State(status)
 
-        #what to do when lose line
+        #reaction to losing line
         if self.next_state == State.NO_LINE:
             self.counter += 1
             
-            #run for 5 seconds
+            #try to recover for 5 seconds
             if self.counter < 500:
                 self.next_state = self.state
 
@@ -104,6 +95,7 @@ class LineFollowingNode(Node):
         if self.next_state == State.UNALLOWED_STATE:
             self.next_state = self.state
 
+        #handling more than 90 deg angles (not good enough, could use better solution)
         if self.next_state in [State.STEER_LEFT, State.STEER_LIGHT_LEFT, State.STEER_RIGHT, State.STEER_LIGHT_RIGHT]:
             self.last_direction_counter = 0
             self.last_direction = self.next_state
@@ -128,39 +120,39 @@ class LineFollowingNode(Node):
             self.state_publisher.publish(String(data = self.state.name))
             
             msg = Twist()
-            msg.linear.x = 0.2 * self.multiplier
+            msg.linear.x = 0.2
             self.publisher.publish(msg)
 
         elif self.state == State.STEER_LIGHT_LEFT:
             self.state_publisher.publish(String(data = State.STEER_LIGHT_LEFT.name))
             
             msg = Twist()
-            msg.linear.x = 0.15 * self.multiplier
-            msg.angular.z = 1.256 * self.multiplier
+            msg.linear.x = 0.15
+            msg.angular.z = 1.256
             self.publisher.publish(msg)
 
         elif self.state == State.STEER_LEFT:
             self.state_publisher.publish(String(data = State.STEER_LEFT.name))
             
             msg = Twist()
-            msg.linear.x = 0.11 * self.multiplier
-            msg.angular.z = 3.14 * self.multiplier
+            msg.linear.x = 0.11
+            msg.angular.z = 3.14
             self.publisher.publish(msg)
 
         elif self.state == State.STEER_LIGHT_RIGHT:
             self.state_publisher.publish(String(data = State.STEER_LIGHT_RIGHT.name))
             
             msg = Twist()
-            msg.linear.x = 0.15 * self.multiplier
-            msg.angular.z = -1.57 * self.multiplier
+            msg.linear.x = 0.15
+            msg.angular.z = -1.57
             self.publisher.publish(msg)
 
         elif self.state == State.STEER_RIGHT:
             self.state_publisher.publish(String(data = State.STEER_RIGHT.name))
             
             msg = Twist()
-            msg.linear.x = 0.11 * self.multiplier
-            msg.angular.z = -3.14 * self.multiplier
+            msg.linear.x = 0.11
+            msg.angular.z = -3.14
             self.publisher.publish(msg)
         
         else:

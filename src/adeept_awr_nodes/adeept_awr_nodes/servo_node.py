@@ -14,13 +14,13 @@ class ServoNode(Node):
         self.declare_parameters(
             namespace='',
             parameters=[
-                ('control_board_channel', rclpy.Parameter.Type.INTEGER),
+                ('pwm_gen_channel', rclpy.Parameter.Type.INTEGER),
                 ('rotation_limit_up', rclpy.Parameter.Type.INTEGER),
                 ('rotation_limit_down', rclpy.Parameter.Type.INTEGER),
                 ('default_position', rclpy.Parameter.Type.INTEGER),
             ]
         )
-        self.control_board_channel = self.get_parameter('control_board_channel').get_parameter_value().integer_value
+        self.pwm_gen_channel = self.get_parameter('pwm_gen_channel').get_parameter_value().integer_value
         self.rotation_limit_up = self.get_parameter('rotation_limit_up').get_parameter_value().integer_value
         self.rotation_limit_down = self.get_parameter('rotation_limit_down').get_parameter_value().integer_value
         self.default_position = self.get_parameter('default_position').get_parameter_value().integer_value
@@ -73,7 +73,7 @@ class ServoNode(Node):
         direction = 1 if target_position > self.curr_servo_pos else -1
         for _ in range(self.curr_servo_pos, target_position, direction):
             self.curr_servo_pos += direction
-            self.pwm.set_pwm(self.control_board_channel, 0, self.curr_servo_pos)
+            self.pwm.set_pwm(self.pwm_gen_channel, 0, self.curr_servo_pos)
             yield self.curr_servo_pos
             time.sleep(0.05)
 
@@ -83,7 +83,7 @@ def main():
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
-        for value in node.moveToPos(node.default_position):
+        for _ in node.moveToPos(node.default_position):
             pass
         node.destroy_node()
     finally:

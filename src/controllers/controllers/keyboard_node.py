@@ -26,7 +26,7 @@ class KeyboardNode(Node):
         self.angular_speed = self.get_parameter('angular_speed').get_parameter_value().double_value
 
         self.service = self.create_service(SetBool, "/toggle_keyboard", self.toggle_callback)
-        self.publisher = self.create_publisher(Twist, "/drive_directions", 10)
+        self.publisher = self.create_publisher(Twist, "/cmd_vel", 10)
         self.servo_action_client = ActionClient(self, Servo, '/put_servo_to_pos')
 
         self.listener = keyboard.Listener(on_press=self.key_press_callback,on_release=self.key_release_callback)

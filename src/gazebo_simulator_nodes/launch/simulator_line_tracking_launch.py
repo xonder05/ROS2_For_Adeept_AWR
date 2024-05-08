@@ -15,7 +15,7 @@ def generate_launch_description():
     with open(config_file, 'r') as f:
         config_contents = yaml.safe_load(f)
 
-    simulator_ultrasonic = Node(
+    simulator_line_tracking = Node(
         package='gazebo_simulator_nodes',
         executable='simulator_line_tracking',
         parameters=[config_file]
@@ -27,12 +27,12 @@ def generate_launch_description():
         executable='parameter_bridge',
         arguments=[
             config_contents["simulator_line_tracking_bridge"]["ros__parameters"]["topic"] + '@' + 
-            config_contents["simulator_line_tracking_bridge"]["ros__parameters"]["ros_message_type"] + '@' + 
+            config_contents["simulator_line_tracking_bridge"]["ros__parameters"]["ros_message_type"] + '[' + 
             config_contents["simulator_line_tracking_bridge"]["ros__parameters"]["gazebo_message_type"]
         ]
     )
 
     return launch.LaunchDescription([
-        simulator_ultrasonic,
+        simulator_line_tracking,
         bridge,
     ])

@@ -19,7 +19,7 @@ setup(
     zip_safe=True,
     maintainer='daniel',
     maintainer_email='daniel.onderk@gmail.com',
-    description='TODO: Package description',
+    description='Contains nodes for controling hardware componennts of the Adeept AWR 4WD robot.',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
@@ -30,8 +30,9 @@ setup(
             "ultrasonic_node = adeept_awr_nodes.ultrasonic_node:main",
             "line_tracking_node = adeept_awr_nodes.line_tracking_node:main",
             "rgb_led_node = adeept_awr_nodes.rgb_led_node:main",
-            "sound_player_node = adeept_awr_nodes.sound_player_node:main",
-            "sound_recorder_node = adeept_awr_nodes.sound_recorder_node:main",
+            "sound_transmitter_node = adeept_awr_nodes.sound_transmitter_node:main",
+            "sound_receiver_node = adeept_awr_nodes.sound_receiver_node:main",
+            "imu_node = adeept_awr_nodes.imu_node:main",
         ],
     },
 )

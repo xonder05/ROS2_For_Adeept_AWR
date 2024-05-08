@@ -26,8 +26,6 @@ endif()
 find_package(rosidl_default_generators REQUIRED)
 
 set(msg_files
-  "msg/DriveDirections.msg"
-  "msg/UltrasonicDistance.msg"
   "msg/CameraFrame.msg"
   "msg/LineTracking.msg"
   "msg/SoundBlock.msg"
@@ -35,12 +33,11 @@ set(msg_files
 
 set(srv_files
   "srv/RGB.srv"
-  "srv/WebCommand.srv"
-  "srv/SetFloat32.srv"
   )
 
 set(action_files
   "action/Servo.action"
+  "action/MCC.action"
   )
 
 rosidl_generate_interfaces(${PROJECT_NAME}

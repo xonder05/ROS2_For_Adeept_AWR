@@ -4,14 +4,12 @@ from rclpy.node import Node
 from interfaces.msg import LineTracking
 
 import RPi.GPIO as GPIO
-import time
 
 class LineTrackerNode(Node):
 
     def __init__(self):
         super().__init__("line_tracking_node")
 
-        
         self.declare_parameters(
             namespace='',
             parameters=[
@@ -37,6 +35,7 @@ class LineTrackerNode(Node):
 
         self.get_logger().info("InitDone")
 
+    #this literally just publishes current state of the gpio lines
     def scanLine(self):
         msg = LineTracking()
         

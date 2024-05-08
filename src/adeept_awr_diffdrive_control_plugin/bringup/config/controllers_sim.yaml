@@ -1,0 +1,10 @@
+controller_manager:
+  ros__parameters:
+    use_sim_time: true
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+diff_drive_controller:
+  ros__parameters:
+    enable_odom_tf: true
